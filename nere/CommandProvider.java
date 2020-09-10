@@ -1,10 +1,9 @@
-package pico.chall.nere;
+package nere;
 
-import pico.chall.nere.unknownCommand;
+import nere.unknownCommand;
 
 @SuppressWarnings("unused")
 public interface CommandProvider {
-	public final String VERSION = "0.4.1 testing";
 	
 		
 	public default Object ErrorEventListener(Exception e) {

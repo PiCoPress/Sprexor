@@ -1,9 +1,9 @@
-package pico.chall.nere;
+package nere;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
-import pico.chall.nere.CommandProvider;
+import nere.CommandProvider;
 
 public class Nere {
 	protected static Vector<String> msg = new Vector<String>();
@@ -208,7 +208,7 @@ public class Nere {
 			
 				//---------------------------------------------------------------------------------------------
 				//---------------------------------------------------------------------------------------------
-				//--------------------------	Syntax Manager	-------------------------------
+				//--------------------------	Syntax	-------------------------------
 			
 				if(smod + mod + pr == 0) {
 				

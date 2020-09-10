@@ -1,4 +1,4 @@
-package pico.chall.nere;
+package nere;
 
 import java.io.BufferedReader;
 import java.io.IOException;

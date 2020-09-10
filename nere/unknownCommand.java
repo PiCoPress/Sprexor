@@ -1,4 +1,4 @@
-package pico.chall.nere;
+package nere;
 
 public class unknownCommand extends Exception {
 	/**
