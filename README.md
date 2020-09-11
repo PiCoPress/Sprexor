@@ -11,7 +11,7 @@
 
  - IOCenter
    - IOCenter ioc = new IOCenter(Nere nere); // IOCenter is load output from nere.
-   - Object[] getMessage() : return recent message.
+   - Object[] getMessage() : return recent message. index 0 : output, index 1 : TYPE
  
   - CommandProvider
     - public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove data that saved in GlobalData.)
