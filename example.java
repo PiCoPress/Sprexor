@@ -5,7 +5,7 @@ public class test {
 		Nere n = new Nere();
 		n.mkcmd("add", new CommandProvider() {
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped) {
+			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
 				int sum = 0;
 				for(String s : args) {
 					sum += Integer.parseInt(s);
@@ -15,7 +15,7 @@ public class test {
 		}, "add numbers\n11");
 		n.mkcmd("sum", new CommandProvider() {
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped) {
+			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
 				String a = "";
 				int c = 0;
 				for(String str : args) {
