@@ -8,10 +8,6 @@ class GlobalData {
 		obj = new HashMap<>();
 	}
 	
-	GlobalData(int i) {
-		obj = new HashMap<>();
-	}
-	
 	void putData(String key, Object value) {
 		obj.put(key, value);
 	}

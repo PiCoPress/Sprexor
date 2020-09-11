@@ -116,9 +116,8 @@ public class Nere {
 		 
 	}
 	
-	public void initRegistry(int size) {
-		if(size <= 0)return;
-		gd = new GlobalData(size);
+	public void initRegistry() {
+		gd = new GlobalData();
 	}
 	
 	public boolean isExist(String s) {
