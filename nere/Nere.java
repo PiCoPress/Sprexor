@@ -12,6 +12,10 @@ public class Nere {
 	private HashMap<String, String> helpDB;
 	private String list = "";
 	private String comment = "#";
+	
+	private GlobalData gd = null;
+	private boolean doBasicSyn = true;
+	
 	private HashMap<String, Object> envVar = new HashMap<String, Object>();
 	private boolean varMode = false;
 	private Vector<String> vec = new Vector<String>();
@@ -48,7 +52,7 @@ public class Nere {
 		 cmd.put("help",new CommandProvider() {
 
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped) {
+			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
 				String[] helpl = list.split("\n");
 				String Result = "";
 				int count = helpl.length - 1;
@@ -65,14 +69,14 @@ public class Nere {
 			}
 			@Override 
 			public Object no_arg_apply() {
-				return apply(new String[0], new boolean[0]);
+				return apply(new String[0], new boolean[0], null);
 			}
 		 });
 		 
 		 cmd.put("var", new CommandProvider() {
 
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped) {
+			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
 				if(args.length == 2) {
 					envVar.put(args[0],args[1]);
 					return args[1];
@@ -93,7 +97,7 @@ public class Nere {
 		 cmd.put("echo", new CommandProvider() {
 
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped) {
+			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
 				String sum = "";
 				for(String str : args) {
 					sum += str;
@@ -109,6 +113,12 @@ public class Nere {
 		 helpDB.put("help", "print this message.");
 		 helpDB.put("var","Define or declare a variable.");
 		 list += "help\nvar\n";
+		 
+	}
+	
+	public void initRegistry(int size) {
+		if(size <= 0)return;
+		gd = new GlobalData(size);
 	}
 	
 	public boolean isExist(String s) {
@@ -119,6 +129,7 @@ public class Nere {
 		return false;
 	}
 	
+	@Deprecated
 	public String getList() {
 		return list;
 	}
@@ -135,6 +146,9 @@ public class Nere {
 		if(!str.isEmpty())comment = str;
 	}
 	
+	public void execSyntax(boolean b) {
+		doBasicSyn = b;
+	}
 	
 	public void exec(String com) throws unknownCommand {
 		com = com.trim();
@@ -146,15 +160,39 @@ public class Nere {
 			return;
 		}
 		
+		if(gd == null) {
+			IOCenter.log("Err : GlobalData isn't formed.", IOCenter.ERR);
+			return;
+		}
 		com = com.substring(id.length() + 1) + " ";
 		
 		String[] comar = com.split("");
 		String[] args = new String[comar.length];
 		boolean[] wra = new boolean[comar.length];
 		short mod = 0, count = 0, pr = 0, smod = 0;
+		int allCount = 0;
+		
+		boolean cmtMode = false;
 		
 		String cache = "";
-		for(String c : comar) {
+		for(;allCount < comar.length; allCount ++) {
+			
+			String c = comar[allCount];
+			
+			if(cmtMode) {
+				if(c.equals(";")) {
+					cmtMode = false;
+					exec(com.substring(allCount + 1));
+					return;
+				}
+				continue;
+			}
+			
+			if(c.equals(";")) {
+				exec(com.substring(allCount + 1));
+				return;
+			}
+			
 			if(!varMode) {
 				if(mod + smod == 1 && c.equals("\\") && pr == 0) {
 					pr = 1;
@@ -206,14 +244,18 @@ public class Nere {
 			}
 			
 			
+			
 				//---------------------------------------------------------------------------------------------
 				//---------------------------------------------------------------------------------------------
 				//--------------------------	Syntax	-------------------------------
-			
+			if(doBasicSyn) {
 				if(smod + mod + pr == 0) {
 				
-					if(c.equals(comment) && mod == 0)break; // ---------------- comment
-				
+					if(c.equals(comment) && mod == 0) {
+						cmtMode = true;
+						continue; // ---------------- comment
+					}
+					
 					if(c.equals("@") && !varMode) {			//----------------- variable 
 						varMode = true;
 					}else {
@@ -235,7 +277,7 @@ public class Nere {
 						}
 							
 					}
-				
+				}
 			}
 			
 			cache += c;
@@ -249,10 +291,11 @@ public class Nere {
 		args = trimArr(args);
 		wra = trimArr(wra, count);
 		try {
-			res = obj.apply(args, wra);
+			res = obj.apply(args, wra, gd);
 		}catch(Exception e) {
 			res = obj.ErrorEventListener(e);
 		}
+		
 		IOCenter.log(res,IOCenter.CMT);
 	}
 }
