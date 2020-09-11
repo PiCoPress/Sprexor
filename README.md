@@ -14,7 +14,7 @@
    - Object[] getMessage() : return recent message.
  
   - CommandProvider
-    - public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove data that saved.)
+    - public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove data that saved in GlobalData.)
     - public default Object no_arg_apply() : this method will be called when argument of nere.exec is empty. (redefinable)
     - public default ErrorEventListener(Exception) : this method will be call when accur error in your code(from nere.mkcmd). (redefinable)
     
