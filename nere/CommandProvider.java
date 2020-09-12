@@ -1,10 +1,7 @@
 package nere;
 
-import nere.unknownCommand;
-
 @SuppressWarnings("unused")
 public interface CommandProvider {
-	
 		
 	public default Object ErrorEventListener(Exception e) {
 		return null;

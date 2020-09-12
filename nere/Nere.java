@@ -3,11 +3,13 @@ package nere;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
-import nere.CommandProvider;
 
 public class Nere {
-	protected static Vector<String> msg = new Vector<String>();
-	protected static Vector<String> err = new Vector<String>();
+	public final String VERSION = "0.1.2";
+	
+	//protected static Vector<String> msg = new Vector<String>();
+	//protected static Vector<String> err = new Vector<String>();
+	protected Vector<Object[]> MessageLog = null;
 	private HashMap<String, CommandProvider> cmd;
 	private HashMap<String, String> helpDB;
 	private String list = "";
@@ -17,7 +19,6 @@ public class Nere {
 	private boolean doBasicSyn = true;
 	
 	private HashMap<String, Object> envVar = new HashMap<String, Object>();
-	private boolean varMode = false;
 	private Vector<String> vec = new Vector<String>();
 	private String[] trimArr(String[] in) {
 		vec.clear();
@@ -39,6 +40,13 @@ public class Nere {
 		}
 		return false;
 	}
+	private void logger(Object oo, IOCenter.TYPE ii) {
+		Object[] eo = new Object[2];
+		eo[0] = oo;
+		eo[1] = ii;
+		MessageLog.add(eo);
+		IOCenter.recentMessage = eo;
+	}
 	
 	private String join(String t, String[] obj) {
 		String sumStr = "";
@@ -48,6 +56,7 @@ public class Nere {
 		return sumStr;
 	}
 	public Nere() {
+		MessageLog = new Vector<Object[]>();
 		 cmd = new HashMap<String, CommandProvider>();
 		 cmd.put("help",new CommandProvider() {
 
@@ -77,7 +86,9 @@ public class Nere {
 
 			@Override
 			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
-				if(args.length == 2) {
+				if(!doBasicSyn) return "Syntax is not permitted.";
+				
+					if(args.length == 2) {
 					envVar.put(args[0],args[1]);
 					return args[1];
 				}else if(args.length == 1) {
@@ -112,25 +123,28 @@ public class Nere {
 		 helpDB = new HashMap<String, String>();
 		 helpDB.put("help", "print this message.");
 		 helpDB.put("var","Define or declare a variable.");
-		 list += "help\nvar\n";
+		 helpDB.put("echo", "print text.");
+		 list += "help\nvar\necho\n";
 		 
 	}
 	
 	public void initRegistry() {
+		if(gd != null)return;
 		gd = new GlobalData();
 	}
 	
 	public boolean isExist(String s) {
 		String[] arr = list.split("\n");
 		for(String compareStr : arr) {
-			if(s.equals(compareStr))return true;
+			if(s.contentEquals(compareStr))return true;
 		}
 		return false;
 	}
 	
 	@Deprecated
 	public String getList() {
-		return list;
+		//return list;
+		return "";
 	}
 	
 	public void mkcmd(String str, CommandProvider cp, String hd) {
@@ -145,22 +159,29 @@ public class Nere {
 		if(!str.isEmpty())comment = str;
 	}
 	
-	public void execSyntax(boolean b) {
+	public void useSyntax(boolean b) {
 		doBasicSyn = b;
 	}
 	
-	public void exec(String com) throws unknownCommand {
+	public void exec(String com) throws CommandNotFoundException {
+		boolean varMode = false;
 		com = com.trim();
+		if(com.contentEquals(""))return;
+		else if(com.startsWith(comment))return;
+		else if(com.contentEquals(";")) {
+			exec(com.substring(1));
+			return;
+		}
 		String id = com.split(" ")[0];
-		if(!isExist(id))throw new unknownCommand(id, com);
+		if(!isExist(id))throw new CommandNotFoundException(id, com);
 		
 		if(com.indexOf(" ") == -1) {
-			IOCenter.log(cmd.get(id).no_arg_apply(), IOCenter.CMT);
+			logger(cmd.get(id).no_arg_apply(), IOCenter.STDOUT);
 			return;
 		}
 		
 		if(gd == null) {
-			IOCenter.log("Err : GlobalData isn't formed.", IOCenter.ERR);
+			logger("Err : GlobalData isn't formed.", IOCenter.ERR);
 			return;
 		}
 		com = com.substring(id.length() + 1) + " ";
@@ -171,6 +192,9 @@ public class Nere {
 		short mod = 0, count = 0, pr = 0, smod = 0;
 		int allCount = 0;
 		
+		String nextStr = "";
+		boolean nextFlag = false;
+		
 		boolean cmtMode = false;
 		
 		String cache = "";
@@ -179,21 +203,37 @@ public class Nere {
 			String c = comar[allCount];
 			
 			if(cmtMode) {
-				if(c.equals(";")) {
+				if(c.contentEquals(";")) {
 					cmtMode = false;
-					exec(com.substring(allCount + 1));
-					return;
+					nextFlag = true;
+					nextStr = com.substring(allCount + 1);
+					break;
 				}
 				continue;
 			}
 			
-			if(c.equals(";")) {
-				exec(com.substring(allCount + 1));
-				return;
+			if(c.contentEquals(";")) {
+				nextStr = com.substring(allCount + 1);
+				nextFlag = true;
+				if(varMode) {
+					if(envVar.get(cache.trim().substring(1)) != null) {
+						args[count ++] = envVar.get(cache.trim().substring(1)) + "";
+						wra[count] = false;
+						cache = "";
+					}else {
+						if(cache.trim().contentEquals("@")) {
+							logger("variable name is empty.",IOCenter.ERR);
+							return;
+						}
+						logger("could not find variable : " + cache.trim().substring(1),IOCenter.ERR);
+						return;
+					}
+				}
+				break;
 			}
 			
 			if(!varMode) {
-				if(mod + smod == 1 && c.equals("\\") && pr == 0) {
+				if(mod + smod == 1 && c.contentEquals("\\") && pr == 0) {
 					pr = 1;
 					continue;
 				}
@@ -220,7 +260,7 @@ public class Nere {
 						mod = 0;
 					}
 					continue;
-				}else if(c.equals("'")) {
+				}else if(c.contentEquals("'")) {
 					if(mod == 0 && smod == 0) {
 						wra[count] = true;
 						smod = 1;
@@ -250,31 +290,38 @@ public class Nere {
 			if(doBasicSyn) {
 				if(smod + mod + pr == 0) {
 				
-					if(c.equals(comment) && mod == 0) {
+					if(c.contentEquals(comment) && mod == 0) {
 						cmtMode = true;
+						args[count++] = cache;
+						wra[count] = false;
+						cache = "";
 						continue; // ---------------- comment
 					}
 					
-					if(c.equals("@") && !varMode) {			//----------------- variable 
+					if(c.contentEquals("@") && !varMode) {			//----------------- variable 
 						varMode = true;
 					}else {
 						if(varMode == true && c.contentEquals("@")) {
-							IOCenter.log("Wrong Systex @@, parse stopped : " + count,IOCenter.ERR);
+							logger("invalid value : '@@', parse stopped : " + count,IOCenter.ERR);
 							return;
 						}else if(varMode){
 							if(c.contentEquals(" ")) {
 								varMode = false;
-								if(envVar.get(cache.substring(1)) != null) {
-									args[count ++] = envVar.get(cache.substring(1)) + "";
+								if(envVar.get(cache.trim().substring(1)) != null) {
+									
+									args[count ++] = envVar.get(cache.trim().substring(1)) + "";
 									wra[count] = false;
 									cache = "";
 								}else {
-									IOCenter.log("could not get data : " + cache.substring(1),IOCenter.ERR);
+									if(cache.trim().contentEquals("@")) {
+										logger("variable name is empty.",IOCenter.ERR);
+										return;
+									}
+									logger("could not find variable : " + cache.trim().substring(1),IOCenter.ERR);
 									return;
 								}
 							}
 						}
-							
 					}
 				}
 			}
@@ -282,10 +329,12 @@ public class Nere {
 			cache += c;
 		}
 		if(mod != 0 || smod != 0 || pr != 0) {
-			IOCenter.log("Error : Wrong String Syntax .", IOCenter.ERR);
+			
+			logger("Error : invalid literal syntax.", IOCenter.ERR);
 			return;
 		}
 		Object res = null;
+		
 		CommandProvider obj = cmd.get(id);
 		args = trimArr(args);
 		wra = trimArr(wra, count);
@@ -294,7 +343,10 @@ public class Nere {
 		}catch(Exception e) {
 			res = obj.ErrorEventListener(e);
 		}
+		logger(res,IOCenter.STDOUT);
 		
-		IOCenter.log(res,IOCenter.CMT);
+		if(nextFlag) {
+			exec(nextStr);
+		}
 	}
 }

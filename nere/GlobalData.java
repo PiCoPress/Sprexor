@@ -2,25 +2,44 @@ package nere;
 
 import java.util.HashMap;
 
-class GlobalData {
-	HashMap<String, Object> obj = null;
+/*
+ * if last char of keyName is '_', read-only data that cannot modify or remove.
+ * 
+ */
+
+public class GlobalData {
+	private HashMap<String, Object> obj = null;
 	GlobalData(){
 		obj = new HashMap<>();
 	}
 	
-	void putData(String key, Object value) {
+	public boolean putData(String key, Object value) {
+		if(existKey(key))return false;
 		obj.put(key, value);
+		return true;
 	}
 	
-	Object getData(String key) {
+	public Object getData(String key) {
 		return obj.get(key);
 	}
 	
-	void removeData(String key) {
+	public boolean removeData(String key) {
+		if(key.toCharArray()[key.length() - 1] == '_')return false;
 		obj.remove(key);
+		return true;
 	}
 	
-	boolean existData(String key) {
+	public boolean existKey(String key) {
 		return obj.containsKey(key);
+	}
+	
+	public boolean existData(Object data) {
+		return obj.containsValue(data);
+	}
+	
+	public boolean modifyData(String key, Object data) {
+		if(existKey(key) || key.toCharArray()[key.length() -1] == '_')return false;
+		obj.replace(key, data);
+		return true;
 	}
 }
