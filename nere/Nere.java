@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 public class Nere {
-	public final String VERSION = "0.1.2";
+	public final String VERSION = "0.2.1";
 	
 	//protected static Vector<String> msg = new Vector<String>();
 	//protected static Vector<String> err = new Vector<String>();
