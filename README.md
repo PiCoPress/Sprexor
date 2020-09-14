@@ -1,4 +1,4 @@
-# Nere 0.2.3
+# Nere (Ne - r) 0.2.3
 - Nere
   - Nere nere = new Nere(); : init Nere.
   - boolean isExist(String) : check if command is exist.
