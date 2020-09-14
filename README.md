@@ -22,7 +22,7 @@
   - CommandProvider
     - public Object code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove data that saved in GlobalData.)
     - public default Object emptyArgs() : this method will be called when argument of nere.exec is empty. (redefinable)
-    - public default error(Exception) : this method will be call when accur error in your code(from nere.mkcmd). (redefinable)
+    - public default error(Exception) : this method will be call when accur error in your code(from nere.register). (redefinable)
     
   - Lib
     - String Processer(String opt) : use subprocess (window : exe, linux : sh)
