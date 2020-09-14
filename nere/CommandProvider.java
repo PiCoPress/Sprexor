@@ -3,14 +3,14 @@ package nere;
 @SuppressWarnings("unused")
 public interface CommandProvider {
 		
-	public default Object ErrorEventListener(Exception e) {
+	public default Object error(Exception e) {
 		return null;
 	}
-	public default Object no_arg_apply() {
-		return "NO_ARGUMENT : please implement this function.";
+	public default Object emptyArgs() {
+		return "argument is empty.";
 	};
 	
 	//public Object apply(String[] args);
 	//public Object apply(String[] args, boolean[] isWrapped);
-	public Object apply(String[] args, boolean[] isWrapped, GlobalData g);
+	public Object code(String[] args, boolean[] isWrapped, GlobalData scope);
 }

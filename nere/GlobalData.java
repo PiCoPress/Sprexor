@@ -7,15 +7,22 @@ import java.util.HashMap;
  * 
  */
 
-public class GlobalData {
+public final class GlobalData {
 	private HashMap<String, Object> obj = null;
+	private boolean flag = false;
+	
 	GlobalData(){
 		obj = new HashMap<>();
+	}
+	
+	protected HashMap<String, Object> getter() {
+		return obj;
 	}
 	
 	public boolean putData(String key, Object value) {
 		if(existKey(key))return false;
 		obj.put(key, value);
+		if(key.toCharArray()[key.length() - 1] == '_')flag = true;
 		return true;
 	}
 	
@@ -40,6 +47,17 @@ public class GlobalData {
 	public boolean modifyData(String key, Object data) {
 		if(existKey(key) || key.toCharArray()[key.length() -1] == '_')return false;
 		obj.replace(key, data);
+		return true;
+	}
+	
+	public boolean reset() {
+		if(flag)return false;
+		obj.clear();
+		return true;
+	}
+	
+	public boolean forceReset() {
+		obj.clear();
 		return true;
 	}
 }

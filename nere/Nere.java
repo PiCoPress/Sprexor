@@ -4,13 +4,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
+
+/*
+ * Nere : Command String Parser & Executor 0.2.3
+ *  copyright¨Ï  2020  by PICOPress, All rights reserved.
+ */
+
+
 public class Nere {
-	public final String VERSION = "0.2.1";
+	public final String VERSION = "0.2.3";
 	
 	//protected static Vector<String> msg = new Vector<String>();
 	//protected static Vector<String> err = new Vector<String>();
 	protected Vector<Object[]> MessageLog = null;
-	private HashMap<String, CommandProvider> cmd;
+	private int configType = 0;
+	private HashMap<String, CommandProvider> cmd = null;
 	private HashMap<String, String> helpDB;
 	private String list = "";
 	private String comment = "#";
@@ -20,6 +28,9 @@ public class Nere {
 	
 	private HashMap<String, Object> envVar = new HashMap<String, Object>();
 	private Vector<String> vec = new Vector<String>();
+	
+	protected Object[] recentMessage = null;
+	
 	private String[] trimArr(String[] in) {
 		vec.clear();
 		for(String eval : in) {
@@ -45,7 +56,7 @@ public class Nere {
 		eo[0] = oo;
 		eo[1] = ii;
 		MessageLog.add(eo);
-		IOCenter.recentMessage = eo;
+		recentMessage = eo;
 	}
 	
 	private String join(String t, String[] obj) {
@@ -58,34 +69,35 @@ public class Nere {
 	public Nere() {
 		MessageLog = new Vector<Object[]>();
 		 cmd = new HashMap<String, CommandProvider>();
+		 recentMessage = new Object[2];
+		 
 		 cmd.put("help",new CommandProvider() {
 
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
-				String[] helpl = list.split("\n");
+			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				String Result = "";
-				int count = helpl.length - 1;
-				for(String key : helpDB.keySet()) {
-					Result += helpl[count] + " - " + helpDB.get(key) + "\n";
-					count --;
+				if(isExist(args[0])) {
+						Result = helpDB.get(args[0]);
+				}else {
+					Result = "command not found.";
 				}
 				return Result.trim();
 			}
 			 
 			@Override
-			public Object ErrorEventListener(Exception e) {
+			public Object error(Exception e) {
 				return 1;
 			}
 			@Override 
-			public Object no_arg_apply() {
-				return apply(new String[0], new boolean[0], null);
+			public Object emptyArgs() {
+				return "blanked name.";
 			}
 		 });
 		 
 		 cmd.put("var", new CommandProvider() {
 
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
+			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				if(!doBasicSyn) return "Syntax is not permitted.";
 				
 					if(args.length == 2) {
@@ -95,12 +107,12 @@ public class Nere {
 					envVar.put(args[0],IOCenter.NO_VALUE);
 					return "NO_VALUE";
 				}else {
-					return no_arg_apply();
+					return emptyArgs();
 				}
 			}
 			
 			@Override
-			public Object no_arg_apply() {
+			public Object emptyArgs() {
 				return "USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"";
 			}
 		 });
@@ -108,7 +120,7 @@ public class Nere {
 		 cmd.put("echo", new CommandProvider() {
 
 			@Override
-			public Object apply(String[] args, boolean[] isWrapped, GlobalData gd) {
+			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				String sum = "";
 				for(String str : args) {
 					sum += str;
@@ -116,7 +128,7 @@ public class Nere {
 				return sum;
 			}
 			@Override
-			public Object no_arg_apply() {
+			public Object emptyArgs() {
 				return "";
 			}
 		});
@@ -128,17 +140,43 @@ public class Nere {
 		 
 	}
 	
-	public void initRegistry() {
+	public void importNere(nere.loadNere.BasicPackages.ImportTemplate t) {
+		if(configType != 0)return;
+		
+		cmd.putAll(t.cmds);
+		envVar.putAll(t.variables);
+		helpDB.putAll(t.help);
+		list += t.cmdLists;
+	}
+	
+	public void initScope() {
+		if(configType != 0)return;
 		if(gd != null)return;
 		gd = new GlobalData();
 	}
 	
 	public boolean isExist(String s) {
+		if(s.trim().contentEquals(""))return false;
 		String[] arr = list.split("\n");
+		boolean trace = false;
 		for(String compareStr : arr) {
-			if(s.contentEquals(compareStr))return true;
+			if(s.contentEquals(compareStr)) {
+				trace = true;
+				break;
+			}
 		}
+		if(trace)return true;
 		return false;
+	}
+	
+	public void send(String str, IOCenter.TYPE type) {
+		if(configType != 2)return;
+		IOCenter.log(str, type);
+		MessageLog.add(recentMessage);
+	}
+	
+	public void activate() {
+		if(configType == 0)configType = 2;
 	}
 	
 	@Deprecated
@@ -147,23 +185,53 @@ public class Nere {
 		return "";
 	}
 	
-	public void mkcmd(String str, CommandProvider cp, String hd) {
+	public void register(String str, CommandProvider cp, String hd) {
+		if(configType != 0)return;
 		if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]", "\s") || str.contentEquals(""))return;
 		cmd.put(str, cp);
 		list += str + "\n";
-		hd = join("\n", hd.split("\n"));
 		helpDB.put(str, hd);
 	}
 	
 	public void setComment(String str) {
+		if(configType != 0)return;
 		if(!str.isEmpty())comment = str;
 	}
 	
 	public void useSyntax(boolean b) {
+		if(configType != 0)return;
 		doBasicSyn = b;
 	}
 	
+	public void exec(String id, String[] args) {
+		if(configType != 2) {
+			recentMessage[0] = "Nere was not prepared yet.";
+			recentMessage[1] = IOCenter.ERR;
+			MessageLog.add(recentMessage);
+			return;
+		}
+		
+		Object res = null;
+		CommandProvider obj = cmd.get(id);
+		args = trimArr(args);
+		
+		try {
+			res = obj.code(args, new boolean[args.length], gd);
+		}catch(Exception e) {
+			res = obj.error(e);
+		}
+		
+		logger(res,IOCenter.STDOUT);
+	}
+	
 	public void exec(String com) throws CommandNotFoundException {
+		if(configType != 2) {
+			recentMessage[0] = "Nere was not prepared yet.";
+			recentMessage[1] = IOCenter.ERR;
+			MessageLog.add(recentMessage);
+			return;
+		}
+		
 		boolean varMode = false;
 		com = com.trim();
 		if(com.contentEquals(""))return;
@@ -176,7 +244,7 @@ public class Nere {
 		if(!isExist(id))throw new CommandNotFoundException(id, com);
 		
 		if(com.indexOf(" ") == -1) {
-			logger(cmd.get(id).no_arg_apply(), IOCenter.STDOUT);
+			logger(cmd.get(id).emptyArgs(), IOCenter.STDOUT);
 			return;
 		}
 		
@@ -185,6 +253,20 @@ public class Nere {
 			return;
 		}
 		com = com.substring(id.length() + 1) + " ";
+		
+		if(id.indexOf("#") != -1) {
+			Object res = null;
+			
+			CommandProvider obj = cmd.get(id);
+			try {
+				res = obj.code(new String[0], new boolean[0], gd);
+			}catch(Exception e) {
+				res = obj.error(e);
+			}
+			
+			logger(res,IOCenter.STDOUT);
+			return;
+		}
 		
 		String[] comar = com.split("");
 		String[] args = new String[comar.length];
@@ -244,7 +326,7 @@ public class Nere {
 					cache = "";
 					continue;
 				}
-			
+				// escape
 				if(c.contentEquals("\"")) {
 					if(mod == 0 && smod == 0) {
 						wra[count] = true;
@@ -339,12 +421,12 @@ public class Nere {
 		args = trimArr(args);
 		wra = trimArr(wra, count);
 		try {
-			res = obj.apply(args, wra, gd);
+			res = obj.code(args, wra, gd);
 		}catch(Exception e) {
-			res = obj.ErrorEventListener(e);
+			res = obj.error(e);
 		}
-		logger(res,IOCenter.STDOUT);
 		
+		logger(res,IOCenter.STDOUT);
 		if(nextFlag) {
 			exec(nextStr);
 		}
