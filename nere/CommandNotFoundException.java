@@ -4,6 +4,7 @@ public class CommandNotFoundException extends Exception {
 	/**
 	 * 
 	 */
+	
 	private static final long serialVersionUID = -1216453421057028085L;
 	
 	
