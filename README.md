@@ -2,13 +2,13 @@
 - Nere
   - Nere nere = new Nere(); : init Nere.
   - boolean isExist(String) : check if command is exist.
-  - String ~~ getList() ~~ : return list. @Deprecated
+  - String ~~getList()~~ : return list. @Deprecated
   - void setComment(String) : set comment.
   - void register(String str, CommandProvider cp, String hd) : str( command name), cp(refer below), hd(message to help)
   - void exec(String com) throws unknownCommand: execute command "com".
   - void exec(String id, String[] args)
   - void useSyntax(boolean b) : whether check basic syntax.
-  - void ~~ initScope() ~~ : @Deprecated because merged with constructor.
+  - void ~~initScope()~~ : @Deprecated because merged with constructor.
   - void importNere(nere.CommandProvider t | nere.CommandProvider[] t) : import Nere to nere(above) from t class.
   - void send(String, IOCenter.TYPE) : send instant message.
   - void activate() : should activate by this before use "exec" method. and if activate, it cannot setting properties.
