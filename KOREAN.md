@@ -1,4 +1,4 @@
-# 네어 (Nere) 0.2.3
+# 네어 (Nere) 0.2.4
 - Nere
   - Nere nere = new Nere(); : Nere 초기화
   - boolean isExist(String) : 이 커맨드가 존재하는지 확인합니다
@@ -8,8 +8,8 @@
   - void exec(String com) throws unknownCommand: com 인자를 맞아서 실행해줍니다.
   - void exec(String id, String[] args)
   - void useSyntax(boolean b) : 기본 문법을 검사할건지의 여부
-  - void initScope()
-  - void importNere(nere.loadNere.BasicPackages.ImportTemplate t) : t라는 매개변수로부터 Nere 를 임폴트합니다
+  - void initScope() @Deprecated (constructor 로 병합됨)
+  - void importNere(CommandProvider t | CommandProvider[] t) : t라는 클래스로부터 Nere 를 임폴트합니다
   - void send(String, IOCenter.TYPE) : 인스턴트 메세지를 전송합니다.
   - void activate() : 이것이 실행되어야만 exec메소드를 실행할 수 있으며, 만일 실행되었을 경우 상세 설정을 할 수 없습니다. (충돌 방지)
 
@@ -23,7 +23,9 @@
     - public Object code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(인자), isWrapped[i](arg[i]가 ' 또는 "로 묶였는지 여부), gd (GlobalData로부터 저장하거나 삭제할 수 있습니다. )
     - public default Object emptyArgs() : exec에서 들어온 매개변수가 없으면 실행됩니다. (재정의 가능)
     - public default error(Exception) : 오버라이드된 code 메소드에서 오류날 경우 이 메소드가 실행됩니다.(register로부터). (재정의 가능)
-    
+    - public default getCommandName() : 임폴트 전용 메소드
+    - public default String help() : 임폴트 전용 메소드
+
   - Lib
     - String Processer(String opt) : 서브프로세스 사용 (window : exe, linux : sh)
     - byte AnalOption(String, boolean[])
@@ -40,12 +42,12 @@
     - boolean reset()
     - boolean forceReset()
     
-  - nere.loadNere.BasicPackages : 이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
-    - ImportTemplate : constructor(HashMap<String, CommandProvider> cmds, HashMap<String, Object> variables, String cmdLists - 엔터로 끝나야함, HashMap<String, String> help)
-    - "example" 라는 커맨드가 존재합니다.
+  - nere.loadNere.BasicPackages implement nere.CommandProvider : 이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
+    - "example" 샘플입니다.
 
 ## basic feature
- - @(name) :  저장된 값을 불러옵니다.
- - var (name) (value) : 이름=값 으로 정의합니다.
- - echo
- - help : 기능 향상됨.
+  - @(name) :  저장된 값을 불러옵니다.
+  - var (name) (value) : 이름=값 으로 정의합니다.
+  - echo
+  - help : 기능 향상됨.
+  - delete (name) : 변수 삭제함

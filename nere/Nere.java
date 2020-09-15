@@ -1,18 +1,20 @@
 package nere;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
 
 /*
- * Nere : Command String Parser & Executor 0.2.3
+ * Nere : Command String Parser & Executor 0.2.4
  *  copyright¨Ï  2020  by PICOPress, All rights reserved.
  */
 
 
 public class Nere {
-	public final String VERSION = "0.2.3";
+	public static final String VERSION = "0.2.4";
 	
 	//protected static Vector<String> msg = new Vector<String>();
 	//protected static Vector<String> err = new Vector<String>();
@@ -26,7 +28,7 @@ public class Nere {
 	private GlobalData gd = null;
 	private boolean doBasicSyn = true;
 	
-	private HashMap<String, Object> envVar = new HashMap<String, Object>();
+	protected HashMap<String, Object> envVar;
 	private Vector<String> vec = new Vector<String>();
 	
 	protected Object[] recentMessage = null;
@@ -66,10 +68,12 @@ public class Nere {
 		}
 		return sumStr;
 	}
+	
 	public Nere() {
 		MessageLog = new Vector<Object[]>();
 		 cmd = new HashMap<String, CommandProvider>();
 		 recentMessage = new Object[2];
+		 envVar = new HashMap<String, Object>();
 		 
 		 cmd.put("help",new CommandProvider() {
 
@@ -132,30 +136,82 @@ public class Nere {
 				return "";
 			}
 		});
+		 
+		 cmd.put("delete", new nere.CommandProvider() {
+				@Override
+				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					for(String name : args) {
+						envVar.remove(name);
+					}
+					return "variables deleted.";
+				}
+				@Override
+				public Object emptyArgs() {
+					return "variable name is blank.";
+				}
+			});
+		 
 		 helpDB = new HashMap<String, String>();
 		 helpDB.put("help", "print this message.");
 		 helpDB.put("var","Define or declare a variable.");
 		 helpDB.put("echo", "print text.");
-		 list += "help\nvar\necho\n";
-		 
+		 helpDB.put("delete", "usage : delete (var1) (var2)....(var n)");
+		 list += "help\nvar\necho\ndelete\n";
+		 gd = new GlobalData();
 	}
 	
-	public void importNere(nere.loadNere.BasicPackages.ImportTemplate t) {
+	/**
+	 * 	import spesific commands in this Nere.
+	 * @param cmp : Other classes that implemented with CommandProvider
+	 * @return void
+	 * @since 0.2.3
+	 * @activate before.
+	 */
+	public void importNere(CommandProvider[] cmp) {
 		if(configType != 0)return;
 		
-		cmd.putAll(t.cmds);
-		envVar.putAll(t.variables);
-		helpDB.putAll(t.help);
-		list += t.cmdLists;
+		for(CommandProvider ccom : cmp) {
+			cmd.put(ccom.getCommandName(), (CommandProvider)ccom);
+			helpDB.put(ccom.getCommandName(), ccom.help());
+			list += ccom.getCommandName() + "\n";
+		}
 	}
 	
+	/**
+	 * 	import spesific command in this Nere. 
+	 * @param cmp : Other class that implemented with CommandProvider
+	 * @return void
+	 * @see nere.CommandProvider
+	 * @see nere.loadNere.BasicPackages
+	 * @since 0.2.3
+	 * @activate before.
+	 */
+	public void importNere(CommandProvider cmp) {
+		if(configType != 0)return;
+		cmd.put(cmp.getCommandName(), (CommandProvider)cmp);
+		helpDB.put(cmp.getCommandName(), cmp.help());
+		list += cmp.getCommandName() + "\n";
+	}
+	
+	/**
+	 * init Scope
+	 * @deprecated
+	 */
+	@Deprecated
 	public void initScope() {
 		if(configType != 0)return;
 		if(gd != null)return;
-		gd = new GlobalData();
 	}
 	
+	/**
+	 * check whether name is exist
+	 * @param s - command name.
+	 * @return return true if command name(s) is exist, other case false.
+	 * @since 0.2.0
+	 * @activate after.
+	 */
 	public boolean isExist(String s) {
+		if(configType != 2)return false;
 		if(s.trim().contentEquals(""))return false;
 		String[] arr = list.split("\n");
 		boolean trace = false;
@@ -169,12 +225,26 @@ public class Nere {
 		return false;
 	}
 	
+	/**
+	 * send a instant message.
+	 * @param str : message to send at IOCenter.
+	 * @param type : message type
+	 * @return void
+	 * @since 0.2.3
+	 * @see nere.IOCenter.TYPE
+	 * @activate after.
+	 */
 	public void send(String str, IOCenter.TYPE type) {
 		if(configType != 2)return;
 		IOCenter.log(str, type);
 		MessageLog.add(recentMessage);
 	}
 	
+	/**
+	 * Acivate to use method exec, and cannot set value of properties of this Nere.
+	 * @since 0.2.3
+	 * @activate before.
+	 */
 	public void activate() {
 		if(configType == 0)configType = 2;
 	}
@@ -185,6 +255,17 @@ public class Nere {
 		return "";
 	}
 	
+	/**
+	 * Register new command for work with java source that you programmed. new command name shouldn't be included special character like *, ^ etc...
+	 * <br> <br> it renamed mkcmd to register (when version is 0.2.3).<br>
+	 * <br> If activated, cannot use this.
+	 * @param str : command name that should not conain special characters. 
+	 * @param cp : CommandProvider
+	 * @param hd : help message.
+	 * @since 0.1
+	 * @see nere.CommandProvier
+	 * @activate before.
+	 */
 	public void register(String str, CommandProvider cp, String hd) {
 		if(configType != 0)return;
 		if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]", "\s") || str.contentEquals(""))return;
@@ -193,24 +274,42 @@ public class Nere {
 		helpDB.put(str, hd);
 	}
 	
+	/**
+	 * 
+	 * @param str : define annotate identifier character.
+	 * @since 0.1.5
+	 * @activate before.
+	 */
 	public void setComment(String str) {
 		if(configType != 0)return;
 		if(!str.isEmpty())comment = str;
 	}
-	
+	/**
+	 * 
+	 * @param b : true - on, false - off
+	 * @since 0.2.0
+	 * @activate before.
+	 */
 	public void useSyntax(boolean b) {
 		if(configType != 0)return;
 		doBasicSyn = b;
 	}
-	
-	public void exec(String id, String[] args) {
+	/**
+	 * execute command as non-parse.
+	 * @param id : command name
+	 * @param args : arguments
+	 * @throws CommandNotFoundException
+	 * @since 0.2.3
+	 * @activate after.
+	 */
+	public void exec(String id, String[] args)throws CommandNotFoundException {
 		if(configType != 2) {
 			recentMessage[0] = "Nere was not prepared yet.";
 			recentMessage[1] = IOCenter.ERR;
 			MessageLog.add(recentMessage);
 			return;
 		}
-		
+		if(!isExist(id))throw new CommandNotFoundException(id, id);
 		Object res = null;
 		CommandProvider obj = cmd.get(id);
 		args = trimArr(args);
@@ -223,7 +322,14 @@ public class Nere {
 		
 		logger(res,IOCenter.STDOUT);
 	}
-	
+	/**
+	 * It can execute command as powerful string parser, and it will be run that you configure.
+	 * @param com : command string to execute
+	 * @throws CommandNotFoundException
+	 * @see nere.CommandNotFoundException
+	 * @since 0.1
+	 * @activate after.
+	 */
 	public void exec(String com) throws CommandNotFoundException {
 		if(configType != 2) {
 			recentMessage[0] = "Nere was not prepared yet.";

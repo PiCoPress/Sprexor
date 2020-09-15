@@ -1,41 +1,25 @@
 package nere.loadNere;
 
-import java.util.HashMap;
-
-public class BasicPackages {
-	public static class ImportTemplate{
-		public HashMap<String, nere.CommandProvider> cmds;
-		public HashMap<String, Object> variables;
-		public String cmdLists;
-		public HashMap<String, String> help;
-		public ImportTemplate(HashMap<String, nere.CommandProvider> cmds, HashMap<String, Object> variables, String cmdLists, HashMap<String, String> help) {
-			this.cmds = cmds;
-			this.variables = variables;
-			this.cmdLists = cmdLists;
-			this.help = help;
-		}
+import nere.*;
+/**
+ * example Convenience Register Command Class. Before code(version 0.2.3's BasicPackages is toooo inefficient, so remade.)
+ * @author PICOPress
+ * @since 0.2.4
+ */
+public class BasicPackages implements CommandProvider{
+	public String getCommandName() {
+		return "example";
 	}
-	public static ImportTemplate get() {
-		HashMap<String, nere.CommandProvider> tmp = new HashMap<String, nere.CommandProvider>();
-		tmp.put("example", new nere.CommandProvider(){
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, nere.GlobalData scope) {
-				return args[0] + args[1] + args[2];
-			}
-			
-			@Override
-			public Object error(Exception e) {
-				return "error";
-			}
-			
-			@Override
-			public Object emptyArgs() {
-				return "argument empty.";
-			}
-		});
-		HashMap<String, String> h = ((new HashMap<String, String>()));
-		h.put("example", "example help.");
-		ImportTemplate im = new ImportTemplate(tmp, new HashMap<String, Object>(), "example\n", h);
-		return im;
+	
+	public String help() {
+		return "example helping message.";
+	}
+	
+	public static BasicPackages call() {
+		return new BasicPackages();
+	}
+	
+	public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+		return args;
 	}
 }

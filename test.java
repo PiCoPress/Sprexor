@@ -1,5 +1,7 @@
 import nere.*;
 
+import nere.loadNere.BasicPackages;
+
 public class test {
 	public static void main(String[] args) {
 		Nere n = new Nere();
@@ -34,8 +36,7 @@ public class test {
 			}
 		}, "view detail");
 		
-		n.initScope();
-		n.importNere(nere.loadNere.BasicPackages.get());
+		n.importNere(BasicPackages.call());
 		n.activate();
 		
 		IOCenter i = new IOCenter(n);
@@ -46,7 +47,7 @@ public class test {
 			n.exec("var a 1444 ;var b 6");
 			System.out.println(i.getMessage()[0]);
 			n.exec("sum 1 21 @a @b;add @a @b");
-			n.exec("help echo");
+			n.exec("help example");
 		} catch (CommandNotFoundException e) {
 			System.out.println(e);
 		}

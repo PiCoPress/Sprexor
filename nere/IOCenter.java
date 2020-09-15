@@ -2,6 +2,11 @@ package nere;
 
 import java.util.Vector;
 
+/**
+ * Standard Internal Output Center
+ * @author PICOPress
+ * @since 0.1.2
+ */
 public class IOCenter {
 	private static Nere nere;
 	
@@ -31,10 +36,17 @@ public class IOCenter {
 	public IOCenter(Nere ne) {
 		nere = ne;
 	}
+	/**
+	 * return recent Message.
+	 * @return Object[2], index 1 : message<br>index 2 : message TYPE
+	 */
 	public Object[] getMessage() {
 		return nere.recentMessage;
 	}
-	
+	/**
+	 * return all of message.
+	 * @return Vector<Object[2]>,  index 1 : message<br>index 2 : message TYPE
+	 */
 	public Vector<Object[]> getOutput(){
 		return nere.MessageLog;
 	}
