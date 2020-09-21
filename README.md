@@ -1,4 +1,6 @@
 # Sprexor - 0.2.7 Beta
+String Parser & Executor
+S      p r      ex    or
 - Sprexor
   - Sprexor spr = new Sprexor(); : Sprexor constructor.
   - boolean isExist(String) : check if command is exist.
