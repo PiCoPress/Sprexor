@@ -1,5 +1,5 @@
 # Sprexor - 0.2.7 Beta
-String Parser & Executor
+String Parser & Executor<br>
 S      p r      ex    or
 - Sprexor
   - Sprexor spr = new Sprexor(); : Sprexor constructor.
