@@ -1,10 +1,10 @@
-import nere.*;
+import sprexor.*;
 
-import nere.loadNere.BasicPackages;
+import sprexor.cosmos.BasicPackages;
 
 public class test {
 	public static void main(String[] args) {
-		Nere n = new Nere();
+		Sprexor n = new Sprexor();
 		n.register("add", new CommandProvider() {
 			@Override
 			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
@@ -27,6 +27,7 @@ public class test {
 			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				String a = "";
 				int c = 0;
+				n.call("entry_on"); // It will be enter the EntryMode.
 				for(String str : args) {
 					a += str + " : " + c + "\n";
 					c ++;
@@ -34,9 +35,13 @@ public class test {
 				n.send("sum running...", IOCenter.CMT);
 				return a;
 			}
+			@Override
+			public Object EntryMode(String msg) {
+				return msg.length();
+			}
 		}, "view detail");
 		
-		n.importNere(BasicPackages.call());
+		n.importSprex(BasicPackages.call());
 		n.activate();
 		
 		IOCenter i = new IOCenter(n);
@@ -46,8 +51,9 @@ public class test {
 			System.out.println(i.getMessage()[0]);
 			n.exec("var a 1444 ;var b 6");
 			System.out.println(i.getMessage()[0]);
-			n.exec("sum 1 21 @a @b;add @a @b");
-			n.exec("help example");
+			n.exec("sum 1 21 @a @b;add @a @b"); //here
+			//i.exitEntry();
+			n.exec("help example ; delete a;echo @a");
 		} catch (CommandNotFoundException e) {
 			System.out.println(e);
 		}

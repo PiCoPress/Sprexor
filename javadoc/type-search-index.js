@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"sprexor.cosmos","l":"BasicPackages"},{"p":"sprexor","l":"CommandNotFoundException"},{"p":"sprexor","l":"CommandProvider"},{"p":"sprexor","l":"GlobalData"},{"p":"sprexor","l":"IOCenter"},{"p":"sprexor","l":"Sprexor"},{"p":"sprexor","l":"Tools"}]
