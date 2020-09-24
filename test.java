@@ -1,9 +1,10 @@
 import sprexor.*;
-
 import sprexor.cosmos.BasicPackages;
+import java.util.Scanner;
 
 public class test {
 	public static void main(String[] args) {
+		Scanner s = new Scanner(System.in);
 		Sprexor n = new Sprexor();
 		n.register("add", new CommandProvider() {
 			@Override
@@ -37,7 +38,8 @@ public class test {
 			}
 			@Override
 			public Object EntryMode(String msg) {
-				return msg.length();
+				
+				return msg;
 			}
 		}, "view detail");
 		
@@ -46,21 +48,16 @@ public class test {
 		
 		IOCenter i = new IOCenter(n);
 		try {
-			//n.useSyntax(false);
-			n.exec("add 12 1 1 11");
-			System.out.println(i.getMessage()[0]);
-			n.exec("var a 1444 ;var b 6");
-			System.out.println(i.getMessage()[0]);
-			n.exec("sum 1 21 @a @b;add @a @b"); //here
-			//i.exitEntry();
-			n.exec("help example ; delete a;echo @a");
-		} catch (CommandNotFoundException e) {
+			while(true) {
+				String ss = s.nextLine();
+				if(ss.trim().contentEquals("exit"))break;
+				n.exec(ss);
+				for(Object[] o : i.getBlockMessage()) {
+					System.out.println(o[0] + " - " + o[1]);
+				}
+			}
+		} catch (CommandNotFoundException | SprexorException e) {
 			System.out.println(e);
-		}
-		System.out.println(i.getMessage()[0] + "\n--------\n");
-		
-		for(Object[] o : i.getOutput()) {
-			System.out.println(o[0]);
 		}
 	}
 }

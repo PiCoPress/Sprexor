@@ -43,7 +43,17 @@ public class IOCenter {
 	public Object[] getMessage() {
 		return sp.recentMessage;
 	}
-	
+	/**
+	 * return all of message that printed in Sprexor.exec method. This range is smaller than range of getOutput().
+	 * @return Vector
+	 */
+	public Vector<Object[]> getBlockMessage() {
+		return sp.blockMessage;
+	}
+	/**
+	 * exit entry mode
+	 * @since 0.2.7
+	 */
 	public void exitEntry() {
 		sp.entryMode = false;
 		sp.entryId = "";
@@ -52,6 +62,7 @@ public class IOCenter {
 	/**
 	 * return all of message.
 	 * @return Vector(Object[2]),  index 1 : message<br>index 2 : message TYPE
+	 * @since 0.2.1
 	 */
 	public Vector<Object[]> getOutput(){
 		return sp.MessageLog;
