@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Sprexor - 0.2.10
 =================
 
@@ -147,4 +146,3 @@ S...........p.r.............ex........or
 *entry mode is useful feature. It is similar concept that type command "cat" in the linux.*
 =======
 * entry mode is useful feature. It is similar concept that type command "cat" in the linux.
->>>>>>> 6a906e8b5de53a7d6815629c7df54abf99476a05
