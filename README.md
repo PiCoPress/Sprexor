@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Sprexor - 0.2.10
 =================
 
@@ -57,8 +56,7 @@ Sprexor - 0.2.10
   <br>
   
 #### GlobalData 
-- if last character of key name is '_', this data would be read-only. 
-
+	if last character of key name is '_', this data would be read-only.
 	GlobalData gd = new GlobalData()
 	void putData(String key, Object value)
 	Object getData(String key)
@@ -71,8 +69,7 @@ Sprexor - 0.2.10
   <br>
   
 #### BasicPackages
-+ Let you know how to use this and it will be added many features.
-
+	Let you know how to use this and it will be added many features.
 	"example" command exists.
   <br>
   
