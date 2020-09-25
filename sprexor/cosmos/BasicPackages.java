@@ -2,7 +2,7 @@ package sprexor.cosmos;
 
 import sprexor.*;
 /**
- * example Convenience Register Command Class. Before code(version 0.2.3's BasicPackages is toooo inefficient, so remade.)
+ * example Convenience Register Command Class.
  * @author PICOPress
  * @since 0.2.4
  */
