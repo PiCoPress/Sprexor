@@ -17,7 +17,7 @@ Sprexor - 0.2.10
 
 #### Sprexor
 
->Sprexor(void | boolean) : Sprexor constructor. If argument is true, basic command(help, echo, var delete) will not be defined.
+>Sprexor(void | boolean) : Sprexor constructor. If argument is false, basic command(help, echo, var delete) will not be defined.
 
 >boolean isExist() check if command is exist.
 
