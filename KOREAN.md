@@ -12,7 +12,7 @@
 9. [메뉴얼](#menual)
 
 
-####Sprexor
+#### Sprexor
 
 >Sprexor s = new Sprexor(); : 스프렉서 초기화
 
@@ -41,7 +41,7 @@
 >void setInterruptChar(String|char) : 파싱중에 설정된 문자가 있을 경우 그 문자를 기준으로 강제 종료합니다.
 	
 	
-####IOCenter
+#### IOCenter
 
 >코드의 꼬임을 방지하기 위해 만든 클래스
 
@@ -58,7 +58,7 @@
 >>Vector<Object[]> getBlockMessage() : 'exec'메서드가 실행되는 동안 출력된 모든 결과를 반환합니다. 즉, 함수 단위로 저장됩니다.
 	
 	
-####CommandProvider
+#### CommandProvider
 
 >public Object code(String [] args, boolean[] isWrapped, GlobalData gd) : arg(인자), isWrapped [i] (arg[i]가 ' 또는 "로 묶였는지 여부), gd (GlobalData로부터 저장하거나 삭제할 수 있습니다. )
 
@@ -73,7 +73,7 @@
 >public default Object EntryMode(String msg) : 이 메서드의 반환 값이 null이 아닐 경우 그 엔트리 모드가 끝날 때까지 이 메서드가 실행됩니다. (확장 용이성)
     
     
-####Tools
+#### Tools
 
 >String Processer(String opt) : 서브프로세스 사용 (window : exe, linux : sh)
 
@@ -84,7 +84,7 @@
 >String[] binder (문자열 배열, 시작값) : 문자열 배열에서 사직값부터 마지막 값까지 묶어 반환합니다.
     
     
-####GlobalData
+#### GlobalData
 
 >이것은 CommandProvider의 code 메소드의 매개변수 중 하나입니다. 각 명령어마다 접근할 수 있는 하나의 스코프이며, 규칙은 어느 데이터를 삭제하거나 바꾸고자 할 경우 그 키의 이름의 마지막 글자가 _이면 읽기 전용이라고 정했습니다. 따라서 삭제나 변경은 불가능합니다.
 
@@ -107,16 +107,16 @@
 >>boolean forceReset() : 스코프에 읽기 전용인 데이터가 있어도 무시하고 전부 초기화합니다.
     
     
-####Standard library
+#### Standard library
 
-#####BasicBackages
+##### BasicBackages
 
 >이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
 
 >>"example" 샘플입니다.
 	
 	
-####Exception
+#### Exception
 
 >SprexorException
 
