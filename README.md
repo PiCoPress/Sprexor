@@ -67,7 +67,7 @@ Sprexor - 0.2.10
 
 >>public default Object emptyArgs() : this method will be called when argument of Sprexor.exec is empty. (redefinable)
 
->>public default error(Exception) : this method will be call when accur error in your code(from Sprexor.register). (redefinable)
+>>public default error(Exception) : this method will be call when occurred error in your code(from Sprexor.register). (redefinable)
 
 >>public default getCommandName() : for importSprex.
 
