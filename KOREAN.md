@@ -140,7 +140,7 @@
 # Menual
 
 1. *new 생성자로 객체 생성*<br>
-** java Sprexor sp = new Sprexor()** 또는 **Sprexor sp = new Sprexor(false)** <span style="color:green">// 매개변수가 false 이면 help, echo, var, delete 와 같은 기본 명령어가 등록되지 않습니다.</span><br>   
+**java Sprexor sp = new Sprexor()** 또는 **Sprexor sp = new Sprexor(false)** <span style="color:green">// 매개변수가 false 이면 help, echo, var, delete 와 같은 기본 명령어가 등록되지 않습니다.</span><br>   
 2. *여러가지의 내부 설정*<br>
     - **useSyntax** : 매개변수가 false이면 기본 문법을 사용하지 않도록 설정하고, true라면 기본 문법을 사용하도록 설정합니다.
     - **setComment** : 주석으로 사용할 문자를 정합니다. 문법 사용이 false 라면 소용이 없습니다. 

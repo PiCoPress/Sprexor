@@ -132,7 +132,7 @@ Sprexor - 0.2.10
 ---
 # Menual
 1. *create object by 'new constructor'*<br>
-** java Sprexor sp = new Sprexor()** 또는 **Sprexor sp = new Sprexor(false)** <span style="color:green">// If parameter is false, does not register basic commands are help, echo, var, and delete.</span><br>   
+**java Sprexor sp = new Sprexor()** 또는 **Sprexor sp = new Sprexor(false)** <span style="color:green">// If parameter is false, does not register basic commands are help, echo, var, and delete.</span><br>   
 2. *property settings*<br>
     - **useSyntax** : If parameter is false, cannot use syntax(variable, comment etc..) and true, explicitly can use syntax.
     - **setComment** : set character to use comment. If 'useSyntax' is false, so non-effect anything. 
@@ -144,7 +144,7 @@ Sprexor - 0.2.10
     <br>   
 3. *calling activate*<br>
 If this method is called, then you cannot set property settings, and prepare to run command.<br>   
-4. *receiving message by IOCenter *<br>
+4. *receiving message by IOCenter*<br>
 IOCenter io = new IOCenter(sp) <span style="color:green">//it read all of message, set message type to send, and let out from entry mode to force.
     - **getMessage** : return the message to Object[2] first index: msg, second : msg type(STDOUT, ERR, CMT, NO_VALUE, custom1~3). And unit is 'command'.
     - **getBlockMessage** : return the message to Vector. And unit is 'method'.
