@@ -1,6 +1,7 @@
 package sprexor;
 
 public class CommandNotFoundException extends Exception {
+	
 	/**
 	 * 
 	 */

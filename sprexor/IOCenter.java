@@ -19,6 +19,7 @@ public class IOCenter {
 		custom2,
 		custom3,
 	}
+	
 	public static TYPE ERR = TYPE.ERR;
 	public static TYPE CMT = TYPE.CMT;
 	public static TYPE STDOUT = TYPE.STDOUT;

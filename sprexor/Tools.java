@@ -17,6 +17,8 @@ public class Tools{
 		return true;
 	}
 	
+	public static final String VOID = "";
+	
 	public static String Processor(String opt) {
 		String res = "";
 		try {
@@ -78,5 +80,29 @@ public class Tools{
 		if(tmp.trim().isEmpty())return (String[]) v.toArray();
 		v.add(tmp);
 		return (String[]) v.toArray();
+	}
+	
+	public static CommandProvider[] toCPClass(CommandProvider...cp) {
+		return cp;
+	}
+	
+	public static String arg2String(String[] args) {
+		String tmp = "";
+		for(String str : args) tmp += str;
+		return tmp;
+	}
+	
+	public static String[] excludeArr(String[] arg, int a) {
+		String[] tmp = {};
+		int le = arg.length;
+		int count = 0;
+		
+		for(int i = 0; i < le; i ++) {
+			if(a == i) continue;
+			tmp[count] = arg[i];
+			count ++;
+		}
+		if(arg.length <= 1)tmp[0] = arg[0];
+		return tmp;
 	}
 }

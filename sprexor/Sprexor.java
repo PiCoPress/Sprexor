@@ -5,16 +5,12 @@ import java.util.HashMap;
 import java.util.Vector;
 
 /*
- * Sprexor : the String Parser & Executor 0.2.10
+ * Sprexor : the String Parser & Executor 0.2.11
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 
-
 public class Sprexor {
-	public static final String VERSION = "0.2.10";
-	
-	//protected static Vector<String> msg = new Vector<String>();
-	//protected static Vector<String> err = new Vector<String>();
+	public static final String VERSION = "0.2.11";
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -27,6 +23,8 @@ public class Sprexor {
 	private boolean doBasicSyn = true;
 	private Vector<String> vec = new Vector<String>();
 	private boolean errorIn = false;
+	private boolean dosem = true;
+	private boolean isInit = true;
 	private SprexorException pfe;
 	protected Object[] recentMessage = null;
 	protected HashMap<String, Object> envVar;
@@ -43,12 +41,14 @@ public class Sprexor {
 		}
 		return Arrays.copyOf(vec.toArray(), vec.size(), String[].class);
 	}
+	
 	private boolean[] trimArr(boolean[] in, int num) {
 		boolean[] tmp = new boolean[num];
 		for(int i = 0; i < num; i ++)tmp[i] = in[i];
 		
 		return tmp;
 	}
+	
 	private boolean fil(String ch, String...tar) {
 		for(String t : tar) {
 			if(ch.indexOf(t) != -1)return true;
@@ -60,11 +60,11 @@ public class Sprexor {
 		Object[] oe = new Object[2];
 		oe[0] = oo.toString().trim();
 		oe[1] = ii;
-		if(oo == null)return;
 		MessageLog.add(oe);
 		blockMessage.add(oe);
 		recentMessage = oe;
 	}
+	
 	@SuppressWarnings("unused")
 	private String join(String t, String[] obj) {
 		String sumStr = "";
@@ -79,229 +79,41 @@ public class Sprexor {
 		 cmd = new HashMap<String, CommandProvider>();
 		 recentMessage = new Object[2];
 		 envVar = new HashMap<String, Object>();
-		 
-		 cmd.put("help",new CommandProvider() {
-
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-				String Result = "";
-				if(isExist(args[0])) {
-						Result = helpDB.get(args[0]);
-				}else {
-					Result = " ";
-				}
-				return Result.trim();
-			}
-			 
-			@Override
-			public Object error(Exception e) {
-				return 1;
-			}
-			@Override 
-			public Object emptyArgs() {
-				return "blanked name.";
-			}
-		 });
-		 
-		 cmd.put("var", new CommandProvider() {
-
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-				if(!doBasicSyn) return "Syntax is not permitted.";
-				
-					if(args.length == 2) {
-					envVar.put(args[0],args[1]);
-					return args[1];
-				}else if(args.length == 1) {
-					envVar.put(args[0],IOCenter.NO_VALUE);
-					return "NO_VALUE";
-				}else {
-					return emptyArgs();
-				}
-			}
-			
-			@Override
-			public Object emptyArgs() {
-				return "USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"";
-			}
-		 });
-		 
-		 cmd.put("echo", new CommandProvider() {
-
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-				String sum = "";
-				for(String str : args) {
-					sum += str;
-				}
-				return sum;
-			}
-			@Override
-			public Object emptyArgs() {
-				return "";
-			}
-		});
-		 
-		 cmd.put("delete", new CommandProvider() {
-				@Override
-				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-					for(String name : args) {
-						envVar.remove(name);
-					}
-					if(args.length == 1) {
-						System.out.println(args[0]);
-						envVar.remove(args[0]);
-					}
-					return "variable(s) deleted.";
-				}
-				@Override
-				public Object emptyArgs() {
-					return "variable name is blank.";
-				}
-			});
-		 
 		 helpDB = new HashMap<String, String>();
-		 helpDB.put("help", "print this message.");
-		 helpDB.put("var","Define or declare a variable.");
-		 helpDB.put("echo", "print text.");
-		 helpDB.put("delete", "usage : delete (var1) (var2)....(var n)");
-		 list += "help\nvar\necho\ndelete\n";
-		 gd = new GlobalData();
-	}
-	
-	public Sprexor(boolean assignBasicFeatures) {
-		MessageLog = new Vector<Object[]>();
-		 cmd = new HashMap<String, CommandProvider>();
-		 recentMessage = new Object[2];
-		 envVar = new HashMap<String, Object>();
-		 if(!assignBasicFeatures)return;
-		 cmd.put("help",new CommandProvider() {
-
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-				String Result = "";
-				if(isExist(args[0])) {
-						Result = helpDB.get(args[0]);
-				}else {
-					Result = " ";
-				}
-				return Result.trim();
-			}
-			 
-			@Override
-			public Object error(Exception e) {
-				return 1;
-			}
-			@Override 
-			public Object emptyArgs() {
-				return "blanked name.";
-			}
-		 });
-		 
-		 cmd.put("var", new CommandProvider() {
-
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-				if(!doBasicSyn) return "Syntax is not permitted.";
-				
-					if(args.length == 2) {
-					envVar.put(args[0],args[1]);
-					return args[1];
-				}else if(args.length == 1) {
-					envVar.put(args[0],IOCenter.NO_VALUE);
-					return "NO_VALUE";
-				}else {
-					return emptyArgs();
-				}
-			}
-			
-			@Override
-			public Object emptyArgs() {
-				return "USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"";
-			}
-		 });
-		 
-		 cmd.put("echo", new CommandProvider() {
-
-			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-				String sum = "";
-				for(String str : args) {
-					sum += str;
-				}
-				return sum;
-			}
-			@Override
-			public Object emptyArgs() {
-				return "";
-			}
-		});
-		 
-		 cmd.put("delete", new CommandProvider() {
-				@Override
-				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-					for(String name : args) {
-						envVar.remove(name);
-					}
-					if(args.length == 1) {
-						envVar.remove(args[0]);
-					}
-					return "variable(s) deleted.";
-				}
-				@Override
-				public Object emptyArgs() {
-					return "variable name is blank.";
-				}
-			});
-		 
-		 helpDB = new HashMap<String, String>();
-		 helpDB.put("help", "print this message.");
-		 helpDB.put("var","Define or declare a variable.");
-		 helpDB.put("echo", "print text.");
-		 helpDB.put("delete", "usage : delete (var1) (var2)....(var n)");
-		 list += "help\nvar\necho\ndelete\n";
-		 gd = new GlobalData();
-	}
-	
-	/**
-	 * 	import spesific commands in this sprexor. Activate before.
-	 * @param cmp : Other classes that implemented with CommandProvider
-	 
-	 * @since 0.2.3
-	 */
-	public void importSprex(CommandProvider[] cmp) {
-		if(configType != 0)return;
-		
-		for(CommandProvider ccom : cmp) {
-			cmd.put(ccom.getCommandName(), (CommandProvider)ccom);
-			helpDB.put(ccom.getCommandName(), ccom.help());
-			list += ccom.getCommandName() + "\n";
-		}
 	}
 	
 	/**
 	 * 	import spesific command in this sprexor. Activate before.
 	 * @param cmp : Other class that implemented with CommandProvider
-	 
 	 * @see sprexor.CommandProvider
 	 * @see sprexor.cosmos.BasicPackages
 	 * @since 0.2.3
 	 */
 	public void importSprex(CommandProvider cmp) {
 		if(configType != 0)return;
-		cmd.put(cmp.getCommandName(), (CommandProvider)cmp);
-		helpDB.put(cmp.getCommandName(), cmp.help());
-		list += cmp.getCommandName() + "\n";
+		if(cmp.referenceClass() == null) {
+			cmd.put(cmp.getCommandName(), (CommandProvider)cmp);
+			helpDB.put(cmp.getCommandName(), cmp.help());
+			list += cmp.getCommandName() + "\n";
+		}else {
+			CommandProvider[] re = cmp.referenceClass();
+			for(CommandProvider cp : re) {
+				String tmpname = cp.getCommandName();
+				if(isExist(tmpname))return;
+				else if(tmpname.matches("\n|\r|#|@"))return;
+				
+				cmd.put(tmpname, cp);
+				helpDB.put(tmpname, cp.help());
+				list += tmpname + "\n";
+			}
+		}
 	}
 	
-	/**
-	 * init Scope
-	 * @deprecated
-	 */
 	@Deprecated
 	public void initScope() {
 		if(configType != 0)return;
 		if(gd != null)return;
+		gd = new GlobalData();
 	}
 	
 	/**
@@ -310,11 +122,14 @@ public class Sprexor {
 	 * @return return true if command name(s) is exist, other case false.
 	 * @since 0.2.0
 	 */
+	
 	public boolean isExist(String s) {
 		if(configType != 2)return false;
 		if(s.trim().contentEquals(""))return false;
+		
 		String[] arr = list.split("\n");
 		boolean trace = false;
+		
 		for(String compareStr : arr) {
 			if(s.contentEquals(compareStr)) {
 				trace = true;
@@ -324,12 +139,19 @@ public class Sprexor {
 		if(trace)return true;
 		return false;
 	}
+	/**
+	 * basic features are not assigned.
+	 * @since 0.2.11
+	 */
+	public void unBasicFeatures() {
+		if(configType != 0)return;
+		isInit = false;
+	}
 	
 	/**
 	 * send a instant message. Activate after.
 	 * @param str : message to send at IOCenter.
 	 * @param type : message type
-	 
 	 * @since 0.2.3
 	 * @see sprexor.IOCenter.TYPE
 	 */
@@ -347,6 +169,106 @@ public class Sprexor {
 	 */
 	public void activate() {
 		if(configType == 0)configType = 2;
+		else return;
+		if(!isInit)return;
+		 cmd.put("help",new CommandProvider() {
+				@Override
+				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					String Result = "";
+					if(isExist(args[0])) {
+							Result = helpDB.get(args[0]);
+					}else {
+						Result = " ";
+					}
+					return Result.trim();
+				}
+				@Override
+				public Object error(Exception e) {
+					return 1;
+				}
+				@Override 
+				public Object emptyArgs() {
+					return "blanked name.";
+				}
+			 });
+			 cmd.put("var", new CommandProvider() {
+				@Override
+				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					if(!doBasicSyn) return "Syntax is not permitted.";
+					if(args.length == 2) {	
+						if(envVar.containsKey(args[0]))envVar.replace(args[0], args[1]);
+						else envVar.put(args[0],args[1]);
+						return args[1];
+					}else if(args.length == 1) {
+						if(envVar.containsKey(args[0]))envVar.replace(args[0], IOCenter.NO_VALUE);
+						else envVar.put(args[0],IOCenter.NO_VALUE);
+						return "NO_VALUE";
+					}else {
+						return emptyArgs();
+					}
+				}
+				
+				@Override
+				public Object emptyArgs() {
+					return "USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"";
+				}
+			 });
+			 cmd.put("echo", new CommandProvider() {
+				@Override
+				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					String sum = "";
+					for(String str : args) {
+						sum += str;
+					}
+					return sum;
+				}
+				
+				@Override
+				public Object emptyArgs() {
+					return "";
+				}
+			});
+			 
+			 cmd.put("delete", new CommandProvider() {
+					@Override
+					public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+						for(String name : args) {
+							envVar.remove(name);
+						}
+						if(args.length == 1) {
+							
+							System.out.println(args[0]);
+							envVar.remove(args[0]);
+						}
+						return "variable(s) deleted.";
+					}
+					
+					@Override
+					public Object emptyArgs() {
+						return "variable name is blank.";
+					}
+				});
+			 
+			 cmd.put("commands", new CommandProvider() {
+
+				@Override
+				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					return list;
+				}
+				
+				@Override
+				public Object emptyArgs() {
+					return list;
+				}
+			 });
+			 
+			 helpDB.put("help", "print this message.");
+			 helpDB.put("var","Define or declare a variable.");
+			 helpDB.put("echo", "print text.");
+			 helpDB.put("delete", "usage : delete (var1) (var2)....(var n)");
+			 helpDB.put("commands", "print all commands.");
+			 list += "help\nvar\necho\ndelete\ncommands\n";
+			 gd = new GlobalData();
 	}
 	
 	@Deprecated
@@ -354,6 +276,7 @@ public class Sprexor {
 		//return list;
 		return "";
 	}
+	
 	/**
 	 * If run it, throw error(SorexorExcepion etc..) instead of output message.
 	 */
@@ -374,11 +297,13 @@ public class Sprexor {
 	 */
 	public void register(String str, CommandProvider cp, String hd) {
 		if(configType != 0)return;
+		
 		if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]", "\s") || str.contentEquals(""))return;
 		cmd.put(str, cp);
 		list += str + "\n";
 		helpDB.put(str, hd);
 	}
+	
 	/**
 	 * set Interrupt Character like Ctrl + C
 	 * @param ch - character
@@ -388,6 +313,7 @@ public class Sprexor {
 		if(configType != 0)return;
 		InterruptChar = ch + "";
 	}
+	
 	/**
 	 * set Interrupt Character like Ctrl + C
 	 * @param ch - String that length is  one.
@@ -397,6 +323,14 @@ public class Sprexor {
 		if(ch.length() != 0)return;
 		if(configType != 0)return;
 		InterruptChar = ch;
+	}
+	/**
+	 * If this function is run, ignore ';' when parsing.
+	 * @since 0.2.11
+	 */
+	public void unSemicolon() {
+		if(configType != 0)return;
+		dosem = false;
 	}
 	
 	/**
@@ -408,6 +342,7 @@ public class Sprexor {
 		if(configType != 0)return;
 		if(!str.isEmpty())comment = str;
 	}
+	
 	/**
 	 * 
 	 * @param b : true - on, false - off. Activate before.
@@ -417,6 +352,7 @@ public class Sprexor {
 		if(configType != 0)return;
 		doBasicSyn = b;
 	}
+	
 	/**
 	 * It is method to control this system. Activate after.
 	 * @param value : the key value, "entry_on" and "entry_off" is available.
@@ -428,12 +364,12 @@ public class Sprexor {
 		case "entry_on":
 			doEntry = true;
 		break;
-		
 		case "entry_off":
 			doEntry = false;
 		break;
 		}
 	}
+	
 	/**
 	 * execute command as non-parse. Activate after.
 	 * @param id : command name
@@ -449,19 +385,39 @@ public class Sprexor {
 			else throw new SprexorException(pfe.ACTIVATION_FAILED, "");
 			return;
 		}
+		
 		if(!isExist(id))throw new CommandNotFoundException(id, id);
 		Object res = null;
 		CommandProvider obj = cmd.get(id);
 		args = trimArr(args);
-		
 		try {
 			res = obj.code(args, new boolean[args.length], gd);
 		}catch(Exception e) {
 			res = obj.error(e);
 		}
-		
 		logger(res,IOCenter.STDOUT);
 	}
+	
+	public void exec(String id, String[] args, boolean[] isWrapped)throws CommandNotFoundException, SprexorException {
+		if(configType != 2) {
+			blockMessage.clear();
+			if(!errorIn)logger("sprexor was not prepared yet.", IOCenter.ERR);
+			else throw new SprexorException(pfe.ACTIVATION_FAILED, "");
+			return;
+		}
+		
+		if(!isExist(id))throw new CommandNotFoundException(id, id);
+		Object res = null;
+		CommandProvider obj = cmd.get(id);
+		args = trimArr(args);
+		try {
+			res = obj.code(args, isWrapped, gd);
+		}catch(Exception e) {
+			res = obj.error(e);
+		}
+		logger(res,IOCenter.STDOUT);
+	}
+	
 	/**
 	 * It can execute command as powerful string parser, and it will be run that you configure. Activate after.
 	 * @param com : command string to execute
@@ -476,6 +432,7 @@ public class Sprexor {
 			MessageLog.add(recentMessage);
 			return;
 		}
+		
 		if(entryMode) {
 			blockMessage.clear();
 			if(!doEntry) {
@@ -495,6 +452,7 @@ public class Sprexor {
 			if(!errorIn)logger(id + " : command not found.", IOCenter.ERR);
 			else throw new CommandNotFoundException(id, com);
 			return;
+			
 		}else if(com.contentEquals("")) {
 			blockMessage.clear();
 			return;
@@ -503,6 +461,7 @@ public class Sprexor {
 			blockMessage.clear();
 			return;
 		}
+		
 		else if(id.indexOf(";") != -1) {
 			blockMessage.clear();
 			String[] tmpo = com.split(";");
@@ -527,11 +486,10 @@ public class Sprexor {
 			logger("Err : GlobalData isn't formed.", IOCenter.ERR);
 			return;
 		}
-		com = com.substring(id.length() + 1) + " ";
 		
-		if(id.indexOf("#") != -1) {
+		com = com.substring(id.length() + 1) + " ";
+		if(id.indexOf(comment) != -1) {
 			Object res = null;
-			
 			CommandProvider obj = cmd.get(id);
 			try {
 				res = obj.code(new String[0], new boolean[0], gd);
@@ -548,22 +506,24 @@ public class Sprexor {
 		boolean[] wra = new boolean[comar.length];
 		short mod = 0, count = 0, pr = 0, smod = 0;
 		int allCount = 0;
-		
 		String nextStr = "";
 		if(nextFlag)nextFlag = false; else blockMessage.clear();
 		boolean lastSpace = false;
 		boolean cmtMode = false;
-		
 		String cache = "";
+		
+		//Parse start
 		for(;allCount < comar.length; allCount ++) {
 			
 			String c = comar[allCount];
 			if(c.contentEquals(InterruptChar))return;
 			if(cmtMode) {
-				if(c.contentEquals(";")) {
+				
+				if(c.contentEquals(";") && dosem) {
 					cmtMode = false;
 					nextFlag = true;
 					nextStr = com.substring(allCount + 1);
+					
 					if((!lastSpace) && !cache.trim().contentEquals("")) {
 						args[count ++] = cache;
 						cache = "";
@@ -573,9 +533,10 @@ public class Sprexor {
 				continue;
 			}
 			
-			if(c.contentEquals(";") && mod + smod == 0) {
+			if(c.contentEquals(";") && mod + smod == 0 && dosem) {
 				nextStr = com.substring(allCount + 1);
 				nextFlag = true;
+				
 				if(varMode) {
 					if(envVar.get(cache.trim().substring(1)) != null) {
 						args[count++] = envVar.get(cache.trim().substring(1)) + "";
@@ -588,12 +549,14 @@ public class Sprexor {
 							else throw new SprexorException(pfe.EXPRSS_ERR, "variable name is empty.");
 							return;
 						}
+						
 						blockMessage.clear();
 						if(!errorIn)logger("could not find variable : " + cache.trim().substring(1),IOCenter.ERR);
 						else throw new SprexorException(pfe.VARIABLE_ERR, cache.trim());
 						return;
 					}
 				}
+				
 				if((!lastSpace) && !cache.trim().contentEquals("")) {
 					args[count ++] = cache;
 					cache = "";
@@ -606,7 +569,7 @@ public class Sprexor {
 					pr = 1;
 					continue;
 				}
-			
+				
 				if(c.contentEquals(" ") && smod == 0 && mod == 0) {
 					if(cache.trim().isEmpty())continue;
 					args[count ++] = cache.trim();
@@ -614,6 +577,7 @@ public class Sprexor {
 					lastSpace = true; 
 					continue;
 				}
+				
 				// escape
 				if(c.contentEquals("\"")) {
 					if(mod == 0 && smod == 0) {
@@ -630,6 +594,7 @@ public class Sprexor {
 						mod = 0;
 					}
 					continue;
+					
 				}else if(c.contentEquals("'")) {
 					if(mod == 0 && smod == 0) {
 						wra[count] = true;
@@ -646,32 +611,64 @@ public class Sprexor {
 					}
 					continue;
 				}else if(pr == 1) {
-					cache += "\\";
-					pr = 0;
-					continue;
+					if(c.contentEquals("n")){
+						if(mod == 0 && smod == 0) {
+							wra[count] = true;
+							smod = 1;
+						}else {
+							if(pr == 1) {
+								pr = 0;
+								cache += "\n";
+								continue;
+							}else if(mod == 1) {
+								cache +=  "\n";
+							}
+							smod = 0;
+						}
+						continue;
+					}else if(c.contentEquals("t")){
+						if(mod == 0 && smod == 0) {
+							wra[count] = true;
+							smod = 1;
+						}else {
+							if(pr == 1) {
+								pr = 0;
+								cache += "\t";
+								continue;
+							}else if(mod == 1) {
+								cache +=  "\t";
+							}
+							smod = 0;
+						}
+						continue;
+					}
+					
+					else {
+						cache += "\\";
+						pr = 0;
+						continue;
+					}
 				}
 			}
+			
 			lastSpace  = false;
-			
-			
 			if(doEntry) {
 				break;
 			}
-			
 				//---------------------------------------------------------------------------------------------
 				//---------------------------------------------------------------------------------------------
 				//--------------------------	Syntax	-------------------------------------------------------
 			if(doBasicSyn) {
 				if(smod + mod + pr == 0) {
-				
+					
 					if(c.contentEquals(comment) && mod == 0) {
+						
 						cmtMode = true;
 						args[count++] = cache;
 						wra[count] = false;
 						cache = "";
 						continue; // ---------------- comment
 					}
-					
 					if(c.contentEquals("@") && !varMode) {			//----------------- variable 
 						varMode = true;
 					}else {
@@ -695,6 +692,7 @@ public class Sprexor {
 										else throw new SprexorException(pfe.EXPRSS_ERR, "variable name is empty.");
 										return;
 									}
+									
 									blockMessage.clear();
 									if(!errorIn)logger("could not find a variable : " + cache.trim().substring(1),IOCenter.ERR);
 									else throw new SprexorException(pfe.VARIABLE_ERR, cache.trim());
@@ -705,20 +703,21 @@ public class Sprexor {
 					}
 				}
 			}
-			
 			cache += c;
 		}
+		
 		if(mod != 0 || smod != 0 || pr != 0) {
 			blockMessage.clear();
 			if(!errorIn)logger("Error : invalid literal syntax.", IOCenter.ERR);
 			else throw new SprexorException(pfe.EXPRSS_ERR, "invalid literal syntax.");
 			return;
 		}
-		Object res = null;
 		
+		Object res = null;
 		CommandProvider obj = cmd.get(id);
 		args = trimArr(args);
 		wra = trimArr(wra, count);
+		
 		try {
 			if(!entryMode) res = obj.code(args, wra, gd);
 			if(obj.EntryMode("") != null || doEntry) {
@@ -726,6 +725,7 @@ public class Sprexor {
 				entryId = id;
 				doEntry = true;
 			}
+			
 		}catch(Exception e) {
 			res = obj.error(e);
 		}

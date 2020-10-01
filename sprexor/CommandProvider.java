@@ -41,6 +41,9 @@ public interface CommandProvider {
 	public default Object EntryMode(String msg) {
 		return null;
 	}
+	public default CommandProvider[] referenceClass() {
+		return null;
+	}
 	
 	//public Object apply(String[] args);
 	//public Object apply(String[] args, boolean[] isWrapped);

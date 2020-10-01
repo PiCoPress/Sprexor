@@ -1,4 +1,4 @@
-Sprexor - 0.2.10
+Sprexor - 0.2.11
 =================
 
 [if you want to see Korean, chlick here.](./KOREAN.md "한국어로 보기")
@@ -25,13 +25,15 @@ Sprexor - 0.2.10
 
 >void register(String str, CommandProvider cp, String hd) : str(command name), cp(refer below), hd(message to help)
 
->void exec(String com) throws unknownCommand: execute command "com".
+>void exec(String com) throws CommandNotFoundException: execute command "com".
 
 >void exec(String id, String[] args)
 
+>void exec(String id, String[] args, boolean[] isWrapped)
+
 >void useSyntax(boolean b) : whether check basic syntax.
 
->void importSprex(sprexor.CommandProvider t | sprexor.CommandProvider[] t) : import Sprex to this(above) from t class.
+>void importSprex(sprexor.CommandProvider t) : import Sprex to this(above) from t class.
 
 >void send(String, IOCenter.TYPE) : send instant message.
 
@@ -42,6 +44,10 @@ Sprexor - 0.2.10
 >void error_strict() : If it is called, throw SprexorException instead of print at IOCenter.
 
 >void setInterruptChar(String|char) : Interrupt Sprexor during parsing if detected this char.
+
+>void unSemicolon() : semicolon is not abled to use.
+
+>void unBasicFeatures() : basic commands is not registered.
 
 	
   
@@ -86,6 +92,12 @@ Sprexor - 0.2.10
 
 >String[] binder(String[] ar, int start) : bind String Array from start index to end.
 
+>CommandProvider[] toCPClass(CommandProvider...) : It return CommandProvider array to arguments. (for referenceClass of CommandProvider)
+
+>String arg2String(String[]) : It return String to array.
+
+>String[] excludeArr(String[], int) : It return array that excluded index of second parameter.
+
 	
   
 #### GlobalData 
@@ -117,7 +129,7 @@ Sprexor - 0.2.10
 
 >Let you know how to use this and it will be added many features.
 
->>"example" command exists.
+>>"find" : It is feature like linux command 'grep' .
 	
   
 #### Exception

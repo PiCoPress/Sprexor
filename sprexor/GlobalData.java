@@ -6,7 +6,6 @@ import java.util.HashMap;
  * if last char of keyName is '_', read-only data that cannot modify or remove.
  * @since 0.2.0
  */
-
 public final class GlobalData {
 	private HashMap<String, Object> obj = null;
 	private boolean flag = false;

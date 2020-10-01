@@ -1,6 +1,10 @@
 package sprexor.cosmos;
 
-import sprexor.*;
+import sprexor.CommandProvider;
+import sprexor.GlobalData;
+import sprexor.Tools;
+import sprexor.Tools.*;
+
 /**
  * example Convenience Register Command Class.
  * @author PICOPress
@@ -8,11 +12,19 @@ import sprexor.*;
  */
 public class BasicPackages implements CommandProvider{
 	public String getCommandName() {
-		return "example";
+		return "find";
 	}
 	
 	public String help() {
-		return "example helping message.";
+		return "Usage : find (str to find) (str...)";
+	}
+	
+	public Object emptyArgs() {
+		return help();
+	}
+	
+	public CommandProvider[] referenceClass() {
+		return null; //Tools.toCPClass();
 	}
 	
 	public static BasicPackages call() {
@@ -20,6 +32,15 @@ public class BasicPackages implements CommandProvider{
 	}
 	
 	public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+		String tmp = Tools.arg2String(Tools.excludeArr(args, 0));
+		String find = args[0];
 		return args;
+		/*String[] splitedStr = tmp.split("\n");
+		String result = "";
+		
+		for(String it : splitedStr) {
+			if(it.indexOf(find) != -1)result += it + "\n";
+		}
+		return result;*/
 	}
 }

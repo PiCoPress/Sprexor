@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.10
+# 스프렉서 (Sprexor) - 0.2.11
 
 **목차**
 1. [Sprexor](#sprexor)
@@ -26,9 +26,11 @@
 
 >void exec(String id, String[] args)
 
+>void exec(String id, String[] args, boolean[] isWrapped)
+
 >void useSyntax(boolean b) : 기본 문법을 사용할건지의 여부
 
->void importSprex(CommandProvider t | CommandProvider[] t) : t라는 클래스로부터 스프렉서 를 임폴트합니다. t 클래스는 CommandProvider 를 상속받아야 합니다.
+>void importSprex(CommandProvider t) : t라는 클래스로부터 스프렉서 를 임폴트합니다. t 클래스는 CommandProvider 를 상속받아야 합니다.
 
 >void send(String, IOCenter.TYPE) : 인스턴트 메세지를 전송합니다.
 
@@ -39,6 +41,10 @@
 >void error_strict() : 이 메서드가 실행된다면 애러를 IOCenter에 저장하는것 대신 오류를 던집니다.
 
 >void setInterruptChar(String|char) : 파싱중에 설정된 문자가 있을 경우 그 문자를 기준으로 강제 종료합니다.
+
+>void unSemicolon() : 세미콜론 사용을 하지 않습니다.
+
+>void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
 	
 	
 #### IOCenter
@@ -82,6 +88,12 @@
 >boolean OptionPrs(String, String, byte) throws Exception : 분석된 옵션을 읽어 첫번쨰 매개변수와 일치한지 아닌지를 반환힙니다.
 
 >String[] binder (문자열 배열, 시작값) : 문자열 배열에서 사직값부터 마지막 값까지 묶어 반환합니다.
+
+>CommandProvider[] toCPClass(CommandProvider...) : 매개변수들을 배열로 반환합니다. (CommandProvider 의 referenceClass 전용)
+
+>String arg2String(String[]) : 문자열 배열을 문자열로 반환합니다.
+
+>String[] excludeArr(String[], int) : 배열에서 두번째 매개변수의 인덱스 값을 제외한 나머지를 반환합니다.
     
     
 #### GlobalData
@@ -113,7 +125,7 @@
 
 >이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
 
->>"example" 샘플입니다.
+>>"find" : 리눅스의 grep과 유사합니다.
 	
 	
 #### Exception
@@ -133,6 +145,8 @@
 >help : 기능 향상됨.
 
 >delete (name) : 변수 삭제함
+
+>commands : 사용 가능 커맨드 출력함
 	
 ---
 	*엔트리 모드는 유용한 기능입니다. 리눅스에서 'cat'명령어를 입력하는 것과 유사합니다.*

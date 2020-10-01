@@ -1,6 +1,7 @@
 package sprexor;
 
 public class SprexorException extends Exception {
+	
 	/**
 	 * There is some of error types.
 	 * @since 0.2.10
