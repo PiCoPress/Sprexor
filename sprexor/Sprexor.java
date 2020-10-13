@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Vector;
 
 /*
- * Sprexor : the String Parser & Executor 0.2.11
+ * Sprexor : the String Parser & Executor 0.2.13
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 
 public class Sprexor {
-	public static final String VERSION = "0.2.11";
+	public static final String VERSION = "0.2.13";
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -32,6 +32,12 @@ public class Sprexor {
 	protected boolean doEntry = false;
 	protected String entryId = "";
 	protected Vector<Object[]> blockMessage = new Vector<Object[]>();
+	public interface dec{
+		public default String notfound(String a) {
+			return "";
+		}
+	}
+	protected dec codes = new dec() {};
 	
 	private String[] trimArr(String[] in) {
 		vec.clear();
@@ -92,7 +98,7 @@ public class Sprexor {
 	public void importSprex(CommandProvider cmp) {
 		if(configType != 0)return;
 		if(cmp.referenceClass() == null) {
-			cmd.put(cmp.getCommandName(), (CommandProvider)cmp);
+			cmd.put(cmp.getCommandName(), cmp);
 			helpDB.put(cmp.getCommandName(), cmp.help());
 			list += cmp.getCommandName() + "\n";
 		}else {
@@ -269,6 +275,8 @@ public class Sprexor {
 			 helpDB.put("commands", "print all commands.");
 			 list += "help\nvar\necho\ndelete\ncommands\n";
 			 gd = new GlobalData();
+			System.out.println("Sprexor : The Command Parser& Executor ( Version : " + VERSION + " )\n" +
+					"copyright(c) 2020 by PICOPress, All rights reserved.\n");
 	}
 	
 	@Deprecated
@@ -369,6 +377,15 @@ public class Sprexor {
 		break;
 		}
 	}
+	/**
+	 * Sprexor.dec - String notfound(unknown id) : If return else empty string, then "notfound" will be run.
+	 * @param k : Implement k.
+	 * @since 0.2.13
+	 */
+	public void bound(dec k) {
+		if(configType != 0)return;
+		codes = k;
+	}
 	
 	/**
 	 * execute command as non-parse. Activate after.
@@ -432,7 +449,6 @@ public class Sprexor {
 			MessageLog.add(recentMessage);
 			return;
 		}
-		
 		if(entryMode) {
 			blockMessage.clear();
 			if(!doEntry) {
@@ -449,7 +465,10 @@ public class Sprexor {
 		String id = com.split(" ")[0].trim();
 		if(!isExist(id)) {
 			blockMessage.clear();
-			if(!errorIn)logger(id + " : command not found.", IOCenter.ERR);
+			if(!errorIn) { //how to throw error
+				if(codes.notfound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
+				else logger(codes.notfound(id), IOCenter.ERR); // It can be defined by "bound" Function.
+			}
 			else throw new CommandNotFoundException(id, com);
 			return;
 			
@@ -512,7 +531,7 @@ public class Sprexor {
 		boolean cmtMode = false;
 		String cache = "";
 		
-		//Parse start
+		//------------------Parse start---------------------
 		for(;allCount < comar.length; allCount ++) {
 			
 			String c = comar[allCount];
@@ -730,7 +749,7 @@ public class Sprexor {
 			res = obj.error(e);
 		}
 		
-		logger(res,IOCenter.STDOUT);
+		if(res != null)logger(res,IOCenter.STDOUT);
 		if(nextFlag) {
 			exec(nextStr);
 		}

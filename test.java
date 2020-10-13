@@ -23,6 +23,16 @@ public class test {
 			}
 		}, "add number");
 		
+		n.register("optprs", new CommandProvider() {
+
+			@Override
+			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				
+				return null;
+			}
+			
+		}, "Option parser test.");
+		
 		n.register("sum", new CommandProvider() {
 			@Override
 			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
@@ -43,8 +53,16 @@ public class test {
 			}
 		}, "view detail");
 		
-		n.importSprex(BasicPackages.call());
-		n.activate();
+		n.importSprex(new BasicPackages());
+		
+		n.bound(new Sprexor.dec(){
+			@Override
+			public String notfound(String id) { // redefine command_not_found error.
+				return "error : " + id;
+			}
+		});
+		
+		n.activate(); // activate
 		
 		IOCenter i = new IOCenter(n);
 		try {

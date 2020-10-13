@@ -3,7 +3,6 @@ package sprexor.cosmos;
 import sprexor.CommandProvider;
 import sprexor.GlobalData;
 import sprexor.Tools;
-import sprexor.Tools.*;
 
 /**
  * example Convenience Register Command Class.
@@ -27,20 +26,19 @@ public class BasicPackages implements CommandProvider{
 		return null; //Tools.toCPClass();
 	}
 	
-	public static BasicPackages call() {
-		return new BasicPackages();
+	public Object error(Exception e) {
+		return e;
 	}
 	
-	public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+	@Override public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
 		String tmp = Tools.arg2String(Tools.excludeArr(args, 0));
 		String find = args[0];
-		return args;
-		/*String[] splitedStr = tmp.split("\n");
+		String[] splitedStr = tmp.split("\n");
 		String result = "";
 		
 		for(String it : splitedStr) {
 			if(it.indexOf(find) != -1)result += it + "\n";
 		}
-		return result;*/
+		return result;
 	}
 }

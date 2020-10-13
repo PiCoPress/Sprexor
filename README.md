@@ -1,4 +1,4 @@
-Sprexor - 0.2.11
+Sprexor - 0.2.13
 =================
 
 [if you want to see Korean, chlick here.](./KOREAN.md "한국어로 보기")
@@ -49,6 +49,8 @@ Sprexor - 0.2.11
 
 >void unBasicFeatures() : basic commands is not registered.
 
+>void bound(Sprexor.dec) : redefine command_not_found Error handler .
+
 	
   
 #### IOCenter
@@ -98,6 +100,8 @@ Sprexor - 0.2.11
 
 >String[] excludeArr(String[], int) : It return array that excluded index of second parameter.
 
+>void smooth(String[] all, String[] optList, Class cl) : "all" is all of arguments, "optList" is array of options like "-abc or --abc" to process same works. And "cl" is Class to run method "option".
+
 	
   
 #### GlobalData 
@@ -129,7 +133,7 @@ Sprexor - 0.2.11
 
 >Let you know how to use this and it will be added many features.
 
->>"find" : It is feature like linux command 'grep' .
+>>"find" : This command finds content with unit of line. Bug fixed.
 	
   
 #### Exception

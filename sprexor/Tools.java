@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Vector;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class Tools{
 	
@@ -93,7 +95,7 @@ public class Tools{
 	}
 	
 	public static String[] excludeArr(String[] arg, int a) {
-		String[] tmp = {};
+		String[] tmp = {"",};
 		int le = arg.length;
 		int count = 0;
 		
@@ -104,5 +106,18 @@ public class Tools{
 		}
 		if(arg.length <= 1)tmp[0] = arg[0];
 		return tmp;
+	}
+	
+	public static void smooth(String[] all, String[] optList, Class cl) throws NoSuchMethodException, SecurityException,
+	IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		int la = all.length, lo = optList.length;
+		for(int i = 0; i < la; i ++) {
+			for(int j = 0; j < lo; j ++) {
+				if(all[i].contentEquals(optList[j])) {
+					Method[] aa = cl.getMethods();
+					for(int k = 0; k < aa.length; k ++) if(aa[k].getName().contentEquals("option")) aa[k].invoke(null, optList[j]);
+				}
+			}
+		}
 	}
 }

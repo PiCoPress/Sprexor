@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.11
+# 스프렉서 (Sprexor) - 0.2.13
 
 **목차**
 1. [Sprexor](#sprexor)
@@ -45,6 +45,8 @@
 >void unSemicolon() : 세미콜론 사용을 하지 않습니다.
 
 >void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
+
+>void bound(Sprexor.dec) : 재정의된 인터페이스(dec) 를 통하여 커맨드가 발견되지 않았을 때의 처리방식을 설정합니다.
 	
 	
 #### IOCenter
@@ -94,6 +96,8 @@
 >String arg2String(String[]) : 문자열 배열을 문자열로 반환합니다.
 
 >String[] excludeArr(String[], int) : 배열에서 두번째 매개변수의 인덱스 값을 제외한 나머지를 반환합니다.
+
+>void smooth(String[] all, String[] optList, Class cl) : all 매개변수는 탐색할 문자열 배열, optList 매개변수는 같은 방식의 처리를 할 옵션 이름들, 마지막 매개변수는 이 클래스에서 "option" 이라는 메서드를 찾아 실행합니다.
     
     
 #### GlobalData
@@ -125,7 +129,7 @@
 
 >이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
 
->>"find" : 리눅스의 grep과 유사합니다.
+>>"find" : 리눅스의 grep과 유사합니다. 버그 수정됨.
 	
 	
 #### Exception
