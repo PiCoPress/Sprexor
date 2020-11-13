@@ -84,7 +84,7 @@ public class Tools{
 		return (String[]) v.toArray();
 	}
 	
-	public static CommandProvider[] toCPClass(CommandProvider...cp) {
+	public static CommandProvider[] toCPClass(CommandProvider  ... cp) {
 		return cp;
 	}
 	

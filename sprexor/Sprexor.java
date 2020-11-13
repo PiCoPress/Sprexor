@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Vector;
 
 /*
- * Sprexor : the String Parser & Executor 0.2.13
+ * Sprexor : the String Parser & Executor 0.2.14
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 
 public class Sprexor {
-	public static final String VERSION = "0.2.13";
+	public static final String VERSION = "0.2.14";
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -25,20 +25,21 @@ public class Sprexor {
 	private boolean errorIn = false;
 	private boolean dosem = true;
 	private boolean isInit = true;
+	private boolean ignoreCase = false;
 	private SprexorException pfe;
 	protected Object[] recentMessage = null;
 	protected HashMap<String, Object> envVar;
 	protected boolean entryMode = false;
 	protected boolean doEntry = false;
 	protected String entryId = "";
+	protected dec codes = new dec() {};
 	protected Vector<Object[]> blockMessage = new Vector<Object[]>();
 	public interface dec{
 		public default String notfound(String a) {
 			return "";
 		}
+		public default void out(String str, IOCenter.TYPE type) { }
 	}
-	protected dec codes = new dec() {};
-	
 	private String[] trimArr(String[] in) {
 		vec.clear();
 		for(String eval : in) {
@@ -47,7 +48,6 @@ public class Sprexor {
 		}
 		return Arrays.copyOf(vec.toArray(), vec.size(), String[].class);
 	}
-	
 	private boolean[] trimArr(boolean[] in, int num) {
 		boolean[] tmp = new boolean[num];
 		for(int i = 0; i < num; i ++)tmp[i] = in[i];
@@ -69,6 +69,7 @@ public class Sprexor {
 		MessageLog.add(oe);
 		blockMessage.add(oe);
 		recentMessage = oe;
+		codes.out(oo.toString().trim(), ii);
 	}
 	
 	@SuppressWarnings("unused")
@@ -167,8 +168,16 @@ public class Sprexor {
 		recentMessage[1] = type;
 		MessageLog.add(recentMessage);
 		blockMessage.add(recentMessage);
+		codes.out(str, type);
 	}
-	
+	/** Ignore upper or lower case of character. 
+	 * ex ) input : ABcD
+	 *		detect : abcd
+	 *@since 0.2.14
+	 */
+	public void ignoreUpperCase() {
+		ignoreCase = true;
+	}
 	/**
 	 * Acivate to use method exec, and cannot set value of properties of this sprexor. Activate before.
 	 * @since 0.2.3
@@ -275,7 +284,7 @@ public class Sprexor {
 			 helpDB.put("commands", "print all commands.");
 			 list += "help\nvar\necho\ndelete\ncommands\n";
 			 gd = new GlobalData();
-			System.out.println("Sprexor : The Command Parser& Executor ( Version : " + VERSION + " )\n" +
+			 System.out.println("Sprexor : The Command Parser& Executor ( Version : " + VERSION + " )\n" +
 					"copyright(c) 2020 by PICOPress, All rights reserved.\n");
 	}
 	
@@ -305,8 +314,8 @@ public class Sprexor {
 	 */
 	public void register(String str, CommandProvider cp, String hd) {
 		if(configType != 0)return;
-		
-		if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]", "\s") || str.contentEquals(""))return;
+		else if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]", "\s") || str.contentEquals(""))return;
+		else if(ignoreCase) str.toLowerCase();
 		cmd.put(str, cp);
 		list += str + "\n";
 		helpDB.put(str, hd);
@@ -463,6 +472,7 @@ public class Sprexor {
 		boolean varMode = false;
 		com = com.trim();
 		String id = com.split(" ")[0].trim();
+		if (ignoreCase) id = id.toLowerCase();
 		if(!isExist(id)) {
 			blockMessage.clear();
 			if(!errorIn) { //how to throw error

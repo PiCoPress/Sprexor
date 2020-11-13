@@ -1,4 +1,4 @@
-Sprexor - 0.2.13
+Sprexor - 0.2.14
 =================
 
 [if you want to see Korean, chlick here.](./KOREAN.md "한국어로 보기")
@@ -11,33 +11,34 @@ Sprexor - 0.2.13
 5. [GlobalData](#globaldata)
 6. [cosmos.BasicPackages](#standard-library)
 7. [Exception](#exception)
-8. [see example code](./test.java)
-9. [Menual](#menual)
+8. [Basic Features](#basic-feature)
+9. [see example code](./test.java)
+10. [Menual](#menual)
 
 
 #### Sprexor
 
->Sprexor(void | boolean) : Sprexor constructor. If argument is false, basic command(help, echo, var delete) will not be defined.
+>Sprexor(void | boolean) : Sprexor constructor. If the argument equals false, basic command - help, echo, var delete - will not be defined.
 
->boolean isExist() check if command is exist.
+>boolean isExist(String) Check if the Command is exist.
 
->void setComment(String) : set comment.
+>void setComment(String) : Set a comment character.
 
 >void register(String str, CommandProvider cp, String hd) : str(command name), cp(refer below), hd(message to help)
 
->void exec(String com) throws CommandNotFoundException: execute command "com".
+>void exec(String com) throws CommandNotFoundException: Execute command "com".
 
 >void exec(String id, String[] args)
 
 >void exec(String id, String[] args, boolean[] isWrapped)
 
->void useSyntax(boolean b) : whether check basic syntax.
+>void useSyntax(boolean b) : Whether check basic syntax.
 
->void importSprex(sprexor.CommandProvider t) : import Sprex to this(above) from t class.
+>void importSprex(sprexor.CommandProvider t) : Import Sprex to this(above) from T class.
 
->void send(String, IOCenter.TYPE) : send instant message.
+>void send(String, IOCenter.TYPE) : Send instant message.
 
->void activate() : should activate by this before use "exec" method. and if activate, it cannot setting properties.
+>void activate() : It should activate by this before use "exec" method. and if activate, it cannot setting properties.
 
 >void call(String key) : control flow of system to key. Available keys : entry_on, entry_off.
 
@@ -45,11 +46,13 @@ Sprexor - 0.2.13
 
 >void setInterruptChar(String|char) : Interrupt Sprexor during parsing if detected this char.
 
->void unSemicolon() : semicolon is not abled to use.
+>void unSemicolon() : Semicolon is not abled to use.
 
->void unBasicFeatures() : basic commands is not registered.
+>void unBasicFeatures() : Basic commands are not registered.
 
->void bound(Sprexor.dec) : redefine command_not_found Error handler .
+>void bound(Sprexor.dec) : Redefine command_not_found Error handler ; dec.notfound, dec.out : It will be run when print output.
+
+>void ignoreUpperCase() : Ignore Upper case of character.
 
 	
   
@@ -57,31 +60,31 @@ Sprexor - 0.2.13
 
 >enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, custom1, custom2, custom3}
 
->IOCenter ioc = new IOCenter(Sprexor sp); // IOCenter is load output from sp.
+>IOCenter ioc = new IOCenter(Sprexor sp); // IOCenterlead to load output from sp.
 
->Object[] getMessage() : return recent message. index 0 : output, index 1 : TYPE
+>Object[] getMessage() : Return recent message. index 0 : output, index 1 : TYPE
 
->Vector<Object[]> getOuput() : return all of printed message. And the scope is 'constructor'.
+>Vector<Object[]> getOuput() : Return all of printed message. And the scope is 'constructor'.
 
->void ExitEntry() : exit entry mode.
+>void ExitEntry() : Exit entry mode.
 
->Vector<Object[]> getBlockMessage() : return all of output that printed from 'exec' method that called once. So, it means the scope is 'method'.
+>Vector<Object[]> getBlockMessage() : Return all of output that printed from 'exec' method that called once. So, it means that the scope is 'method'.
 
     
   
 #### CommandProvider
 
->public Object code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove data that saved in GlobalData.)
+>public Object code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove a data that saved in GlobalData.)
 
->>public default Object emptyArgs() : this method will be called when argument of Sprexor.exec is empty. (redefinable)
+>>public default Object emptyArgs() : This method will be called when argument of Sprexor.exec is empty. (redefinable)
 
->>public default error(Exception) : this method will be call when occurred error in your code(from Sprexor.register). (redefinable)
+>>public default error(Exception) : This method will be called when occurred error in your code(from Sprexor.register). (redefinable)
 
->>public default getCommandName() : for importSprex.
+>>public default getCommandName() : For the ImportSprex.
 
->>public default help() : for importSprex.
+>>public default help() : Ror the ImportSprex.
 
->>public default Object EntryMode(String msg) : be run if in the entry mode.
+>>public default Object EntryMode(String msg) : Run if in the entry mode.
     
   
 #### Tools
@@ -134,6 +137,7 @@ Sprexor - 0.2.13
 >Let you know how to use this and it will be added many features.
 
 >>"find" : This command finds content with unit of line. Bug fixed.
+>>"for" : developing...
 	
   
 #### Exception
@@ -142,6 +146,19 @@ Sprexor - 0.2.13
 
 >CommandNotFoundException
 	
+#### Basic Feature
+
+>@(name) :  Load saved value.
+
+>var (name) (value) : Define (name) = (value).
+
+>echo
+
+>help : Print message to help.
+
+>delete (name) : Delete variable.
+
+>commands : Print the Command list.
 	
 ---
 	*entry mode is useful feature. It is similar concept that type command "cat" in the linux.*
@@ -154,7 +171,7 @@ Sprexor - 0.2.13
     - **setComment** : set character to use comment. If 'useSyntax' is false, so non-effect anything. 
     - **importSprex** : put in class by 'implement CommandProvider' and allowed Class array. please refer to the above that necessary implement method.
     - **error_strict** : When you didn't called,that occurred error during parsing or other methods is saved MessageLog, throw exception.
-    - **register** : first parameter is name of command(used by exec), second parameter is 'new CommandProvider(){/*TODO*/}', *code* - programming to run(returned value would be last message, sp.send is able to print with msg type)<br>, *emptyArgs* is called when argument of command is empty<br>, *error* - be called when caught in method 'code'. last parameter is string that provide in 'help'
+    - **register** : first parameter is name of command(used by exec), second parameter is 'new CommandProvider(){ }', *code* - programming to run(returned value would be last message, sp.send is able to print with msg type)<br>, *emptyArgs* is called when argument of command is empty<br>, *error* - be called when caught in method 'code'. last parameter is string that provide in 'help'
      command.
     - **setInterruptChar** : set a char to interrupt parsing.
     <br>   

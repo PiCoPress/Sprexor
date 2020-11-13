@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.13
+# 스프렉서 (Sprexor) - 0.2.14
 
 **목차**
 1. [Sprexor](#sprexor)
@@ -8,8 +8,9 @@
 5. [GlobalData](#globaldata)
 6. [cosmos.BasicPackages](#standard-library)
 7. [Exception](#exception)
-8. [예시코드보기](./test.java)
-9. [메뉴얼](#menual)
+8. [Basic Features](#basic-feature)
+9. [예시코드보기](./test.java)
+10. [메뉴얼](#menual)
 
 
 #### Sprexor
@@ -46,7 +47,8 @@
 
 >void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
 
->void bound(Sprexor.dec) : 재정의된 인터페이스(dec) 를 통하여 커맨드가 발견되지 않았을 때의 처리방식을 설정합니다.
+>void bound(Sprexor.dec) : 재정의된 인터페이스(dec) 를 통하여 커맨드가 발견되지 않았을 때의 처리방식을 설정합니다. dec.notfound, dec.out : 출력을 할 때마다 이 함수가 호출됩니다.
+>void ignoreUpperCase() : 대소문자를 무시하여 실행합니다.
 	
 	
 #### IOCenter
@@ -130,6 +132,7 @@
 >이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
 
 >>"find" : 리눅스의 grep과 유사합니다. 버그 수정됨.
+>>"for" : 개발중...
 	
 	
 #### Exception
@@ -146,7 +149,7 @@
 
 >echo
 
->help : 기능 향상됨.
+>help : 도움말을 출력합니다.
 
 >delete (name) : 변수 삭제함
 
@@ -164,7 +167,7 @@
     - **setComment** : 주석으로 사용할 문자를 정합니다. 문법 사용이 false 라면 소용이 없습니다. 
     - **importSprex** : 매개변수에는 CommandProvider 를 implement 한 클래스를 집어넣습니다.클래스 배열도 들어올 수 있습니다. 그 클래스의 필수 구현 요소는 위를 참조하세요.
     - **error_strict** : 호출하지 않았을 경우 파싱중 발생한 오류나 내부 다른 메소드들의 오류가 MessageLog 에 쌓이지만 호출할 경우, try-catch 구문을 사용하여 예외를 처리해야 합니다.
-    - **register** : 첫번쨰 매개변수는 명령어의 이름을 지정하고(exec 에서 사용됩니다), 두번쨰 매개변수는 new CommandProvider(){/*TODO*/} 에서 오버라이딩 할 메소드에서 *code*는 실행시킬 코드를 작성(리턴값은 마지막에 출력할 메세지, sp.send 로 메세지의 타입을 지정하여 출력 가능)<br>, *emptyArgs* 는 명령어의 인자가 없을 경우 호출<br>, *error*는 code메소드 내에서 오류가 발생했을 경우 호출됩니다. 마지막 매개변수는 help 명령어에서 이 명령어에 대한 도움말을 제공하는 문자열입니다.
+    - **register** : 첫번쨰 매개변수는 명령어의 이름을 지정하고(exec 에서 사용됩니다), 두번쨰 매개변수는 new CommandProvider(){ } 에서 오버라이딩 할 메소드에서 *code*는 실행시킬 코드를 작성(리턴값은 마지막에 출력할 메세지, sp.send 로 메세지의 타입을 지정하여 출력 가능)<br>, *emptyArgs* 는 명령어의 인자가 없을 경우 호출<br>, *error*는 code메소드 내에서 오류가 발생했을 경우 호출됩니다. 마지막 매개변수는 help 명령어에서 이 명령어에 대한 도움말을 제공하는 문자열입니다.
     - **setInterruptChar** : 강제로 종료할 문자 1글자를 설정합니다.
     <br>   
 3. *activate 호출*<br>

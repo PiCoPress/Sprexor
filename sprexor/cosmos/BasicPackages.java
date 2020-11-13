@@ -15,7 +15,9 @@ public class BasicPackages implements CommandProvider{
 	}
 	
 	public String help() {
-		return "Usage : find (str to find) (str...)";
+		return "::: The BasicPackages 0.2.14 :::\n" +
+				"1. find : Find text(s) by the unit of line.\n" + 
+				"2. for : Repeat and run commands for count.";
 	}
 	
 	public Object emptyArgs() {
@@ -23,7 +25,7 @@ public class BasicPackages implements CommandProvider{
 	}
 	
 	public CommandProvider[] referenceClass() {
-		return null; //Tools.toCPClass();
+		return Tools.toCPClass(this, new For()); //Tools.toCPClass();
 	}
 	
 	public Object error(Exception e) {
