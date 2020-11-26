@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Vector;
 
 /*
- * Sprexor : the String Parser & Executor 0.2.14
+ * Sprexor : the String Parser & Executor 0.2.16
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 
 public class Sprexor {
-	public static final String VERSION = "0.2.14";
+	public static final String VERSION = "0.2.16";
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -188,14 +188,14 @@ public class Sprexor {
 		if(!isInit)return;
 		 cmd.put("help",new CommandProvider() {
 				@Override
-				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 					String Result = "";
 					if(isExist(args[0])) {
 							Result = helpDB.get(args[0]);
 					}else {
 						Result = " ";
 					}
-					return Result.trim();
+					return new IOCenter(Result.trim(), IOCenter.STDOUT);
 				}
 				@Override
 				public Object error(Exception e) {
@@ -208,18 +208,18 @@ public class Sprexor {
 			 });
 			 cmd.put("var", new CommandProvider() {
 				@Override
-				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-					if(!doBasicSyn) return "Syntax is not permitted.";
+				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					if(!doBasicSyn) return new IOCenter("Syntax is not permitted.", IOCenter.ERR);
 					if(args.length == 2) {	
 						if(envVar.containsKey(args[0]))envVar.replace(args[0], args[1]);
 						else envVar.put(args[0],args[1]);
-						return args[1];
+						return new IOCenter(args[1], IOCenter.STDOUT);
 					}else if(args.length == 1) {
 						if(envVar.containsKey(args[0]))envVar.replace(args[0], IOCenter.NO_VALUE);
 						else envVar.put(args[0],IOCenter.NO_VALUE);
-						return "NO_VALUE";
+						return new IOCenter("NO_VALUE", IOCenter.NO_VALUE);
 					}else {
-						return emptyArgs();
+						return new IOCenter(emptyArgs().toString(), IOCenter.CMT);
 					}
 				}
 				
@@ -230,12 +230,12 @@ public class Sprexor {
 			 });
 			 cmd.put("echo", new CommandProvider() {
 				@Override
-				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 					String sum = "";
 					for(String str : args) {
-						sum += str;
+						sum += str + " ";
 					}
-					return sum;
+					return new IOCenter(sum, IOCenter.STDOUT);
 				}
 				
 				@Override
@@ -246,7 +246,7 @@ public class Sprexor {
 			 
 			 cmd.put("delete", new CommandProvider() {
 					@Override
-					public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 						for(String name : args) {
 							envVar.remove(name);
 						}
@@ -255,7 +255,7 @@ public class Sprexor {
 							System.out.println(args[0]);
 							envVar.remove(args[0]);
 						}
-						return "variable(s) deleted.";
+						return new IOCenter("variable(s) deleted.", IOCenter.STDOUT);
 					}
 					
 					@Override
@@ -267,8 +267,8 @@ public class Sprexor {
 			 cmd.put("commands", new CommandProvider() {
 
 				@Override
-				public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
-					return list;
+				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					return new IOCenter(list, IOCenter.STDOUT);
 				}
 				
 				@Override
@@ -619,7 +619,11 @@ public class Sprexor {
 							continue;
 						}else if(smod == 1) {
 							cache +=  c;
+							mod = 0;
+							continue;
 						}
+						args[count ++] = cache.trim();
+						cache = "";
 						mod = 0;
 					}
 					continue;
@@ -635,7 +639,11 @@ public class Sprexor {
 							continue;
 						}else if(mod == 1) {
 							cache +=  c;
+							smod = 0;
+							continue;
 						}
+						args[count ++] = cache.trim();
+						cache = "";
 						smod = 0;
 					}
 					continue;
@@ -691,7 +699,6 @@ public class Sprexor {
 				if(smod + mod + pr == 0) {
 					
 					if(c.contentEquals(comment) && mod == 0) {
-						
 						cmtMode = true;
 						args[count++] = cache;
 						wra[count] = false;
@@ -703,7 +710,7 @@ public class Sprexor {
 					}else {
 						if(varMode == true && c.contentEquals("@")) {
 							blockMessage.clear();
-							if(!errorIn)logger("invalid value : '@@', parse stopped : " + count,IOCenter.ERR);
+							if(!errorIn)logger("Invalid expression : '@@', Parsing stopped : " + count,IOCenter.ERR);
 							else throw new SprexorException(pfe.EXPRSS_ERR, "@@");
 							return;
 						}else if(varMode){
@@ -717,13 +724,13 @@ public class Sprexor {
 								}else {
 									if(cache.trim().contentEquals("@")) {
 										blockMessage.clear();
-										if(!errorIn)logger("variable name is empty.",IOCenter.ERR);
-										else throw new SprexorException(pfe.EXPRSS_ERR, "variable name is empty.");
+										if(!errorIn)logger("Variable name emptied..",IOCenter.ERR);
+										else throw new SprexorException(pfe.EXPRSS_ERR, "Variable name was emptied.");
 										return;
 									}
 									
 									blockMessage.clear();
-									if(!errorIn)logger("could not find a variable : " + cache.trim().substring(1),IOCenter.ERR);
+									if(!errorIn)logger("Could not find a variable : " + cache.trim().substring(1),IOCenter.ERR);
 									else throw new SprexorException(pfe.VARIABLE_ERR, cache.trim());
 									return;
 								}
@@ -742,7 +749,7 @@ public class Sprexor {
 			return;
 		}
 		
-		Object res = null;
+		IOCenter res = null;
 		CommandProvider obj = cmd.get(id);
 		args = trimArr(args);
 		wra = trimArr(wra, count);
@@ -754,12 +761,12 @@ public class Sprexor {
 				entryId = id;
 				doEntry = true;
 			}
-			
 		}catch(Exception e) {
-			res = obj.error(e);
+			res = new IOCenter(obj.error(e).toString(), IOCenter.ERR);
 		}
-		
-		if(res != null)logger(res,IOCenter.STDOUT);
+		if(res == null)res = new IOCenter("", IOCenter.UNKNOWN);
+		else if(res.status == null)res.status = IOCenter.UNKNOWN;
+		if(res != null)logger(res.Msg,res.status);
 		if(nextFlag) {
 			exec(nextStr);
 		}

@@ -2,6 +2,7 @@ package sprexor.cosmos;
 
 import sprexor.CommandProvider;
 import sprexor.GlobalData;
+import sprexor.IOCenter;
 import sprexor.Tools;
 
 /**
@@ -15,7 +16,7 @@ public class BasicPackages implements CommandProvider{
 	}
 	
 	public String help() {
-		return "::: The BasicPackages 0.2.14 :::\n" +
+		return "::: The BasicPackages 0.2.16 :::\n" +
 				"1. find : Find text(s) by the unit of line.\n" + 
 				"2. for : Repeat and run commands for count.";
 	}
@@ -28,11 +29,11 @@ public class BasicPackages implements CommandProvider{
 		return Tools.toCPClass(this, new For()); //Tools.toCPClass();
 	}
 	
-	public Object error(Exception e) {
-		return e;
+	public IOCenter error(Exception e) {
+		return new IOCenter(e.getMessage(), IOCenter.ERR);
 	}
 	
-	@Override public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+	@Override public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 		String tmp = Tools.arg2String(Tools.excludeArr(args, 0));
 		String find = args[0];
 		String[] splitedStr = tmp.split("\n");
@@ -41,6 +42,6 @@ public class BasicPackages implements CommandProvider{
 		for(String it : splitedStr) {
 			if(it.indexOf(find) != -1)result += it + "\n";
 		}
-		return result;
+		return new IOCenter(result, IOCenter.STDOUT);
 	}
 }

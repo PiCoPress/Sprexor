@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.14
+# 스프렉서 (Sprexor) - 0.2.16
 
 **목차**
 1. [Sprexor](#sprexor)
@@ -70,13 +70,13 @@
 	
 #### CommandProvider
 
->public Object code(String [] args, boolean[] isWrapped, GlobalData gd) : arg(인자), isWrapped [i] (arg[i]가 ' 또는 "로 묶였는지 여부), gd (GlobalData로부터 저장하거나 삭제할 수 있습니다. )
+>public IOcenter code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(인자), isWrapped [i] (arg[i]가 ' 또는 "로 묶였는지 여부), gd (GlobalData로부터 저장하거나 삭제할 수 있습니다. )
 
 >public default Object emptyArgs() : exec에서 들어온 매개변수가 없으면 실행됩니다. (재정의 가능)
 
->public default error(Exception) : 오버라이드된 code 메소드에서 오류날 경우 이 메소드가 실행됩니다.(register로부터). (재정의 가능)
+>public default Object error(Exception) : 오버라이드된 code 메소드에서 오류날 경우 이 메소드가 실행됩니다.(register로부터). (재정의 가능)
 
->public default getCommandName() : 임폴트 전용 메소드
+>public default String getCommandName() : 임폴트 전용 메소드
 
 >public default String help() : 임폴트 전용 메소드
 
@@ -97,7 +97,11 @@
 
 >String arg2String(String[]) : 문자열 배열을 문자열로 반환합니다.
 
+>String arg2String(String[], String) : 배열 사이에 두번째 매개변수를 넣어 반환합니다.
+
 >String[] excludeArr(String[], int) : 배열에서 두번째 매개변수의 인덱스 값을 제외한 나머지를 반환합니다.
+
+>String[] cuㅅArr(String[], int startIndex) : excludeArr 의 상위 호환, String.substring 과 비슷합니다.
 
 >void smooth(String[] all, String[] optList, Class cl) : all 매개변수는 탐색할 문자열 배열, optList 매개변수는 같은 방식의 처리를 할 옵션 이름들, 마지막 매개변수는 이 클래스에서 "option" 이라는 메서드를 찾아 실행합니다.
     
@@ -132,7 +136,7 @@
 >이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
 
 >>"find" : 리눅스의 grep과 유사합니다. 버그 수정됨.
->>"for" : 개발중...
+>>"for" : for(txt | code) (count) Str...
 	
 	
 #### Exception
@@ -174,7 +178,7 @@
 이 메소드가 실행되면 위의 내부 설정을 더 이상 사용할 수 없으며, 명령어를 실행할 수 있도록 설정합니다.<br>   
 4. *IOCenter 생성자로 메세지를 받아오기*<br>
 IOCenter io = new IOCenter(sp) <span style="color:green">//명령어에서 출력한 모든 메세지를 읽거나, 출력에 대한 타입을 지정할 수 있고, 엔트리모드에서 강제로 나갈 수 있습니다.
-    - **getMessage** : 가장 최근에 출력된 메세지를 Object[2] 로 반환합니다. 인덱스 1은 메세지, 2번째는 메세지 타입(STDOUT, ERR, CMT, NO_VALUE, custom1~3)입니다. 단위는 명령어입니다.
+    - **getMessage** : 가장 최근에 출력된 메세지를 Object[2] 로 반환합니다. 인덱스 1은 메세지, 2번째는 메세지 타입(STDOUT, ERR, CMT, NO_VALUE, UNKNOWN, custom1~3)입니다. 단위는 명령어입니다.
     - **getBlockMessage** : exec으로 실행했을 때 출력된 메세지를 벡터로 반환합니다. 단위는 메소드 입니다.
     - **getOutput** : sp 객체에서 출력된 모든 메세지를 백터로 반환합니다. 단위는 생성자 입니다.
     - **exitEntry** : 엔트리모드를 나갑니다.<br>   

@@ -54,5 +54,5 @@ public interface CommandProvider {
 	 * @param scope : GlobalData
 	 * @return Object (any type which not array.)
 	 */
-	public Object code(String[] args, boolean[] isWrapped, GlobalData scope);
+	public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope);
 }

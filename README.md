@@ -1,4 +1,4 @@
-Sprexor - 0.2.14
+Sprexor - 0.2.16
 =================
 
 [if you want to see Korean, chlick here.](./KOREAN.md "한국어로 보기")
@@ -58,15 +58,15 @@ Sprexor - 0.2.14
   
 #### IOCenter
 
->enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, custom1, custom2, custom3}
+>enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, UNKNOWN, custom1, custom2, custom3}
 
->IOCenter ioc = new IOCenter(Sprexor sp); // IOCenterlead to load output from sp.
+>IOCenter ioc = new IOCenter(Sprexor sp); // IOCenter lead to load output from sp.
 
 >Object[] getMessage() : Return recent message. index 0 : output, index 1 : TYPE
 
 >Vector<Object[]> getOuput() : Return all of printed message. And the scope is 'constructor'.
 
->void ExitEntry() : Exit entry mode.
+>void ExitEntry() : Exit the EntryMode.
 
 >Vector<Object[]> getBlockMessage() : Return all of output that printed from 'exec' method that called once. So, it means that the scope is 'method'.
 
@@ -74,15 +74,15 @@ Sprexor - 0.2.14
   
 #### CommandProvider
 
->public Object code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove a data that saved in GlobalData.)
+>public IOCenter code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove a data that saved in GlobalData.)
 
 >>public default Object emptyArgs() : This method will be called when argument of Sprexor.exec is empty. (redefinable)
 
->>public default error(Exception) : This method will be called when occurred error in your code(from Sprexor.register). (redefinable)
+>>public default Object error(Exception) : This method will be called when occurred error in your code(from Sprexor.register). (redefinable)
 
->>public default getCommandName() : For the ImportSprex.
+>>public default String getCommandName() : For the ImportSprex.
 
->>public default help() : Ror the ImportSprex.
+>>public default String help() : For the ImportSprex.
 
 >>public default Object EntryMode(String msg) : Run if in the entry mode.
     
@@ -101,7 +101,11 @@ Sprexor - 0.2.14
 
 >String arg2String(String[]) : It return String to array.
 
+>String arg2String(String[], String) : Return the String by joining second argument.
+
 >String[] excludeArr(String[], int) : It return array that excluded index of second parameter.
+
+>String[] cutArr(String[], int startIndex) : Advanced excludeArr. It is similar to "String.substring".
 
 >void smooth(String[] all, String[] optList, Class cl) : "all" is all of arguments, "optList" is array of options like "-abc or --abc" to process same works. And "cl" is Class to run method "option".
 
@@ -137,7 +141,7 @@ Sprexor - 0.2.14
 >Let you know how to use this and it will be added many features.
 
 >>"find" : This command finds content with unit of line. Bug fixed.
->>"for" : developing...
+>>"for" : for (txt | code) (count) Str...
 	
   
 #### Exception
@@ -150,7 +154,7 @@ Sprexor - 0.2.14
 
 >@(name) :  Load saved value.
 
->var (name) (value) : Define (name) = (value).
+>var (name) (value) : Defining (name) = (value).
 
 >echo
 
@@ -165,13 +169,13 @@ Sprexor - 0.2.14
 ---
 # Menual
 1. *create object by 'new constructor'*<br>
-**java Sprexor sp = new Sprexor()** 또는 **Sprexor sp = new Sprexor(false)** <span style="color:green">// If parameter is false, does not register basic commands are help, echo, var, and delete.</span><br>   
+**java Sprexor sp = new Sprexor()** or **Sprexor sp = new Sprexor(false)** <span style="color:green">// If parameter is false, does not register basic commands are help, echo, var, and delete.</span><br>   
 2. *property settings*<br>
     - **useSyntax** : If parameter is false, cannot use syntax(variable, comment etc..) and true, explicitly can use syntax.
     - **setComment** : set character to use comment. If 'useSyntax' is false, so non-effect anything. 
     - **importSprex** : put in class by 'implement CommandProvider' and allowed Class array. please refer to the above that necessary implement method.
     - **error_strict** : When you didn't called,that occurred error during parsing or other methods is saved MessageLog, throw exception.
-    - **register** : first parameter is name of command(used by exec), second parameter is 'new CommandProvider(){ }', *code* - programming to run(returned value would be last message, sp.send is able to print with msg type)<br>, *emptyArgs* is called when argument of command is empty<br>, *error* - be called when caught in method 'code'. last parameter is string that provide in 'help'
+    - **register** : first parameter is name of command(used by exec), second parameter is 'new CommandProvider(){ }', *code* - programming to run(returned value would be last message, sp.send is able to print with msg type)<br>, *emptyArgs* is called when argument emptied<br>, *error* - be called when caught in method 'code'. last parameter is String to show with 'help'
      command.
     - **setInterruptChar** : set a char to interrupt parsing.
     <br>   
@@ -179,7 +183,7 @@ Sprexor - 0.2.14
 If this method is called, then you cannot set property settings, and prepare to run command.<br>   
 4. *receiving message by IOCenter*<br>
 IOCenter io = new IOCenter(sp) <span style="color:green">//it read all of message, set message type to send, and let out from entry mode to force.
-    - **getMessage** : return the message to Object[2] first index: msg, second : msg type(STDOUT, ERR, CMT, NO_VALUE, custom1~3). And unit is 'command'.
+    - **getMessage** : return the message to Object[2] first index: msg, second : msg type(STDOUT, ERR, CMT, NO_VALUE, UNKNOWN, custom1~3). And unit is 'command'.
     - **getBlockMessage** : return the message to Vector. And unit is 'method'.
     - **getOutput** : return the message to Vector. And unit is 'constructor'.
     - **exitEntry** : exit entry mode.<br>   

@@ -79,9 +79,14 @@ public class Tools{
 				v.add(a[i]);
 			}
 		}
-		if(tmp.trim().isEmpty())return (String[]) v.toArray();
+		String[] strarr = new String[v.size()];
+		int i = 0;
+		for(Object obj : v.toArray()) {
+			strarr[i ++] = obj.toString();
+		}
+		if(tmp.trim().isEmpty())return strarr;
 		v.add(tmp);
-		return (String[]) v.toArray();
+		return strarr;
 	}
 	
 	public static CommandProvider[] toCPClass(CommandProvider  ... cp) {
@@ -92,6 +97,12 @@ public class Tools{
 		String tmp = "";
 		for(String str : args) tmp += str;
 		return tmp;
+	}
+	
+	public static String arg2String(String[] args, String ch) {
+		String tmp = "";
+		for(String str : args) tmp += str + ch;
+		return tmp.substring(0 , tmp.length() - 1);
 	}
 	
 	public static String[] excludeArr(String[] arg, int a) {
@@ -105,6 +116,15 @@ public class Tools{
 			count ++;
 		}
 		if(arg.length <= 1)tmp[0] = arg[0];
+		return tmp;
+	}
+	
+	public static String[] cutArr(String[] arr, int startIndex) {
+		if(startIndex == 0)return arr;
+		String[] tmp = new String[arr.length - startIndex];
+		for(int i = startIndex; i < arr.length; i ++) {
+			tmp[i - startIndex] = arr[i];
+		}
 		return tmp;
 	}
 	

@@ -8,13 +8,13 @@ public class test {
 		Sprexor n = new Sprexor();
 		n.register("add", new CommandProvider() {
 			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+			public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				int sum = 0;
 				for(String s : args) {
 					sum += Integer.parseInt(s);
 				}
 				scope.putData("1_", sum);
-				return sum;
+				return new IOCenter(sum + "", IOCenter.STDOUT);
 			}
 			
 			@Override
@@ -26,7 +26,7 @@ public class test {
 		n.register("optprs", new CommandProvider() {
 
 			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+			public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				
 				return null;
 			}
@@ -35,7 +35,7 @@ public class test {
 		
 		n.register("sum", new CommandProvider() {
 			@Override
-			public Object code(String[] args, boolean[] isWrapped, GlobalData scope) {
+			public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
 				String a = "";
 				int c = 0;
 				n.call("entry_on"); // It will be enter the EntryMode.
@@ -44,7 +44,7 @@ public class test {
 					c ++;
 				}
 				n.send("sum running...", IOCenter.CMT);
-				return a;
+				return null;
 			}
 			@Override
 			public Object EntryMode(String msg) {
