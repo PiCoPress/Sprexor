@@ -107,7 +107,7 @@ Sprexor - 0.2.16
 
 >String[] cutArr(String[], int startIndex) : Advanced excludeArr. It is similar to "String.substring".
 
->void smooth(String[] all, String[] optList, Class cl) : "all" is all of arguments, "optList" is array of options like "-abc or --abc" to process same works. And "cl" is Class to run method "option".
+>void smooth(String[] all, String[] optList, Class cl) : "all" is all of arguments, "optList" is array of options like "-abc or --abc" to process same works. And "cl" is a Class to run method Option(String name, String value).
 
 	
   

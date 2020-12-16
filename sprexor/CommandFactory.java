@@ -1,7 +1,6 @@
 package sprexor;
 
-
-public interface CommandProvider {
+public interface CommandFactory {
 	/**
 	 * This function will be called when occur error in the method : code. redefinable
 	 * @param e : Execption e
@@ -20,19 +19,33 @@ public interface CommandProvider {
 	/**
 	 * @param msg : input
 	 * @return print message.
-	 * @since 0.2.5
+	 * @throws SprexorException 
+	 * @throws CommandNotFoundException 
+	 * @since 0.2.18
 	 */
-	public default Object EntryMode(String msg) {
+	public default Object EntryMode(String msg) throws CommandNotFoundException, SprexorException {
 		return null;
 	}
-	//public Object apply(String[] args);
-	//public Object apply(String[] args, boolean[] isWrapped);
+	/**
+	 * for import other class(import class)
+	 * @return String
+	 */
+	public abstract String help();
+	/**
+	 * for import other class(import class)
+	 * @return String
+	 */
+	public abstract String getCommandName();
+	public default CommandFactory[] referenceClass() {
+		return null;
+	}
 	/**
 	 * Operate with java source overrided method.
 	 * @param args : arguments
 	 * @param isWrapped : (boolean) isWrapped[i] == whether args[i] is wrapped by " or '.
 	 * @param scope : GlobalData
+	 * @param sprex is Sprexor Instance which working now.
 	 * @return Object (any type which not array.)
 	 */
-	public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope);
+	public abstract IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope, Sprexor sprex);
 }

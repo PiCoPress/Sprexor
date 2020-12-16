@@ -10,25 +10,20 @@ import java.util.Vector;
 public class IOCenter {
 	private static Sprexor sp;
 	
-	protected static enum TYPE{
+	public static enum TYPE{
 		ERR, // red
 		CMT, // white or green
 		STDOUT, // white
+		WARN,
 		NO_VALUE,
 		UNKNOWN,
-		custom1,
-		custom2,
-		custom3,
 	}
-	
-	public static TYPE ERR = TYPE.ERR;
-	public static TYPE CMT = TYPE.CMT;
-	public static TYPE STDOUT = TYPE.STDOUT;
-	public static TYPE NO_VALUE = TYPE.NO_VALUE;
-	public static TYPE UNKNOWN = TYPE.UNKNOWN;
-	public static TYPE custom1 = TYPE.custom1;
-	public static TYPE custom2 = TYPE.custom2;
-	public static TYPE custom3 = TYPE.custom3;
+	public static final TYPE ERR = TYPE.ERR;
+	public static final TYPE CMT = TYPE.CMT;
+	public static final TYPE STDOUT = TYPE.STDOUT;
+	public static final TYPE WARN = TYPE.WARN;
+	public static final TYPE NO_VALUE = TYPE.NO_VALUE;
+	public static final TYPE UNKNOWN = TYPE.UNKNOWN;
 	
 	protected String Msg = "";
 	protected TYPE status = null;

@@ -57,22 +57,28 @@ public class test {
 		
 		n.bound(new Sprexor.dec(){
 			@Override
-			public String notfound(String id) { // redefine command_not_found error.
-				return "error : " + id;
+			public String notfound(String id) { // redefine command_not_found error and "out" method.
+				return "This command is not usable : " + id;
+			}
+			@Override
+			public void out(String msg, IOCenter.TYPE ii) {
+				if(ii.equals(IOCenter.ERR)) System.err.println(msg);
+				else System.out.println(msg);
 			}
 		});
 		
 		n.activate(); // activate
-		
+
 		IOCenter i = new IOCenter(n);
 		try {
 			while(true) {
+				System.out.print("root@test-pc:~$ ");
 				String ss = s.nextLine();
 				if(ss.trim().contentEquals("exit"))break;
 				n.exec(ss);
-				for(Object[] o : i.getBlockMessage()) {
+				/*for(Object[] o : i.getBlockMessage()) {
 					System.out.println(o[0] + " - " + o[1]);
-				}
+				}*/
 			}
 		} catch (CommandNotFoundException | SprexorException e) {
 			System.out.println(e);

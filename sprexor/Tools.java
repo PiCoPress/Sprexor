@@ -89,8 +89,8 @@ public class Tools{
 		return strarr;
 	}
 	
-	public static CommandProvider[] toCPClass(CommandProvider  ... cp) {
-		return cp;
+	public static CommandFactory[] toCFClasses(CommandFactory  ... cf) {
+		return cf;
 	}
 	
 	public static String arg2String(String[] args) {
@@ -120,7 +120,7 @@ public class Tools{
 	}
 	
 	public static String[] cutArr(String[] arr, int startIndex) {
-		if(startIndex == 0)return arr;
+		if(startIndex == 0 || arr.length - startIndex <= 0)return arr;
 		String[] tmp = new String[arr.length - startIndex];
 		for(int i = startIndex; i < arr.length; i ++) {
 			tmp[i - startIndex] = arr[i];
@@ -128,15 +128,14 @@ public class Tools{
 		return tmp;
 	}
 	
-	public static void smooth(String[] all, String[] optList, Class cl) throws NoSuchMethodException, SecurityException,
-	IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		int la = all.length, lo = optList.length;
-		for(int i = 0; i < la; i ++) {
-			for(int j = 0; j < lo; j ++) {
-				if(all[i].contentEquals(optList[j])) {
-					Method[] aa = cl.getMethods();
-					for(int k = 0; k < aa.length; k ++) if(aa[k].getName().contentEquals("option")) aa[k].invoke(null, optList[j]);
-				}
+	public static void smooth(String[] all, String[] optList, Class cl) throws NoSuchMethodException,
+	IllegalAccessException, InvocationTargetException {
+		Method me = cl.getDeclaredMethod("Option", String.class);
+		boolean mod = false;
+		for(String st : all) {
+			for(String opt : optList) {
+				if(opt.contentEquals(st)) { mod = true; continue; }
+				if(mod) { mod = false; me.invoke(null, opt, st); }
 			}
 		}
 	}

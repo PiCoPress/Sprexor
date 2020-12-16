@@ -4,17 +4,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
+import sprexor.IOCenter.TYPE;
+
 /*
- * Sprexor : the String Parser & Executor 0.2.16
+ * Sprexor : the String Parser & Executor 0.2.18-alpha1
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 
 public class Sprexor {
-	public static final String VERSION = "0.2.16";
+	public static final String VERSION = "0.2.18-alpha1";
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
-	private HashMap<String, String> helpDB;
+	private HashMap<String, String> helpDB = null;
+	private HashMap<String, CommandFactory> cmdlib = null;
+	private HashMap<String, String> helplib = null;
 	private String list = "";
 	private String comment = "#";
 	private boolean nextFlag = false;
@@ -38,7 +42,7 @@ public class Sprexor {
 		public default String notfound(String a) {
 			return "";
 		}
-		public default void out(String str, IOCenter.TYPE type) { }
+		public default void out(String str, IOCenter.TYPE type) { };
 	}
 	private String[] trimArr(String[] in) {
 		vec.clear();
@@ -87,6 +91,8 @@ public class Sprexor {
 		 recentMessage = new Object[2];
 		 envVar = new HashMap<String, Object>();
 		 helpDB = new HashMap<String, String>();
+		 cmdlib = new HashMap<String, CommandFactory>();
+		 helplib = new HashMap<String, String>();
 	}
 	
 	/**
@@ -96,21 +102,21 @@ public class Sprexor {
 	 * @see sprexor.cosmos.BasicPackages
 	 * @since 0.2.3
 	 */
-	public void importSprex(CommandProvider cmp) {
+	public void importSprex(CommandFactory cmp) {
 		if(configType != 0)return;
 		if(cmp.referenceClass() == null) {
-			cmd.put(cmp.getCommandName(), cmp);
-			helpDB.put(cmp.getCommandName(), cmp.help());
+			cmdlib.put(cmp.getCommandName(), cmp);
+			helplib.put(cmp.getCommandName(), cmp.help());
 			list += cmp.getCommandName() + "\n";
 		}else {
-			CommandProvider[] re = cmp.referenceClass();
-			for(CommandProvider cp : re) {
+			CommandFactory[] re = cmp.referenceClass();
+			for(CommandFactory cp : re) {
 				String tmpname = cp.getCommandName();
 				if(isExist(tmpname))return;
 				else if(tmpname.matches("\n|\r|#|@"))return;
 				
-				cmd.put(tmpname, cp);
-				helpDB.put(tmpname, cp.help());
+				cmdlib.put(tmpname, cp);
+				helplib.put(tmpname, cp.help());
 				list += tmpname + "\n";
 			}
 		}
@@ -133,10 +139,8 @@ public class Sprexor {
 	public boolean isExist(String s) {
 		if(configType != 2)return false;
 		if(s.trim().contentEquals(""))return false;
-		
 		String[] arr = list.split("\n");
 		boolean trace = false;
-		
 		for(String compareStr : arr) {
 			if(s.contentEquals(compareStr)) {
 				trace = true;
@@ -192,6 +196,7 @@ public class Sprexor {
 					String Result = "";
 					if(isExist(args[0])) {
 							Result = helpDB.get(args[0]);
+							if(Result == null) Result = helplib.get(args[0]);
 					}else {
 						Result = " ";
 					}
@@ -247,15 +252,13 @@ public class Sprexor {
 			 cmd.put("delete", new CommandProvider() {
 					@Override
 					public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+						int i = 0;
 						for(String name : args) {
-							envVar.remove(name);
+							Object returned = envVar.remove(name);
+							if(returned == null)logger(args[i] + " : not existed variable.", TYPE.WARN);
+							i ++;
 						}
-						if(args.length == 1) {
-							
-							System.out.println(args[0]);
-							envVar.remove(args[0]);
-						}
-						return new IOCenter("variable(s) deleted.", IOCenter.STDOUT);
+						return new IOCenter("variable(s) deleted.");
 					}
 					
 					@Override
@@ -284,8 +287,8 @@ public class Sprexor {
 			 helpDB.put("commands", "print all commands.");
 			 list += "help\nvar\necho\ndelete\ncommands\n";
 			 gd = new GlobalData();
-			 System.out.println("Sprexor : The Command Parser& Executor ( Version : " + VERSION + " )\n" +
-					"copyright(c) 2020 by PICOPress, All rights reserved.\n");
+			 logger("Sprexor : The Command Parser& Executor ( Version : " + VERSION + " )\n" +
+					"copyright(c) 2020 by PICOPress, All rights reserved.\n", TYPE.STDOUT);
 	}
 	
 	@Deprecated
@@ -384,6 +387,8 @@ public class Sprexor {
 		case "entry_off":
 			doEntry = false;
 		break;
+		default:
+			break;
 		}
 	}
 	/**
@@ -415,16 +420,18 @@ public class Sprexor {
 		if(!isExist(id))throw new CommandNotFoundException(id, id);
 		Object res = null;
 		CommandProvider obj = cmd.get(id);
+		CommandFactory cfObj = cmdlib.get(id);
 		args = trimArr(args);
 		try {
-			res = obj.code(args, new boolean[args.length], gd);
+			if(obj != null) res = obj.code(args, new boolean[args.length], gd);
+			else res = cfObj.code(args, new boolean[args.length], gd, this);
 		}catch(Exception e) {
-			res = obj.error(e);
+			res = obj != null ? obj.error(e) : cfObj.error(e);
 		}
 		logger(res,IOCenter.STDOUT);
 	}
 	
-	public void exec(String id, String[] args, boolean[] isWrapped)throws CommandNotFoundException, SprexorException {
+	public void exec(String id, String[] args, boolean[] isWrapped) throws CommandNotFoundException, SprexorException {
 		if(configType != 2) {
 			blockMessage.clear();
 			if(!errorIn)logger("sprexor was not prepared yet.", IOCenter.ERR);
@@ -435,11 +442,13 @@ public class Sprexor {
 		if(!isExist(id))throw new CommandNotFoundException(id, id);
 		Object res = null;
 		CommandProvider obj = cmd.get(id);
+		CommandFactory cfObj = cmdlib.get(id);
 		args = trimArr(args);
 		try {
-			res = obj.code(args, isWrapped, gd);
+			if(obj != null) res = obj.code(args, isWrapped, gd);
+			else res = cfObj.code(args, isWrapped, gd, this);
 		}catch(Exception e) {
-			res = obj.error(e);
+			res = obj != null ? obj.error(e) : cfObj.error(e);
 		}
 		logger(res,IOCenter.STDOUT);
 	}
@@ -464,16 +473,21 @@ public class Sprexor {
 				entryMode = false;
 				entryId = "";
 			}else {
-				logger(cmd.get(entryId).EntryMode(com), IOCenter.STDOUT);
+				logger(cmd.get(entryId) != null ? cmd.get(entryId).EntryMode(com) : cmdlib.get(entryId).EntryMode(com), IOCenter.STDOUT);
 				return;
 			}
 		}
-		
 		boolean varMode = false;
 		com = com.trim();
 		String id = com.split(" ")[0].trim();
 		if (ignoreCase) id = id.toLowerCase();
-		if(!isExist(id)) {
+		if(com.contentEquals("")) {
+			blockMessage.clear();
+			return;
+		}else if(com.startsWith(comment)) {
+			blockMessage.clear();
+			return;
+		}else if(!isExist(id)) {
 			blockMessage.clear();
 			if(!errorIn) { //how to throw error
 				if(codes.notfound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
@@ -482,16 +496,7 @@ public class Sprexor {
 			else throw new CommandNotFoundException(id, com);
 			return;
 			
-		}else if(com.contentEquals("")) {
-			blockMessage.clear();
-			return;
-		}
-		else if(com.startsWith(comment)) {
-			blockMessage.clear();
-			return;
-		}
-		
-		else if(id.indexOf(";") != -1) {
+		}else if(id.indexOf(";") != -1) {
 			blockMessage.clear();
 			String[] tmpo = com.split(";");
 			if(tmpo.length > 1)exec(com.split(";")[1]);
@@ -501,13 +506,13 @@ public class Sprexor {
 				else throw new SprexorException(pfe.EXPRSS_ERR, "cannot paese : " + com);
 				return;
 			}
-			logger(cmd.get(tmpo[0]).emptyArgs(), IOCenter.STDOUT);
+			logger(cmd.get(id) != null ? cmd.get(tmpo[0]).emptyArgs() : cmdlib.get(tmpo[0]).emptyArgs(), IOCenter.STDOUT);
 			return;
 		}
 		
 		if(com.indexOf(" ") == -1) {
 			if(!nextFlag)blockMessage.clear();
-			logger(cmd.get(id).emptyArgs(), IOCenter.STDOUT);
+			logger(cmd.get(id) != null ? cmd.get(id).emptyArgs() : cmdlib.get(id).emptyArgs(), IOCenter.STDOUT);
 			return;
 		}
 		
@@ -517,26 +522,29 @@ public class Sprexor {
 		}
 		
 		com = com.substring(id.length() + 1) + " ";
-		if(id.indexOf(comment) != -1) {
+		if(id.indexOf(comment) != -1) { // When encountered Comment.
 			Object res = null;
 			CommandProvider obj = cmd.get(id);
+			CommandFactory cfObj = cmdlib.get(id);
 			try {
-				res = obj.code(new String[0], new boolean[0], gd);
+				if(obj != null) res = obj.code(new String[0], new boolean[0], gd);
+				else res = cfObj.code(new String[0], new boolean[0], gd, this);
 			}catch(Exception e) {
-				res = obj.error(e);
+				res = obj != null ? obj.error(e) : cfObj.error(e);
 			}
-			
 			logger(res,IOCenter.STDOUT);
 			return;
 		}
-		
-		String[] comar = com.split("");
-		String[] args = new String[comar.length];
-		boolean[] wra = new boolean[comar.length];
-		short mod = 0, count = 0, pr = 0, smod = 0;
-		int allCount = 0;
+		String[] comar = com.split(""),
+				args = new String[comar.length];
 		String nextStr = "";
-		if(nextFlag)nextFlag = false; else blockMessage.clear();
+		short mod = 0,
+				count = 0,
+				pr = 0,
+				smod = 0;
+		int allCount = 0;
+		if(nextFlag) nextFlag = false; else blockMessage.clear();
+		boolean[] wra = new boolean[comar.length];
 		boolean lastSpace = false;
 		boolean cmtMode = false;
 		String cache = "";
@@ -740,7 +748,7 @@ public class Sprexor {
 				}
 			}
 			cache += c;
-		}
+		} 									// Parse Ended.
 		
 		if(mod != 0 || smod != 0 || pr != 0) {
 			blockMessage.clear();
@@ -751,18 +759,35 @@ public class Sprexor {
 		
 		IOCenter res = null;
 		CommandProvider obj = cmd.get(id);
+		CommandFactory cfObj = cmdlib.get(id);
 		args = trimArr(args);
 		wra = trimArr(wra, count);
 		
 		try {
-			if(!entryMode) res = obj.code(args, wra, gd);
-			if(obj.EntryMode("") != null || doEntry) {
-				entryMode = true;
-				entryId = id;
-				doEntry = true;
+			if(!entryMode) {
+				if(obj != null) res = obj.code(args, wra, gd);
+				else res = cfObj.code(args, wra, gd, this);
+				if(doEntry) {
+					entryMode = true;
+					entryId = id;
+				}
+			}
+			if(obj != null) {
+				if(obj.EntryMode(null) != null || doEntry) {
+					entryMode = true;
+					entryId = id;
+					doEntry = true;
+				}
+			}else {
+				if(cfObj.EntryMode(null) != null || doEntry) {
+					entryMode = true;
+					entryId = id;
+					doEntry = true;
+				}
 			}
 		}catch(Exception e) {
-			res = new IOCenter(obj.error(e).toString(), IOCenter.ERR);
+			if(obj != null)res = new IOCenter(obj.error(e).toString(), IOCenter.ERR);
+			else res = new IOCenter(cfObj.error(e).toString(), IOCenter.ERR);
 		}
 		if(res == null)res = new IOCenter("", IOCenter.UNKNOWN);
 		else if(res.status == null)res.status = IOCenter.UNKNOWN;

@@ -48,6 +48,7 @@
 >void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
 
 >void bound(Sprexor.dec) : 재정의된 인터페이스(dec) 를 통하여 커맨드가 발견되지 않았을 때의 처리방식을 설정합니다. dec.notfound, dec.out : 출력을 할 때마다 이 함수가 호출됩니다.
+
 >void ignoreUpperCase() : 대소문자를 무시하여 실행합니다.
 	
 	
@@ -101,9 +102,9 @@
 
 >String[] excludeArr(String[], int) : 배열에서 두번째 매개변수의 인덱스 값을 제외한 나머지를 반환합니다.
 
->String[] cuㅅArr(String[], int startIndex) : excludeArr 의 상위 호환, String.substring 과 비슷합니다.
+>String[] cutArr(String[], int startIndex) : excludeArr 의 상위 호환, String.substring 과 비슷합니다.
 
->void smooth(String[] all, String[] optList, Class cl) : all 매개변수는 탐색할 문자열 배열, optList 매개변수는 같은 방식의 처리를 할 옵션 이름들, 마지막 매개변수는 이 클래스에서 "option" 이라는 메서드를 찾아 실행합니다.
+>void smooth(String[] all, String[] optList, Class cl) : all 매개변수는 탐색할 문자열 배열, optList 매개변수는 같은 방식의 처리를 할 옵션 이름들, 마지막 매개변수는 이 클래스에서 Option(String name, String value) 이라는 메서드를 찾아 실행합니다.
     
     
 #### GlobalData

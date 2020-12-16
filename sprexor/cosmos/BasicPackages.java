@@ -1,16 +1,17 @@
 package sprexor.cosmos;
 
-import sprexor.CommandProvider;
+import sprexor.CommandFactory;
+import sprexor.Sprexor;
 import sprexor.GlobalData;
 import sprexor.IOCenter;
 import sprexor.Tools;
 
 /**
- * example Convenience Register Command Class.
+ * It is a Class to provide BasicPackages and to make CommandClass for who don't know.
  * @author PICOPress
  * @since 0.2.4
  */
-public class BasicPackages implements CommandProvider{
+public class BasicPackages implements CommandFactory{
 	public String getCommandName() {
 		return "find";
 	}
@@ -25,15 +26,14 @@ public class BasicPackages implements CommandProvider{
 		return help();
 	}
 	
-	public CommandProvider[] referenceClass() {
-		return Tools.toCPClass(this, new For()); //Tools.toCPClass();
+	public CommandFactory[] referenceClass() {
+		return Tools.toCFClasses(this, new For()); //Tools.toCFClasses();
 	}
 	
 	public IOCenter error(Exception e) {
 		return new IOCenter(e.getMessage(), IOCenter.ERR);
 	}
-	
-	@Override public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+	public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope, Sprexor sprex) {
 		String tmp = Tools.arg2String(Tools.excludeArr(args, 0));
 		String find = args[0];
 		String[] splitedStr = tmp.split("\n");
