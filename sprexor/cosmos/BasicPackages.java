@@ -17,9 +17,9 @@ public class BasicPackages implements CommandFactory{
 	}
 	
 	public String help() {
-		return "::: The BasicPackages 0.2.16 :::\n" +
+		return "::: The BasicPackages 0.2.18 :::\n" +
 				"1. find : Find text(s) by the unit of line.\n" + 
-				"2. for : Repeat and run commands for count.";
+				"2. repeat : Repeat the text.";
 	}
 	
 	public Object emptyArgs() {

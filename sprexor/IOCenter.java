@@ -9,7 +9,6 @@ import java.util.Vector;
  */
 public class IOCenter {
 	private static Sprexor sp;
-	
 	public static enum TYPE{
 		ERR, // red
 		CMT, // white or green

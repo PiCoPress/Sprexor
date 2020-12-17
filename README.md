@@ -1,5 +1,6 @@
-Sprexor - 0.2.16
+Sprexor - 0.2.18-alpha2 Venom
 =================
+[Updated Things](./Update.md)
 
 [if you want to see Korean, chlick here.](./KOREAN.md "한국어로 보기")
 
@@ -7,6 +8,7 @@ Sprexor - 0.2.16
 1. [Sprexor](#sprexor)
 2. [IOCenter](#iocenter)
 3. [CommandProvider](#commandprovider)
+4. [CommandFactory](#commandfactory)
 4. [Tools](#tools)
 5. [GlobalData](#globaldata)
 6. [cosmos.BasicPackages](#standard-library)
@@ -58,7 +60,7 @@ Sprexor - 0.2.16
   
 #### IOCenter
 
->enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, UNKNOWN, custom1, custom2, custom3}
+>enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, UNKNOWN, WARN}
 
 >IOCenter ioc = new IOCenter(Sprexor sp); // IOCenter lead to load output from sp.
 
@@ -74,9 +76,21 @@ Sprexor - 0.2.16
   
 #### CommandProvider
 
->public IOCenter code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove a data that saved in GlobalData.)
+>>public IOCenter code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove a data that saved in GlobalData.)
 
->>public default Object emptyArgs() : This method will be called when argument of Sprexor.exec is empty. (redefinable)
+>>public default Object emptyArgs(GlobalData) : This method will be called when argument of Sprexor.exec is empty. (redefinable)
+
+>>public default Object error(Exception) : This method will be called when occurred error in your code(from Sprexor.register). (redefinable)
+
+>>public default Object EntryMode(String msg) : Run if in the entry mode.
+
+#### CommandFactory
+
+>CommandFactory is used for make to Class Command(s) will be imported to Sprexor.
+
+>>public IOCenter code(String[] args, boolean[] isWrapped, GlobalData gd, Sprexor) : arg(arguments), isWrapped[i](whether arg[i] is wrapped by ' or "), gd (you can get or put or remove a data that saved in GlobalData.), Sprexor has this instance.
+
+>>public default Object emptyArgs(GlobalData, Sprexor) : This method will be called when argument of Sprexor.exec is empty. (redefinable), Sprexor has this instance.
 
 >>public default Object error(Exception) : This method will be called when occurred error in your code(from Sprexor.register). (redefinable)
 
@@ -97,7 +111,7 @@ Sprexor - 0.2.16
 
 >String[] binder(String[] ar, int start) : bind String Array from start index to end.
 
->CommandProvider[] toCPClass(CommandProvider...) : It return CommandProvider array to arguments. (for referenceClass of CommandProvider)
+>CommandFactory[] toCFClass(CommandFactory...) : It return CommandProvider array to arguments. (for referenceClass of CommandProvider)
 
 >String arg2String(String[]) : It return String to array.
 
@@ -108,6 +122,8 @@ Sprexor - 0.2.16
 >String[] cutArr(String[], int startIndex) : Advanced excludeArr. It is similar to "String.substring".
 
 >void smooth(String[] all, String[] optList, Class cl) : "all" is all of arguments, "optList" is array of options like "-abc or --abc" to process same works. And "cl" is a Class to run method Option(String name, String value).
+
+>String SMT_FORM(String) : Replace certain tag in the String to tab or newline char.
 
 	
   
@@ -141,7 +157,7 @@ Sprexor - 0.2.16
 >Let you know how to use this and it will be added many features.
 
 >>"find" : This command finds content with unit of line. Bug fixed.
->>"for" : for (txt | code) (count) Str...
+>>"repeat" : Repeat the text.
 	
   
 #### Exception
@@ -154,7 +170,7 @@ Sprexor - 0.2.16
 
 >@(name) :  Load saved value.
 
->var (name) (value) : Defining (name) = (value).
+>var (name) (value) : Define (name) = (value).
 
 >echo
 

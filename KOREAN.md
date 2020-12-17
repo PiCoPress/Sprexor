@@ -1,16 +1,19 @@
-# 스프렉서 (Sprexor) - 0.2.16
+# 스프렉서 (Sprexor) - 0.2.18-alpha2 Venom
+
+[0.2.18 수정사항](./Update.md)
 
 **목차**
 1. [Sprexor](#sprexor)
 2. [IOCenter](#iocenter)
 3. [CommandProvider](#commandprovider)
-4. [Tools](#tools)
-5. [GlobalData](#globaldata)
-6. [cosmos.BasicPackages](#standard-library)
-7. [Exception](#exception)
-8. [Basic Features](#basic-feature)
-9. [예시코드보기](./test.java)
-10. [메뉴얼](#menual)
+4. [CommandFactory](#commandfactory)
+5. [Tools](#tools)
+6. [GlobalData](#globaldata)
+7. [cosmos.BasicPackages](#standard-library)
+8. [Exception](#exception)
+9. [Basic Features](#basic-feature)
+10. [예시코드보기](./test.java)
+11. [메뉴얼](#menual)
 
 
 #### Sprexor
@@ -56,7 +59,7 @@
 
 >코드의 꼬임을 방지하기 위해 만든 클래스
 
->>enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, custom1, custom2, custom3}
+>>enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, UNKNOWN, WARN}
 
 >>IOCenter ioc = new IOCenter(Sprexor sp); sp로부터 출력 결과를 가져옴
 
@@ -73,15 +76,28 @@
 
 >public IOcenter code(String[] args, boolean[] isWrapped, GlobalData gd) : arg(인자), isWrapped [i] (arg[i]가 ' 또는 "로 묶였는지 여부), gd (GlobalData로부터 저장하거나 삭제할 수 있습니다. )
 
->public default Object emptyArgs() : exec에서 들어온 매개변수가 없으면 실행됩니다. (재정의 가능)
+>public default IOCenter emptyArgs(GlobalData) : exec에서 들어온 매개변수가 없으면 실행됩니다. (재정의 가능)
 
 >public default Object error(Exception) : 오버라이드된 code 메소드에서 오류날 경우 이 메소드가 실행됩니다.(register로부터). (재정의 가능)
 
->public default String getCommandName() : 임폴트 전용 메소드
-
->public default String help() : 임폴트 전용 메소드
-
 >public default Object EntryMode(String msg) : 이 메서드의 반환 값이 null이 아닐 경우 그 엔트리 모드가 끝날 때까지 이 메서드가 실행됩니다. (확장 용이성)
+
+
+#### CommandFactory
+
+>CommandFactory는 Sprexor에서 임폴트될 명령어를 만들기 위해 사용됩니다.
+
+>>public IOcenter code(String[] args, boolean[] isWrapped, GlobalData gd, Sprexor) : arg(인자), isWrapped [i] (arg[i]가 ' 또는 "로 묶였는지 여부), gd (GlobalData로부터 저장하거나 삭제할 수 있습니다. ), Sprexor는 현재 인스턴스에 대한 오브젝트입니다.
+
+>>public default IOCenter emptyArgs(GlobalData, Sprexor) : exec에서 들어온 매개변수가 없으면 실행됩니다. (재정의 가능), Sprexor는 현재 인스턴스에 대한 오브젝트입니다.
+
+>>public default Object error(Exception) : 오버라이드된 code 메소드에서 오류날 경우 이 메소드가 실행됩니다.(register로부터). (재정의 가능)
+
+>>public default String getCommandName() : 임폴트 전용 메소드
+
+>>public default String help() : 임폴트 전용 메소드
+
+>>public default Object EntryMode(String msg) : 이 메서드의 반환 값이 null이 아닐 경우 그 엔트리 모드가 끝날 때까지 이 메서드가 실행됩니다. (확장 용이성)
     
     
 #### Tools
@@ -94,7 +110,7 @@
 
 >String[] binder (문자열 배열, 시작값) : 문자열 배열에서 사직값부터 마지막 값까지 묶어 반환합니다.
 
->CommandProvider[] toCPClass(CommandProvider...) : 매개변수들을 배열로 반환합니다. (CommandProvider 의 referenceClass 전용)
+>CommandFactory[] toCㄹClass(CommandFactory...) : 매개변수들을 배열로 반환합니다. (CommandProvider 의 referenceClass 전용)
 
 >String arg2String(String[]) : 문자열 배열을 문자열로 반환합니다.
 
@@ -105,6 +121,8 @@
 >String[] cutArr(String[], int startIndex) : excludeArr 의 상위 호환, String.substring 과 비슷합니다.
 
 >void smooth(String[] all, String[] optList, Class cl) : all 매개변수는 탐색할 문자열 배열, optList 매개변수는 같은 방식의 처리를 할 옵션 이름들, 마지막 매개변수는 이 클래스에서 Option(String name, String value) 이라는 메서드를 찾아 실행합니다.
+
+>String SMT_FORM(String) : 문자열의 특정 형식에 맞는 태그를 탭이나 개행문자로 변환합니다.
     
     
 #### GlobalData
@@ -137,7 +155,7 @@
 >이걸 어떻게 사용할 지 알려주고, 미래에 많은 기능이 추가될 것입니다.
 
 >>"find" : 리눅스의 grep과 유사합니다. 버그 수정됨.
->>"for" : for(txt | code) (count) Str...
+>>"repeat" : 입력된 문자를 반복합니다.
 	
 	
 #### Exception
@@ -156,9 +174,9 @@
 
 >help : 도움말을 출력합니다.
 
->delete (name) : 변수 삭제함
+>delete (name) : 변수를 삭제합니다.
 
->commands : 사용 가능 커맨드 출력함
+>commands : 사용 가능 커맨드를 출력합니다.
 	
 ---
 	*엔트리 모드는 유용한 기능입니다. 리눅스에서 'cat'명령어를 입력하는 것과 유사합니다.*

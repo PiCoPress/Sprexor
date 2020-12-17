@@ -14,8 +14,8 @@ public interface CommandProvider {
 	 * this function will be called when argument is null. redefinable
 	 * @return Object (any type which not array.)
 	 */
-	public default Object emptyArgs() {
-		return "Argument emptied.";
+	public default IOCenter emptyArgs(GlobalData gd) {
+		return new IOCenter("Argument emptied.");
 	};
 	/**
 	 * @param msg : input

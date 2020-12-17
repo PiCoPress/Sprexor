@@ -7,12 +7,14 @@ import java.util.Vector;
 import sprexor.IOCenter.TYPE;
 
 /*
- * Sprexor : the String Parser & Executor 0.2.18-alpha1
+ * Sprexor : the String Parser & Executor 0.2.18-alpha2 Venom
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 
 public class Sprexor {
-	public static final String VERSION = "0.2.18-alpha1";
+	public static final String VERSION = "0.2.18-alpha2";
+	public static final String CODENAME = "Venom";
+	public static final int API_LEVEL = 15;
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -106,7 +108,9 @@ public class Sprexor {
 		if(configType != 0)return;
 		if(cmp.referenceClass() == null) {
 			cmdlib.put(cmp.getCommandName(), cmp);
-			helplib.put(cmp.getCommandName(), cmp.help());
+			String hlpMsg = cmp.help();
+			if(hlpMsg.startsWith("**USE_SMT_FORM**")) hlpMsg = Tools.SMT_FORM(hlpMsg.substring(16));
+			helplib.put(cmp.getCommandName(), hlpMsg);
 			list += cmp.getCommandName() + "\n";
 		}else {
 			CommandFactory[] re = cmp.referenceClass();
@@ -116,7 +120,9 @@ public class Sprexor {
 				else if(tmpname.matches("\n|\r|#|@"))return;
 				
 				cmdlib.put(tmpname, cp);
-				helplib.put(tmpname, cp.help());
+				String hlpMsg = cp.help();
+				if(hlpMsg.startsWith("**USE_SMT_FORM**")) hlpMsg = Tools.SMT_FORM(hlpMsg.substring(16));
+				helplib.put(tmpname, hlpMsg);
 				list += tmpname + "\n";
 			}
 		}
@@ -207,8 +213,8 @@ public class Sprexor {
 					return 1;
 				}
 				@Override 
-				public Object emptyArgs() {
-					return "blanked name.";
+				public IOCenter emptyArgs(GlobalData gd) {
+					return new IOCenter("blanked name.");
 				}
 			 });
 			 cmd.put("var", new CommandProvider() {
@@ -224,13 +230,13 @@ public class Sprexor {
 						else envVar.put(args[0],IOCenter.NO_VALUE);
 						return new IOCenter("NO_VALUE", IOCenter.NO_VALUE);
 					}else {
-						return new IOCenter(emptyArgs().toString(), IOCenter.CMT);
+						return new IOCenter(emptyArgs(gd).toString(), IOCenter.CMT);
 					}
 				}
 				
 				@Override
-				public Object emptyArgs() {
-					return "USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"";
+				public IOCenter emptyArgs(GlobalData gd) {
+					return new IOCenter("USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"");
 				}
 			 });
 			 cmd.put("echo", new CommandProvider() {
@@ -244,8 +250,8 @@ public class Sprexor {
 				}
 				
 				@Override
-				public Object emptyArgs() {
-					return "";
+				public IOCenter emptyArgs(GlobalData gd) {
+					return null;
 				}
 			});
 			 
@@ -262,8 +268,8 @@ public class Sprexor {
 					}
 					
 					@Override
-					public Object emptyArgs() {
-						return "variable name is blank.";
+					public IOCenter emptyArgs(GlobalData gd) {
+						return new IOCenter("variable name is blank.");
 					}
 				});
 			 
@@ -271,12 +277,12 @@ public class Sprexor {
 
 				@Override
 				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
-					return new IOCenter(list, IOCenter.STDOUT);
+					return new IOCenter(list);
 				}
 				
 				@Override
-				public Object emptyArgs() {
-					return list;
+				public IOCenter emptyArgs(GlobalData gd) {
+					return new IOCenter(list);
 				}
 			 });
 			 
@@ -304,7 +310,6 @@ public class Sprexor {
 		if(configType != 0)return;
 		errorIn = true;
 	}
-	
 	/**
 	 * Register new command for work with java source that you programmed. new command name shouldn't be included special character like *, ^ etc...
 	 * <br> <br> it renamed mkcmd to register (when version is 0.2.3).<br>
@@ -466,6 +471,9 @@ public class Sprexor {
 			recentMessage[1] = IOCenter.ERR;
 			MessageLog.add(recentMessage);
 			return;
+		}else if(gd == null) {
+			logger("Err : GlobalData isn't formed.", IOCenter.ERR);
+			return;
 		}
 		if(entryMode) {
 			blockMessage.clear();
@@ -506,20 +514,17 @@ public class Sprexor {
 				else throw new SprexorException(pfe.EXPRSS_ERR, "cannot paese : " + com);
 				return;
 			}
-			logger(cmd.get(id) != null ? cmd.get(tmpo[0]).emptyArgs() : cmdlib.get(tmpo[0]).emptyArgs(), IOCenter.STDOUT);
+			logger(cmd.get(id) != null ? cmd.get(tmpo[0]).emptyArgs(gd) : cmdlib.get(tmpo[0]).emptyArgs(gd, this), IOCenter.STDOUT);
 			return;
 		}
 		
 		if(com.indexOf(" ") == -1) {
 			if(!nextFlag)blockMessage.clear();
-			logger(cmd.get(id) != null ? cmd.get(id).emptyArgs() : cmdlib.get(id).emptyArgs(), IOCenter.STDOUT);
+			logger(cmd.get(id) != null ? cmd.get(id).emptyArgs(gd) : cmdlib.get(id).emptyArgs(gd, this), IOCenter.STDOUT);
 			return;
 		}
 		
-		if(gd == null) {
-			logger("Err : GlobalData isn't formed.", IOCenter.ERR);
-			return;
-		}
+		
 		
 		com = com.substring(id.length() + 1) + " ";
 		if(id.indexOf(comment) != -1) { // When encountered Comment.
@@ -527,8 +532,8 @@ public class Sprexor {
 			CommandProvider obj = cmd.get(id);
 			CommandFactory cfObj = cmdlib.get(id);
 			try {
-				if(obj != null) res = obj.code(new String[0], new boolean[0], gd);
-				else res = cfObj.code(new String[0], new boolean[0], gd, this);
+				if(obj != null) res = obj.emptyArgs(gd);
+				else res = cfObj.emptyArgs(gd, this);
 			}catch(Exception e) {
 				res = obj != null ? obj.error(e) : cfObj.error(e);
 			}
