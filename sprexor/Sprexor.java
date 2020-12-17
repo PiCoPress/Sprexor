@@ -251,7 +251,7 @@ public class Sprexor {
 				
 				@Override
 				public IOCenter emptyArgs(GlobalData gd) {
-					return null;
+					return new IOCenter("");
 				}
 			});
 			 
@@ -520,7 +520,7 @@ public class Sprexor {
 		
 		if(com.indexOf(" ") == -1) {
 			if(!nextFlag)blockMessage.clear();
-			logger(cmd.get(id) != null ? cmd.get(id).emptyArgs(gd) : cmdlib.get(id).emptyArgs(gd, this), IOCenter.STDOUT);
+			logger(cmd.get(id) != null ? cmd.get(id).emptyArgs(gd).Msg : cmdlib.get(id).emptyArgs(gd, this).Msg, IOCenter.STDOUT);
 			return;
 		}
 		
@@ -532,8 +532,8 @@ public class Sprexor {
 			CommandProvider obj = cmd.get(id);
 			CommandFactory cfObj = cmdlib.get(id);
 			try {
-				if(obj != null) res = obj.emptyArgs(gd);
-				else res = cfObj.emptyArgs(gd, this);
+				if(obj != null) res = obj.emptyArgs(gd).Msg;
+				else res = cfObj.emptyArgs(gd, this).Msg;
 			}catch(Exception e) {
 				res = obj != null ? obj.error(e) : cfObj.error(e);
 			}
