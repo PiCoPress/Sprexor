@@ -1,4 +1,4 @@
-Sprexor - 0.2.18-alpha2 Venom
+Sprexor - 0.2.18-alpha3 Venom
 =================
 [Updated Things](./Update.md)
 
@@ -20,7 +20,7 @@ Sprexor - 0.2.18-alpha2 Venom
 
 #### Sprexor
 
->Sprexor(void | boolean) : Sprexor constructor. If the argument equals false, basic command - help, echo, var delete - will not be defined.
+>Sprexor() : Sprexor constructor.
 
 >boolean isExist(String) Check if the Command is exist.
 

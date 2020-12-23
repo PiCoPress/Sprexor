@@ -11,7 +11,7 @@ public interface CommandFactory {
 	}
 	/**
 	 * this function will be called when argument is null. redefinable
-	 * @return Object (any type which not array.)
+	 * @return IOCenter (any type which not array.)
 	 */
 	public default IOCenter emptyArgs(GlobalData scope, Sprexor sprex) {
 		return new IOCenter("Argument emptied.");
@@ -41,11 +41,10 @@ public interface CommandFactory {
 	}
 	/**
 	 * Operate with java source overrided method.
-	 * @param args : arguments
-	 * @param isWrapped : (boolean) isWrapped[i] == whether args[i] is wrapped by " or '.
+	 * @param args : The processed parameter.
 	 * @param scope : GlobalData
 	 * @param sprex is Sprexor Instance which working now.
-	 * @return Object (any type which not array.)
+	 * @return IOCenter
 	 */
-	public abstract IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope, Sprexor sprex);
+	public abstract IOCenter code(Component args, GlobalData scope, Sprexor sprex);
 }

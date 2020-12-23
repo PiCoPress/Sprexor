@@ -6,6 +6,7 @@ import sprexor.IOCenter;
 import sprexor.Tools;
 import sprexor.Sprexor;
 import sprexor.SprexorException;
+import sprexor.Component;
 
 class For implements sprexor.CommandFactory {
 	@Override
@@ -20,14 +21,14 @@ class For implements sprexor.CommandFactory {
 				"-h, -H, --help[tt] Print this message.";
 	}
 	@Override
-	public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope, Sprexor sprex) {
-		String option_1 = args[0];
+	public IOCenter code(Component args, GlobalData scope, Sprexor sprex) {
+		String option_1 = args.gets(0);
 		switch(option_1) {
 		case "-t" :
 		case "-T" :
 		case "--text" :
-			int i = Integer.parseInt(args[1]);
-			return new IOCenter(Tools.arg2String(Tools.cutArr(args, 2), " ").repeat(i));
+			int i = Integer.parseInt(args.gets(1));
+			return new IOCenter(Tools.arg2String(Tools.cutArr(args.get(), 2), " ").repeat(i));
 		case "-h":
 		case "-H":
 		case "--help":

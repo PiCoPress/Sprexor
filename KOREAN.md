@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.18-alpha2 Venom
+# 스프렉서 (Sprexor) - 0.2.18-alpha3 Venom
 
 [0.2.18 수정사항](./Update.md)
 

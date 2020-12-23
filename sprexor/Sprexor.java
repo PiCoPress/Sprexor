@@ -3,16 +3,17 @@ package sprexor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
-
 import sprexor.IOCenter.TYPE;
 
-/*
- * Sprexor : the String Parser & Executor 0.2.18-alpha2 Venom
+/**
+ * Sprexor : the String Parser & Executor 0.2.18-alpha3 Venom
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
-
 public class Sprexor {
-	public static final String VERSION = "0.2.18-alpha2";
+	//
+	// Internal Variables.
+	//
+	public static final String VERSION = "0.2.18-alpha3";
 	public static final String CODENAME = "Venom";
 	public static final int API_LEVEL = 15;
 	protected Vector<Object[]> MessageLog = null;
@@ -40,12 +41,19 @@ public class Sprexor {
 	protected String entryId = "";
 	protected dec codes = new dec() {};
 	protected Vector<Object[]> blockMessage = new Vector<Object[]>();
-	public interface dec{
-		public default String notfound(String a) {
-			return "";
-		}
+	/**
+	 * The Dec class is used to customize working.
+	 * <br> Methods to implement : 
+	 * <br> - notFound : This method will be invoked when could not find a command to run.
+	 * <br> - out : This method will be invoked when print any message.
+	 */
+	public interface dec {
+		public default String notfound(String a) { return ""; }
 		public default void out(String str, IOCenter.TYPE type) { };
 	}
+	//
+	// private methods.
+	//
 	private String[] trimArr(String[] in) {
 		vec.clear();
 		for(String eval : in) {
@@ -77,16 +85,9 @@ public class Sprexor {
 		recentMessage = oe;
 		codes.out(oo.toString().trim(), ii);
 	}
-	
-	@SuppressWarnings("unused")
-	private String join(String t, String[] obj) {
-		String sumStr = "";
-		for(String str : obj) {
-			sumStr += "\t" + str + t;
-		}
-		return sumStr;
-	}
-	
+	//
+	//public methods.
+	//
 	public Sprexor() {
 		MessageLog = new Vector<Object[]>();
 		 cmd = new HashMap<String, CommandProvider>();
@@ -98,7 +99,8 @@ public class Sprexor {
 	}
 	
 	/**
-	 * 	import spesific command in this sprexor. Activate before.
+	 * importSprex is get command context(s) that created with class in this sprexor.
+	 * <br> It cannot be used after 'activate' method invoked.
 	 * @param cmp : Other class that implemented with CommandProvider
 	 * @see sprexor.CommandProvider
 	 * @see sprexor.cosmos.BasicPackages
@@ -198,11 +200,11 @@ public class Sprexor {
 		if(!isInit)return;
 		 cmd.put("help",new CommandProvider() {
 				@Override
-				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				public IOCenter code(Component args, GlobalData scope) {
 					String Result = "";
-					if(isExist(args[0])) {
-							Result = helpDB.get(args[0]);
-							if(Result == null) Result = helplib.get(args[0]);
+					if(isExist(args.gets(0))) {
+							Result = helpDB.get(args.gets(0));
+							if(Result == null) Result = helplib.get(args.gets(0));
 					}else {
 						Result = " ";
 					}
@@ -219,15 +221,15 @@ public class Sprexor {
 			 });
 			 cmd.put("var", new CommandProvider() {
 				@Override
-				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				public IOCenter code(Component args, GlobalData scope) {
 					if(!doBasicSyn) return new IOCenter("Syntax is not permitted.", IOCenter.ERR);
-					if(args.length == 2) {	
-						if(envVar.containsKey(args[0]))envVar.replace(args[0], args[1]);
-						else envVar.put(args[0],args[1]);
-						return new IOCenter(args[1], IOCenter.STDOUT);
-					}else if(args.length == 1) {
-						if(envVar.containsKey(args[0]))envVar.replace(args[0], IOCenter.NO_VALUE);
-						else envVar.put(args[0],IOCenter.NO_VALUE);
+					if(args.length() == 2) {	
+						if(envVar.containsKey(args.gets(0)))envVar.replace(args.gets(0), args.gets(1));
+						else envVar.put(args.gets(0), args.gets(1));
+						return new IOCenter(args.gets(1), IOCenter.STDOUT);
+					}else if(args.length() == 1) {
+						if(envVar.containsKey(args.gets(0)))envVar.replace(args.gets(0), IOCenter.NO_VALUE);
+						else envVar.put(args.gets(0),IOCenter.NO_VALUE);
 						return new IOCenter("NO_VALUE", IOCenter.NO_VALUE);
 					}else {
 						return new IOCenter(emptyArgs(gd).toString(), IOCenter.CMT);
@@ -241,7 +243,7 @@ public class Sprexor {
 			 });
 			 cmd.put("echo", new CommandProvider() {
 				@Override
-				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				public IOCenter code(Component args, GlobalData scope) {
 					String sum = "";
 					for(String str : args) {
 						sum += str + " ";
@@ -257,11 +259,11 @@ public class Sprexor {
 			 
 			 cmd.put("delete", new CommandProvider() {
 					@Override
-					public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+					public IOCenter code(Component args, GlobalData scope) {
 						int i = 0;
 						for(String name : args) {
 							Object returned = envVar.remove(name);
-							if(returned == null)logger(args[i] + " : not existed variable.", TYPE.WARN);
+							if(returned == null)logger(args.gets(i) + " : not existed variable.", TYPE.WARN);
 							i ++;
 						}
 						return new IOCenter("variable(s) deleted.");
@@ -276,7 +278,7 @@ public class Sprexor {
 			 cmd.put("commands", new CommandProvider() {
 
 				@Override
-				public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
+				public IOCenter code(Component args, GlobalData scope) {
 					return new IOCenter(list);
 				}
 				
@@ -304,19 +306,19 @@ public class Sprexor {
 	}
 	
 	/**
-	 * If run it, throw error(SorexorExcepion etc..) instead of output message.
+	 * If called this method, Error is thrown as a Exception rather than console print.
+	 * @see sprexor.SprexorException
 	 */
 	public void error_strict() {
 		if(configType != 0)return;
 		errorIn = true;
 	}
 	/**
-	 * Register new command for work with java source that you programmed. new command name shouldn't be included special character like *, ^ etc...
-	 * <br> <br> it renamed mkcmd to register (when version is 0.2.3).<br>
-	 * <br> If activated, cannot use this. Activate before.
-	 * @param str : command name that should not conain special characters. 
+	 * This method Register a command. Registring command name shouldn't be included special character like *, ^ etc...
+	 * <br> It cannot be used after activated by the "activate" method.
+	 * @param str : command name that should not be contained special characters. 
 	 * @param cp : CommandProvider
-	 * @param hd : help message.
+	 * @param hd : helping message is used in basic command - help.
 	 * @since 0.1
 	 * @see sprexor.CommandProvider
 	 */
@@ -428,8 +430,8 @@ public class Sprexor {
 		CommandFactory cfObj = cmdlib.get(id);
 		args = trimArr(args);
 		try {
-			if(obj != null) res = obj.code(args, new boolean[args.length], gd);
-			else res = cfObj.code(args, new boolean[args.length], gd, this);
+			if(obj != null) res = obj.code(new Component(args, new boolean[args.length]), gd);
+			else res = cfObj.code(new Component(args, new boolean[args.length]), gd, this);
 		}catch(Exception e) {
 			res = obj != null ? obj.error(e) : cfObj.error(e);
 		}
@@ -448,10 +450,11 @@ public class Sprexor {
 		Object res = null;
 		CommandProvider obj = cmd.get(id);
 		CommandFactory cfObj = cmdlib.get(id);
+		Component comval = new Component(args, isWrapped);
 		args = trimArr(args);
 		try {
-			if(obj != null) res = obj.code(args, isWrapped, gd);
-			else res = cfObj.code(args, isWrapped, gd, this);
+			if(obj != null) res = obj.code(comval, gd);
+			else res = cfObj.code(comval, gd, this);
 		}catch(Exception e) {
 			res = obj != null ? obj.error(e) : cfObj.error(e);
 		}
@@ -459,22 +462,16 @@ public class Sprexor {
 	}
 	
 	/**
-	 * It can execute command as powerful string parser, and it will be run that you configure. Activate after.
+	 * It can execute line as powerful string parser,
+	 * <br> and it will be run that you configure. 
+	 * <br> It cannot be used before run a "activate" method.
 	 * @param com : command string to execute
 	 * @throws CommandNotFoundException
 	 * @throws SprexorException 
 	 * @since 0.1
 	 */
 	public void exec(String com) throws CommandNotFoundException, SprexorException {
-		if(configType != 2) {
-			recentMessage[0] = "sprexor was not prepared yet.";
-			recentMessage[1] = IOCenter.ERR;
-			MessageLog.add(recentMessage);
-			return;
-		}else if(gd == null) {
-			logger("Err : GlobalData isn't formed.", IOCenter.ERR);
-			return;
-		}
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
 		if(entryMode) {
 			blockMessage.clear();
 			if(!doEntry) {
@@ -767,11 +764,11 @@ public class Sprexor {
 		CommandFactory cfObj = cmdlib.get(id);
 		args = trimArr(args);
 		wra = trimArr(wra, count);
-		
+		Component comval = new Component(args, wra);
 		try {
 			if(!entryMode) {
-				if(obj != null) res = obj.code(args, wra, gd);
-				else res = cfObj.code(args, wra, gd, this);
+				if(obj != null) res = obj.code(comval, gd);
+				else res = cfObj.code(comval, gd, this);
 				if(doEntry) {
 					entryMode = true;
 					entryId = id;

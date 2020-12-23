@@ -3,7 +3,7 @@ package sprexor;
 
 public interface CommandProvider {
 	/**
-	 * This function will be called when occur error in the method : code. redefinable
+	 * This function will be called when occur error in the method - code. 
 	 * @param e : Execption e
 	 * @return Object (any type which not array.)
 	 */
@@ -12,12 +12,13 @@ public interface CommandProvider {
 	}
 	/**
 	 * this function will be called when argument is null. redefinable
-	 * @return Object (any type which not array.)
+	 * @return IOCenter
 	 */
 	public default IOCenter emptyArgs(GlobalData gd) {
 		return new IOCenter("Argument emptied.");
 	};
 	/**
+	 * If entered in EntryMode, this method will be invoked.
 	 * @param msg : input
 	 * @return print message.
 	 * @since 0.2.5
@@ -28,11 +29,10 @@ public interface CommandProvider {
 	//public Object apply(String[] args);
 	//public Object apply(String[] args, boolean[] isWrapped);
 	/**
-	 * Operate with java source overrided method.
-	 * @param args : arguments
-	 * @param isWrapped : (boolean) isWrapped[i] == whether args[i] is wrapped by " or '.
+	 * This method should implement to work.
+	 * @param args : The Component Class that processed parameter.
 	 * @param scope : GlobalData
-	 * @return Object (any type which not array.)
+	 * @return IOCenter
 	 */
-	public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope);
+	public abstract IOCenter code(Component args, GlobalData scope);
 }

@@ -5,6 +5,7 @@ import sprexor.Sprexor;
 import sprexor.GlobalData;
 import sprexor.IOCenter;
 import sprexor.Tools;
+import sprexor.Component;
 
 /**
  * It is a Class to provide BasicPackages and to make CommandClass for who don't know.
@@ -33,9 +34,9 @@ public class BasicPackages implements CommandFactory{
 	public IOCenter error(Exception e) {
 		return new IOCenter(e.getMessage(), IOCenter.ERR);
 	}
-	public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope, Sprexor sprex) {
-		String tmp = Tools.arg2String(Tools.excludeArr(args, 0));
-		String find = args[0];
+	public IOCenter code(Component args, GlobalData scope, Sprexor sprex) {
+		String tmp = Tools.arg2String(Tools.excludeArr(args.get(), 0));
+		String find = args.gets(0);
 		String[] splitedStr = tmp.split("\n");
 		String result = "";
 		
