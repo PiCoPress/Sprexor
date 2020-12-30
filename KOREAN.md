@@ -9,8 +9,9 @@
 4. [CommandFactory](#commandfactory)
 5. [Tools](#tools)
 6. [GlobalData](#globaldata)
-7. [cosmos.BasicPackages](#standard-library)
+7. [cosmos.BasicPackages](#the-cosmos)
 8. [Exception](#exception)
+9. [Component](#component)
 9. [Basic Features](#basic-feature)
 10. [예시코드보기](./test.java)
 11. [메뉴얼](#menual)
@@ -50,26 +51,26 @@
 
 >void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
 
->void bound(Sprexor.dec) : 재정의된 인터페이스(dec) 를 통하여 커맨드가 발견되지 않았을 때의 처리방식을 설정합니다. dec.notfound, dec.out : 출력을 할 때마다 이 함수가 호출됩니다.
-
 >void ignoreUpperCase() : 대소문자를 무시하여 실행합니다.
+
+>Impose impose
+
+>Reflection reflect
 	
 	
 #### IOCenter
 
->코드의 꼬임을 방지하기 위해 만든 클래스
+>Sprexor의 입출력을 담당합니다.
 
 >>enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, UNKNOWN, WARN}
 
->>IOCenter ioc = new IOCenter(Sprexor sp); sp로부터 출력 결과를 가져옴
-
->>Object[] getMessage() : 최근 메세지를 반환합니다.. 목차 0 : 출력, 목차 1 : TYPE
-
->>Vector<Object[]> getOuput() : 출력된 모든 메세지를 반환합니다. 생성자 단위로 저장됩니다.
-
 >>exitEntry() : 엔트리 모드를 종료합니다. 
 
->>Vector<Object[]> getBlockMessage() : 'exec'메서드가 실행되는 동안 출력된 모든 결과를 반환합니다. 즉, 함수 단위로 저장됩니다.
+>>@Deprecated ~getBlockMessage()~ 
+
+>>@Deprecated ~getMessage()~ 
+
+>>@Deprecated ~getOuput()~ 
 	
 	
 #### CommandProvider
@@ -104,13 +105,11 @@
 
 >String Processer(String opt) : 서브프로세스 사용 (window : exe, linux : sh)
 
->byte AnalOption(String, boolean[]) : 옵션을 분석하며 그에 맞는 byte 를 반환합니다.
 
->boolean OptionPrs(String, String, byte) throws Exception : 분석된 옵션을 읽어 첫번쨰 매개변수와 일치한지 아닌지를 반환힙니다.
 
 >String[] binder (문자열 배열, 시작값) : 문자열 배열에서 사직값부터 마지막 값까지 묶어 반환합니다.
 
->CommandFactory[] toCㄹClass(CommandFactory...) : 매개변수들을 배열로 반환합니다. (CommandProvider 의 referenceClass 전용)
+>CommandFactory[] toCFClass(CommandFactory...) : 매개변수들을 배열로 반환합니다. (CommandProvider 의 referenceClass 전용)
 
 >String arg2String(String[]) : 문자열 배열을 문자열로 반환합니다.
 
@@ -120,9 +119,13 @@
 
 >String[] cutArr(String[], int startIndex) : excludeArr 의 상위 호환, String.substring 과 비슷합니다.
 
->void smooth(String[] all, String[] optList, Class cl) : all 매개변수는 탐색할 문자열 배열, optList 매개변수는 같은 방식의 처리를 할 옵션 이름들, 마지막 매개변수는 이 클래스에서 Option(String name, String value) 이라는 메서드를 찾아 실행합니다.
-
 >String SMT_FORM(String) : 문자열의 특정 형식에 맞는 태그를 탭이나 개행문자로 변환합니다.
+
+>@Deprecated ~smooth(String[] all, String[] optList, Class cl)~
+
+>@Deprecated ~AnalOption(String, boolean[])~
+
+>@Deprecated ~OptionPrs(String, String, byte)~ throws Exception
     
     
 #### GlobalData
@@ -148,7 +151,7 @@
 >>boolean forceReset() : 스코프에 읽기 전용인 데이터가 있어도 무시하고 전부 초기화합니다.
     
     
-#### Standard library
+#### The Cosmos
 
 ##### BasicBackages
 
@@ -163,6 +166,28 @@
 >SprexorException
 
 >CommandNotFoundException
+
+#### Component
+
+>String[] get() : 인자를 문자열 배열로 반환합니다.
+
+>Unit get(int) : 아래에 있는 부수 클래스를 반환합니다.
+
+>String gets(int) : 문자열로 해당 원소를 반환합니다.
+
+>String getsWithoutOption(int) : 옵션을 무시하고 유효성이 있는 원소를 반환합니다.
+
+>String[] getAllOption() : 모든 옵션을 순서대로 가져옵니다.
+
+>String[] Parse(String)
+
+>int length() : 인수의 길이를 반환합니다.
+
+>*Unit Class*
+
+>>- String toString()
+
+>>- boolean isWrapped() : 문자열로 감싸져 있는 원소인지 확인합니다.
 
 #### basic feature
 

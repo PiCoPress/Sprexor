@@ -5,10 +5,10 @@ public interface CommandProvider {
 	/**
 	 * This function will be called when occur error in the method - code. 
 	 * @param e : Execption e
-	 * @return Object (any type which not array.)
+	 * @return String
 	 */
-	public default Object error(Exception e) {
-		return null;
+	public default String error(Exception e) {
+		return "Error has been occured (1).";
 	}
 	/**
 	 * this function will be called when argument is null. redefinable
@@ -23,7 +23,7 @@ public interface CommandProvider {
 	 * @return print message.
 	 * @since 0.2.5
 	 */
-	public default Object EntryMode(String msg) {
+	public default String EntryMode(String msg) {
 		return null;
 	}
 	//public Object apply(String[] args);

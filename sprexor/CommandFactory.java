@@ -4,9 +4,9 @@ public interface CommandFactory {
 	/**
 	 * This function will be called when occur error in the method : code. redefinable
 	 * @param e : Execption e
-	 * @return Object (any type which not array.)
+	 * @return String
 	 */
-	public default Object error(Exception e) {
+	public default String error(Exception e) {
 		return null;
 	}
 	/**
@@ -23,7 +23,7 @@ public interface CommandFactory {
 	 * @throws CommandNotFoundException 
 	 * @since 0.2.18
 	 */
-	public default Object EntryMode(String msg) throws CommandNotFoundException, SprexorException {
+	public default String EntryMode(String msg) throws CommandNotFoundException, SprexorException {
 		return null;
 	}
 	/**

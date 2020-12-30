@@ -31,8 +31,8 @@ public class BasicPackages implements CommandFactory{
 		return Tools.toCFClasses(this, new For()); //Tools.toCFClasses();
 	}
 	
-	public IOCenter error(Exception e) {
-		return new IOCenter(e.getMessage(), IOCenter.ERR);
+	public String error(Exception e) {
+		return e.getMessage();
 	}
 	public IOCenter code(Component args, GlobalData scope, Sprexor sprex) {
 		String tmp = Tools.arg2String(Tools.excludeArr(args.get(), 0));

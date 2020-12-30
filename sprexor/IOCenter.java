@@ -26,7 +26,7 @@ public class IOCenter {
 	
 	protected String Msg = "";
 	protected TYPE status = null;
-	
+	@Deprecated
 	protected static void log(Object s, TYPE t) {
 		sp.recentMessage[0] = s;
 		sp.recentMessage[1] = t;
@@ -42,17 +42,19 @@ public class IOCenter {
 		Msg = msg;
 		status = STDOUT;
 	}
-	/**
+	/**@deprecated
 	 * return recent Message.
 	 * @return Object[2], index 1 : message<br>index 2 : message TYPE
 	 */
+	@Deprecated
 	public Object[] getMessage() {
 		return sp.recentMessage;
 	}
-	/**
+	/**@deprecated
 	 * return all of message that printed in Sprexor.exec method. This range is smaller than range of getOutput().
 	 * @return Vector
 	 */
+	@Deprecated
 	public Vector<Object[]> getBlockMessage() {
 		return sp.blockMessage;
 	}
@@ -65,11 +67,12 @@ public class IOCenter {
 		sp.entryId = "";
 		sp.doEntry = false;
 	}
-	/**
+	/**@deprecated
 	 * return all of message.
 	 * @return Vector(Object[2]),  index 1 : message<br>index 2 : message TYPE
 	 * @since 0.2.1
 	 */
+	@Deprecated
 	public Vector<Object[]> getOutput(){
 		return sp.MessageLog;
 	}

@@ -8,9 +8,9 @@ public class test {
 		Sprexor n = new Sprexor();
 		n.importSprex(new BasicPackages());
 		
-		n.bound(new Sprexor.dec(){
+		n.impose = new Sprexor.Impose(){
 			@Override
-			public String notfound(String id) { // Redefine command_not_found error and "out" method.
+			public String IdNotFound(String id) { // Redefine command_not_found error and "out" method.
 				return "This command is not usable : " + id;
 			}
 			@Override
@@ -18,7 +18,7 @@ public class test {
 				if(ii.equals(IOCenter.ERR)) System.err.println(msg);
 				else System.out.println(msg);
 			}
-		});
+		};
 		n.activate(); // activate
 		try {
 			while(true) {

@@ -9,13 +9,14 @@ Sprexor - 0.2.18-alpha3 Venom
 2. [IOCenter](#iocenter)
 3. [CommandProvider](#commandprovider)
 4. [CommandFactory](#commandfactory)
-4. [Tools](#tools)
-5. [GlobalData](#globaldata)
-6. [cosmos.BasicPackages](#standard-library)
-7. [Exception](#exception)
-8. [Basic Features](#basic-feature)
-9. [see example code](./test.java)
-10. [Menual](#menual)
+5. [Tools](#tools)
+6. [GlobalData](#globaldata)
+7. [cosmos.BasicPackages](#the-cosmos)
+8. [Exception](#exception)
+9. [Component](#component)
+10. [Basic Features](#basic-feature)
+11. [See example code](./test.java)
+12. [Menual](#menual)
 
 
 #### Sprexor
@@ -52,10 +53,11 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >void unBasicFeatures() : Basic commands are not registered.
 
->void bound(Sprexor.dec) : Redefine command_not_found Error handler ; dec.notfound, dec.out : It will be run when print output.
-
 >void ignoreUpperCase() : Ignore Upper case of character.
 
+>Impose impose
+
+>Reflection reflect
 	
   
 #### IOCenter
@@ -64,13 +66,13 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >IOCenter ioc = new IOCenter(Sprexor sp); // IOCenter lead to load output from sp.
 
->Object[] getMessage() : Return recent message. index 0 : output, index 1 : TYPE
-
->Vector<Object[]> getOuput() : Return all of printed message. And the scope is 'constructor'.
-
 >void ExitEntry() : Exit the EntryMode.
 
->Vector<Object[]> getBlockMessage() : Return all of output that printed from 'exec' method that called once. So, it means that the scope is 'method'.
+>@Deprecated ~getBlockMessage()~
+
+>@Deprecated ~getMessage()~
+
+>@Deprecated ~getOuput()~
 
     
   
@@ -105,9 +107,6 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >String Processer(String opt) : use subprocess (window : exe, linux : sh)
 
->byte AnalOption(String, boolean[])
-
->boolean OptionPrs(String, String, byte) throws Exception
 
 >String[] binder(String[] ar, int start) : bind String Array from start index to end.
 
@@ -121,9 +120,13 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >String[] cutArr(String[], int startIndex) : Advanced excludeArr. It is similar to "String.substring".
 
->void smooth(String[] all, String[] optList, Class cl) : "all" is all of arguments, "optList" is array of options like "-abc or --abc" to process same works. And "cl" is a Class to run method Option(String name, String value).
-
 >String SMT_FORM(String) : Replace certain tag in the String to tab or newline char.
+
+>@Deprecated ~smooth(String[] all, String[] optList, Class cl)~ 
+
+>@Deprecated ~AnalOption(String, boolean[])~
+
+>@Deprecated ~OptionPrs(String, String, byte)~ throws Exception
 
 	
   
@@ -150,7 +153,7 @@ Sprexor - 0.2.18-alpha3 Venom
 >>boolean forceReset() : Although scope has read-only data, erase all of data.
 	
   
-#### Standard Library
+#### The Cosmos
 
 ##### BasicPackages
 
@@ -165,6 +168,28 @@ Sprexor - 0.2.18-alpha3 Venom
 >SprexorException
 
 >CommandNotFoundException
+
+#### Component
+
+>String[] get() : Return string array.
+
+>Unit get(int) : Return Unit Class.
+
+>String gets(int) : Return a unit of argument to string.
+
+>String getsWithoutOption(int) : Return a unit by ignoring options.
+
+>String[] getAllOption() : Get all of options.
+
+>String[] Parse(String)
+
+>int length() : Return the size of arguments.
+
+>*Unit Class*
+
+>>- String toString()
+
+>>- boolean isWrapped() : If it is wrapped with string, return true, otherwise false.
 	
 #### Basic Feature
 

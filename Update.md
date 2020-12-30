@@ -1,5 +1,23 @@
-#0.2.18-alpha3 Venom
+#0.2.18-alpha4 Venom
 
-- New Class - Component : For manage arguments.
-- Almost javadoc notes were improved.
-- Parameters of "code" method changed in CommandProvider and CommandFactory.
+>**changes :**
+
+>- Documents improved.
+
+>- Ingrained null problem almost fixed.
+
+>- Code optimized.
+
+>- Regacy Features removed.
+
+>- Reflection added.
+
+>**new :**
+
+>Component
+>- String getsWithoutOption(int)
+>- String[] getallOption()
+>- String[] Parse(String)
+
+>Unit Class 
+>- enum A ArgumentType (Default, SetType1, SetType2, Str)
