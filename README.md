@@ -1,4 +1,4 @@
-Sprexor - 0.2.18-alpha3 Venom
+Sprexor - 0.2.18-alpha5 Venom
 =================
 [Updated Things](./Update.md)
 
@@ -10,7 +10,6 @@ Sprexor - 0.2.18-alpha3 Venom
 3. [CommandProvider](#commandprovider)
 4. [CommandFactory](#commandfactory)
 5. [Tools](#tools)
-6. [GlobalData](#globaldata)
 7. [cosmos.BasicPackages](#the-cosmos)
 8. [Exception](#exception)
 9. [Component](#component)
@@ -43,11 +42,9 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >void activate() : It should activate by this before use "exec" method. and if activate, it cannot setting properties.
 
->void call(String key) : control flow of system to key. Available keys : entry_on, entry_off.
+>void call(String key) : Control Sprexor to String key.
 
 >void error_strict() : If it is called, throw SprexorException instead of print at IOCenter.
-
->void setInterruptChar(String|char) : Interrupt Sprexor during parsing if detected this char.
 
 >void unSemicolon() : Semicolon is not abled to use.
 
@@ -55,9 +52,13 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >void ignoreUpperCase() : Ignore Upper case of character.
 
+>String eval(String)
+
 >Impose impose
 
 >Reflection reflect
+
+>String eval(String)
 	
   
 #### IOCenter
@@ -107,7 +108,6 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >String Processer(String opt) : use subprocess (window : exe, linux : sh)
 
-
 >String[] binder(String[] ar, int start) : bind String Array from start index to end.
 
 >CommandFactory[] toCFClass(CommandFactory...) : It return CommandProvider array to arguments. (for referenceClass of CommandProvider)
@@ -127,30 +127,6 @@ Sprexor - 0.2.18-alpha3 Venom
 >@Deprecated ~AnalOption(String, boolean[])~
 
 >@Deprecated ~OptionPrs(String, String, byte)~ throws Exception
-
-	
-  
-#### GlobalData 
-
->This is one of parameter of CommandProvider->code. Also it is scope that can access each the registered command. If last character of key name is '_', this data would be read-only.
-
->>GlobalData gd = new GlobalData()
-
->>void putData(String key, Object value)
-
->>Object getData(String key)
-
->>void removeData(String key)
-
->>boolean existData(Obejct data)
-
->>boolean existKey(String key)
-
->>boolean modify(String key, Object data)
-
->>boolean reset()
-
->>boolean forceReset() : Although scope has read-only data, erase all of data.
 	
   
 #### The Cosmos
@@ -175,13 +151,15 @@ Sprexor - 0.2.18-alpha3 Venom
 
 >Unit get(int) : Return Unit Class.
 
->String gets(int) : Return a unit of argument to string.
+>String getsf(int) : Return a unit of argument to string.
 
->String getsWithoutOption(int) : Return a unit by ignoring options.
+>String gets(int) : Return a unit by ignoring options.
 
 >String[] getAllOption() : Get all of options.
 
 >String[] Parse(String)
+
+>void add(String)
 
 >int length() : Return the size of arguments.
 
@@ -190,6 +168,8 @@ Sprexor - 0.2.18-alpha3 Venom
 >>- String toString()
 
 >>- boolean isWrapped() : If it is wrapped with string, return true, otherwise false.
+
+>>- Object label
 	
 #### Basic Feature
 
@@ -218,7 +198,6 @@ Sprexor - 0.2.18-alpha3 Venom
     - **error_strict** : When you didn't called,that occurred error during parsing or other methods is saved MessageLog, throw exception.
     - **register** : first parameter is name of command(used by exec), second parameter is 'new CommandProvider(){ }', *code* - programming to run(returned value would be last message, sp.send is able to print with msg type)<br>, *emptyArgs* is called when argument emptied<br>, *error* - be called when caught in method 'code'. last parameter is String to show with 'help'
      command.
-    - **setInterruptChar** : set a char to interrupt parsing.
     <br>   
 3. *calling activate*<br>
 If this method is called, then you cannot set property settings, and prepare to run command.<br>   

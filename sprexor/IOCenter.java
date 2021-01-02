@@ -23,7 +23,9 @@ public class IOCenter {
 	public static final TYPE WARN = TYPE.WARN;
 	public static final TYPE NO_VALUE = TYPE.NO_VALUE;
 	public static final TYPE UNKNOWN = TYPE.UNKNOWN;
-	
+	//
+	public Object label;
+	//
 	protected String Msg = "";
 	protected TYPE status = null;
 	@Deprecated
@@ -31,6 +33,7 @@ public class IOCenter {
 		sp.recentMessage[0] = s;
 		sp.recentMessage[1] = t;
 	}
+	@Deprecated
 	public IOCenter(Sprexor s) {
 		sp = s;
 	}
@@ -41,6 +44,16 @@ public class IOCenter {
 	public IOCenter(String msg) {
 		Msg = msg;
 		status = STDOUT;
+	}
+	public IOCenter(String msg, TYPE ty, Object l) {
+		Msg = msg;
+		status = ty;
+		label = l;
+	}
+	public IOCenter(String msg, Object l) {
+		Msg = msg;
+		status = STDOUT;
+		label = l;
 	}
 	/**@deprecated
 	 * return recent Message.

@@ -1,10 +1,15 @@
 package sprexor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Vector;
 
 public class Component implements Iterable<String> {
-	String[] v;
-	boolean[] isw;
+	private String[] v;
+	private boolean[] isw;
+	private Object[] reserved;
 	enum A{
 		Default,
 		Str,
@@ -19,6 +24,7 @@ public class Component implements Iterable<String> {
 	public class Unit{
 		String k = "";
 		boolean b;
+		public Object label;
 		public final A ArgumentType;
 		protected Unit(String k, boolean b) {
 			this.k = k;
@@ -39,6 +45,16 @@ public class Component implements Iterable<String> {
 	protected Component(String[] v, boolean[] isw) {
 		this.v = v;
 		this.isw = isw;
+		reserved = new Object[1024];
+	}
+	protected Component(String[] v) {
+		this.v = v;
+		this.isw = new boolean[v.length];
+		reserved = new Object[1024];
+	}
+	public void add(String value) {
+		v = Arrays.copyOf(v, v.length + 1);
+		v[v.length - 1] = value;
 	}
 	/**
 	 *Return all of arguments to string array. 
@@ -53,14 +69,16 @@ public class Component implements Iterable<String> {
 	 * @return Unit Class
 	 */
 	public Unit get(int i) {
-		return new Unit(v[i], isw[i]);
+		Unit u = new Unit(v[i], isw[i]);
+		u.label = reserved[i];
+		return u;
 	}
 	/**
 	 * 
 	 * @param i - The index to get unit of arguments.
 	 * @return String
 	 */
-	public String gets(int i) {
+	public String getsf(int i) {
 		return v[i];
 	}
 	/**
@@ -68,7 +86,7 @@ public class Component implements Iterable<String> {
 	 * @param i
 	 * @return String
 	 */
-	public String getsWithoutOption(int i) {
+	public String gets(int i) {
 		int c = 0;
 		for(String s : v) {
 			if(!s.startsWith("-") || isw[c]) {
@@ -83,15 +101,20 @@ public class Component implements Iterable<String> {
 	 * @return String[]
 	 */
 	public String[] getAllOption() {
-		int c = 0,
-			i = 0;
-		String[] arr = {};
+		int c = 0;
+		ArrayList<String> arr = new ArrayList<String>();
 		for(String s : v) {
-			if(s.startsWith("-") && !isw[c ++]) {
-				arr[i ++] = s.substring(s.startsWith("--") ? 2 : 1);
+			if(s.startsWith("-") && !isw[c ++] && arr.contains(s)) {
+				arr.add(s.substring(s.startsWith("--") ? 2 : 1));
 			}
 		}
-		return null;
+		arr.sort(new Comparator<String>() {
+			@Override
+			public int compare(String s, String ss) {
+				return s.compareTo(ss);
+			}
+		});
+		return arr.toArray(new String[arr.size()]);
 	}
 	public static String[] Parse(String str) {
 		String[] pops = str.split(""),
@@ -190,7 +213,12 @@ public class Component implements Iterable<String> {
 			}
 			cache += c;
 		}
-		return units;
+		Vector<String> vec = new Vector<String>();
+		for(String st : units) {
+			if(st == null)break;
+			vec.add(st);
+		}
+		return vec.toArray(new String[vec.size()]);
 	}
 	/**
 	 * Return the size of arguments.
@@ -198,6 +226,9 @@ public class Component implements Iterable<String> {
 	 */
 	public int length() {
 		return v.length;
+	}
+	protected void setLabel(int index, Object obj) {
+		reserved[index] = obj;
 	}
 	@Override
 	public Iterator<String> iterator() {

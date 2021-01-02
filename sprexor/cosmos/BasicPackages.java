@@ -2,7 +2,6 @@ package sprexor.cosmos;
 
 import sprexor.CommandFactory;
 import sprexor.Sprexor;
-import sprexor.GlobalData;
 import sprexor.IOCenter;
 import sprexor.Tools;
 import sprexor.Component;
@@ -34,7 +33,7 @@ public class BasicPackages implements CommandFactory{
 	public String error(Exception e) {
 		return e.getMessage();
 	}
-	public IOCenter code(Component args, GlobalData scope, Sprexor sprex) {
+	public IOCenter code(Component args, Sprexor sprex) {
 		String tmp = Tools.arg2String(Tools.excludeArr(args.get(), 0));
 		String find = args.gets(0);
 		String[] splitedStr = tmp.split("\n");

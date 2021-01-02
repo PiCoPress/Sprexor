@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.18-alpha3 Venom
+# 스프렉서 (Sprexor) - 0.2.18-alpha5 Venom
 
 [0.2.18 수정사항](./Update.md)
 
@@ -8,7 +8,6 @@
 3. [CommandProvider](#commandprovider)
 4. [CommandFactory](#commandfactory)
 5. [Tools](#tools)
-6. [GlobalData](#globaldata)
 7. [cosmos.BasicPackages](#the-cosmos)
 8. [Exception](#exception)
 9. [Component](#component)
@@ -45,17 +44,19 @@
 
 >void error_strict() : 이 메서드가 실행된다면 애러를 IOCenter에 저장하는것 대신 오류를 던집니다.
 
->void setInterruptChar(String|char) : 파싱중에 설정된 문자가 있을 경우 그 문자를 기준으로 강제 종료합니다.
-
 >void unSemicolon() : 세미콜론 사용을 하지 않습니다.
 
 >void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
 
 >void ignoreUpperCase() : 대소문자를 무시하여 실행합니다.
 
+>String eval(String)
+
 >Impose impose
 
 >Reflection reflect
+
+>Object label
 	
 	
 #### IOCenter
@@ -105,8 +106,6 @@
 
 >String Processer(String opt) : 서브프로세스 사용 (window : exe, linux : sh)
 
-
-
 >String[] binder (문자열 배열, 시작값) : 문자열 배열에서 사직값부터 마지막 값까지 묶어 반환합니다.
 
 >CommandFactory[] toCFClass(CommandFactory...) : 매개변수들을 배열로 반환합니다. (CommandProvider 의 referenceClass 전용)
@@ -126,29 +125,6 @@
 >@Deprecated ~AnalOption(String, boolean[])~
 
 >@Deprecated ~OptionPrs(String, String, byte)~ throws Exception
-    
-    
-#### GlobalData
-
->이것은 CommandProvider의 code 메소드의 매개변수 중 하나입니다. 각 명령어마다 접근할 수 있는 하나의 스코프이며, 규칙은 어느 데이터를 삭제하거나 바꾸고자 할 경우 그 키의 이름의 마지막 글자가 _이면 읽기 전용이라고 정했습니다. 따라서 삭제나 변경은 불가능합니다.
-
->>GlobalData gd = new GlobalData()
-
->>void putData(String key, Object value)
-
->>Object getData(String key)
-
->>void removeData(String key)
-
->>boolean existData(Obejct data)
-
->>boolean existKey(String key)
-
->>boolean modify(String key, Object data)
-
->>boolean reset() : 스코프를 초기화하지만 읽기 전용 데이터가 있으면 실행되지 않습니다.
-
->>boolean forceReset() : 스코프에 읽기 전용인 데이터가 있어도 무시하고 전부 초기화합니다.
     
     
 #### The Cosmos
@@ -173,13 +149,15 @@
 
 >Unit get(int) : 아래에 있는 부수 클래스를 반환합니다.
 
->String gets(int) : 문자열로 해당 원소를 반환합니다.
+>String getsf(int) : 문자열로 해당 원소를 반환합니다.
 
->String getsWithoutOption(int) : 옵션을 무시하고 유효성이 있는 원소를 반환합니다.
+>String gets(int) : 옵션을 무시하고 유효성이 있는 원소를 반환합니다.
 
 >String[] getAllOption() : 모든 옵션을 순서대로 가져옵니다.
 
 >String[] Parse(String)
+
+>void add(String)
 
 >int length() : 인수의 길이를 반환합니다.
 
@@ -188,6 +166,8 @@
 >>- String toString()
 
 >>- boolean isWrapped() : 문자열로 감싸져 있는 원소인지 확인합니다.
+
+>>- Object label
 
 #### basic feature
 
@@ -216,7 +196,6 @@
     - **importSprex** : 매개변수에는 CommandProvider 를 implement 한 클래스를 집어넣습니다.클래스 배열도 들어올 수 있습니다. 그 클래스의 필수 구현 요소는 위를 참조하세요.
     - **error_strict** : 호출하지 않았을 경우 파싱중 발생한 오류나 내부 다른 메소드들의 오류가 MessageLog 에 쌓이지만 호출할 경우, try-catch 구문을 사용하여 예외를 처리해야 합니다.
     - **register** : 첫번쨰 매개변수는 명령어의 이름을 지정하고(exec 에서 사용됩니다), 두번쨰 매개변수는 new CommandProvider(){ } 에서 오버라이딩 할 메소드에서 *code*는 실행시킬 코드를 작성(리턴값은 마지막에 출력할 메세지, sp.send 로 메세지의 타입을 지정하여 출력 가능)<br>, *emptyArgs* 는 명령어의 인자가 없을 경우 호출<br>, *error*는 code메소드 내에서 오류가 발생했을 경우 호출됩니다. 마지막 매개변수는 help 명령어에서 이 명령어에 대한 도움말을 제공하는 문자열입니다.
-    - **setInterruptChar** : 강제로 종료할 문자 1글자를 설정합니다.
     <br>   
 3. *activate 호출*<br>
 이 메소드가 실행되면 위의 내부 설정을 더 이상 사용할 수 없으며, 명령어를 실행할 수 있도록 설정합니다.<br>   

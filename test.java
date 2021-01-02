@@ -19,7 +19,12 @@ public class test {
 				else System.out.println(msg);
 			}
 		};
-		n.activate(); // activate
+		try {
+			n.activate();
+		} catch (SprexorException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} // activate
 		try {
 			while(true) {
 				System.out.print("root@test-pc:~$ ");
@@ -27,8 +32,9 @@ public class test {
 				if(ss.trim().contentEquals("exit"))break;
 				n.exec(ss);
 			}
-		} catch (CommandNotFoundException | SprexorException e) {
+		} catch (SprexorException e) {
 			System.out.println(e);
 		}
+		s.close();
 	}
 }

@@ -1,23 +1,21 @@
-#0.2.18-alpha4 Venom
+#0.2.18-alpha5 Venom
 
 >**changes :**
 
->- Documents improved.
+>- GlobalData removed.
 
->- Ingrained null problem almost fixed.
+>- CommandNotFoundException merged with SprexorException.
 
->- Code optimized.
+>- cosmos.For improved.
 
->- Regacy Features removed.
+>- Reflection improved.
 
->- Reflection added.
+>- InterruptChar removed.
 
->**new :**
+>- label added.
 
->Component
->- String getsWithoutOption(int)
->- String[] getallOption()
->- String[] Parse(String)
+>- Sprexor.eval added.
 
->Unit Class 
->- enum A ArgumentType (Default, SetType1, SetType2, Str)
+>- Sprexor Performance is improved.
+
+>- Sprexor providing things upgraded internally.

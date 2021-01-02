@@ -14,13 +14,13 @@ public interface CommandProvider {
 	 * this function will be called when argument is null. redefinable
 	 * @return IOCenter
 	 */
-	public default IOCenter emptyArgs(GlobalData gd) {
+	public default IOCenter emptyArgs() {
 		return new IOCenter("Argument emptied.");
 	};
 	/**
 	 * If entered in EntryMode, this method will be invoked.
-	 * @param msg : input
-	 * @return print message.
+	 * @param msg
+	 * @return string
 	 * @since 0.2.5
 	 */
 	public default String EntryMode(String msg) {
@@ -29,10 +29,9 @@ public interface CommandProvider {
 	//public Object apply(String[] args);
 	//public Object apply(String[] args, boolean[] isWrapped);
 	/**
-	 * This method should implement to work.
+	 * It is main method for operate.
 	 * @param args : The Component Class that processed parameter.
-	 * @param scope : GlobalData
 	 * @return IOCenter
 	 */
-	public abstract IOCenter code(Component args, GlobalData scope);
+	public abstract IOCenter code(Component args);
 }

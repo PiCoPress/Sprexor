@@ -7,23 +7,22 @@ public interface CommandFactory {
 	 * @return String
 	 */
 	public default String error(Exception e) {
-		return null;
+		return "Error";
 	}
 	/**
 	 * this function will be called when argument is null. redefinable
 	 * @return IOCenter (any type which not array.)
 	 */
-	public default IOCenter emptyArgs(GlobalData scope, Sprexor sprex) {
+	public default IOCenter emptyArgs(Sprexor SprexorInstance) {
 		return new IOCenter("Argument emptied.");
 	};
 	/**
 	 * @param msg : input
 	 * @return print message.
-	 * @throws SprexorException 
-	 * @throws CommandNotFoundException 
+	 * @throws SprexorException
 	 * @since 0.2.18
 	 */
-	public default String EntryMode(String msg) throws CommandNotFoundException, SprexorException {
+	public default String EntryMode(String msg) throws SprexorException {
 		return null;
 	}
 	/**
@@ -42,9 +41,8 @@ public interface CommandFactory {
 	/**
 	 * Operate with java source overrided method.
 	 * @param args : The processed parameter.
-	 * @param scope : GlobalData
-	 * @param sprex is Sprexor Instance which working now.
+	 * @param SprexorInstance
 	 * @return IOCenter
 	 */
-	public abstract IOCenter code(Component args, GlobalData scope, Sprexor sprex);
+	public abstract IOCenter code(Component args, Sprexor SprexorInstance);
 }

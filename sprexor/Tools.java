@@ -143,7 +143,7 @@ public class Tools{
 		return tmp;
 	}
 	/**
-	 * The value(s) that smaller than startIndex cut away, and other will be returned.
+	 * The index that smaller than startIndex cut away, and others will be returned.
 	 * @param arr
 	 * @param startIndex
 	 * @return String array.
@@ -241,5 +241,30 @@ public class Tools{
 			if(!open) result += ch;
 		}
 		return result;
+	}
+	//
+	protected class s_label {
+		String value;
+		boolean first = true;
+		s_label(){
+			value = "STRINGLABEL:";
+		}
+		public void add(String l) {
+			if(first) {
+				first =  false;
+				value += l;
+			}else value += "/" + l.toUpperCase();
+		}
+		public String get(String l) {
+			l = l.toUpperCase();
+			String[] a = value.split(":")[1].split("/");
+			for(String s : a) {
+				if(l.contentEquals(s)) return l;
+			}
+			return null;
+		}
+		public boolean inc(String l) {
+			return l.contains(l.toUpperCase());
+		}
 	}
 }
