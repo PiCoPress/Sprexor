@@ -4,11 +4,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+import java.util.StringTokenizer;
 import sprexor.IOCenter.TYPE;
 
 @Target(ElementType.METHOD)
@@ -19,7 +19,7 @@ import sprexor.IOCenter.TYPE;
 	 */
 }
 /**
- * Sprexor : the String Parser & Executor 0.2.18-alpha5 Venom
+ * Sprexor : the String Parser & Executor 0.2.18-alpha6 Venom
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 public class Sprexor {
@@ -29,7 +29,7 @@ public class Sprexor {
 	@Deprecated protected Vector<Object[]> MessageLog = null;
 	@Deprecated protected Object[] recentMessage = null;
 	@Deprecated protected Vector<Object[]> blockMessage = new Vector<Object[]>();
-	public static final String VERSION = "0.2.18-alpha5";
+	public static final String VERSION = "0.2.18-alpha6";
 	public static final String CODENAME = "Venom";
 	public Reflection reflect;
 	public Impose impose;
@@ -40,7 +40,7 @@ public class Sprexor {
 	private HashMap<String, CommandFactory> cmdlib = null;
 	private HashMap<String, String> helplib = null;
 	private String list = "";
-	private String comment = "#";
+	private char comment = '#';
 	private boolean nextFlag = false;
 	private boolean doBasicSyn = true;
 	private Vector<String> vec = new Vector<String>();
@@ -336,12 +336,12 @@ public class Sprexor {
 
 				@Override
 				public IOCenter code(Component args) {
-					return new IOCenter(list);
+					return new IOCenter(list.trim());
 				}
 				
 				@Override
 				public IOCenter emptyArgs() {
-					return new IOCenter(list);
+					return new IOCenter(list.trim());
 				}
 			 });
 			 helpDB.put("help", "print this message.");
@@ -416,9 +416,9 @@ public class Sprexor {
 	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
 	 * @since 0.1.5
 	 */
-	public void setComment(String str) {
+	public void setComment(char c) {
 		if(configType != 0)return;
-		if(!str.isEmpty())comment = str;
+		if(c != '\0')comment = c;
 	}
 	
 	/**
@@ -452,6 +452,7 @@ public class Sprexor {
 		break;
 		case "entry_off":
 			doEntry = false;
+			entryId = "";
 		break;
 		case "break_parse" :
 			doParse = false;
@@ -521,7 +522,7 @@ public class Sprexor {
 	}
 	
 	/**
-	 * It can execute line as powerful string parser,
+	 * It can execute line with powerful string parser,
 	 * <br> and it will be run that you configure. 
 	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
 	 * @param com : command string to execute
@@ -541,13 +542,14 @@ public class Sprexor {
 				return;
 			}
 		}
+		String commentStr = comment + "";
 		boolean varMode = false;
 		com = com.trim();
 		String id = com.split(" ")[0].trim();
 		if (ignoreCase) id = id.toLowerCase();
 		if(com.contentEquals("")) {
 			return;
-		}else if(com.startsWith(comment)) {
+		}else if(com.startsWith(commentStr)) {
 			return;
 		}else if(!isExist(id)) {
 			if(!errorIn) { //how to throw error
@@ -594,7 +596,7 @@ public class Sprexor {
 				pr = 0,
 				smod = 0;
 		int allCount = 0;
-		if(nextFlag) nextFlag = false; else blockMessage.clear();
+		if(nextFlag) nextFlag = false;
 		boolean[] wra = new boolean[comar.length];
 		boolean lastSpace = false;
 		boolean cmtMode = false;
@@ -753,7 +755,7 @@ public class Sprexor {
 			if(doBasicSyn) {
 				if(smod + mod + pr == 0) {
 					
-					if(c.contentEquals(comment) && mod == 0) {
+					if(c.contentEquals(comment + "") && mod == 0) {
 						cmtMode = true;
 						args[count++] = cache;
 						wra[count] = false;
@@ -855,6 +857,385 @@ public class Sprexor {
 			exec(nextStr);
 		}
 	}
+	/**
+	 * It run a line with powerful string parser.
+	 * <br> And it will be run that configured. 
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * @param input
+	 * @since 0.2.18
+	 * @throws SprexorException
+	 */
+	@Activate_need
+	synchronized public void run(String input) throws SprexorException {
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
+		if(entryMode) {
+			if(!doEntry) {
+				entryMode = false;
+				entryId = "";
+			}else {
+				reflect.entrymode(entryId, input);
+				logger(cmd.get(entryId) != null ? cmd.get(entryId).EntryMode(input) : cmdlib.get(entryId).EntryMode(input), IOCenter.STDOUT);
+				return;
+			}
+		}
+		boolean varMode = false;
+		String commentStr = comment + "";
+		input = input.trim();
+		if(input.isEmpty()) return;
+		String id = "";
+		if(input.startsWith(commentStr)) {
+			return;
+		}
+		char[] chars = input.toCharArray();
+		String[] args = new String[chars.length];
+		String nextStr = "";
+		short mod = 0,
+				count = 0,
+				pr = 0,
+				smod = 0;
+		int allCount = 0;
+		int le = chars.length;
+		StringBuilder cache = new StringBuilder();
+		int capacity = cache.capacity();
+		if(nextFlag) nextFlag = false;
+		boolean[] wra = new boolean[le];
+		boolean lastSpace = false;
+		boolean cmtMode = false;
+		boolean firstTime = true;
+		doParse = true;
+		for(;allCount < le && doParse; allCount ++) {
+			char element = chars[allCount];
+			if(canReflect) reflect.token(element + "", id);
+			if(mod + smod == 1 && canReflect) reflect.strmode_tasking();
+			if(cmtMode) {
+				if(element == ';' && dosem) {
+					cmtMode = false;
+					nextFlag = true;
+					nextStr = input.substring(allCount + 1);
+					if((!lastSpace) && !cache.toString().isEmpty()) {
+						args[count ++] = cache.toString();
+						cache.delete(0, cache.capacity());
+					}
+					break;
+				}
+				continue;
+			}
+			if(element == ';' && mod + smod == 0 && dosem) {
+				nextStr = input.substring(allCount + 1);
+				nextFlag = true;
+				
+				if(varMode) {
+					if(envVar.get(cache.substring(1)) != null) {
+						args[count++] = envVar.get(cache.substring(1)) + "";
+						wra[count] = false;
+						cache.delete(0, cache.capacity());
+					}else {
+						if(cache.toString().contentEquals("@")) {
+							if(!errorIn)logger("variable name is empty.",IOCenter.ERR);
+							else throw new SprexorException(SprexorException.EXPRSS_ERR, "variable name is empty.");
+							return;
+						}
+						if(!errorIn)logger("could not find variable : " + cache.substring(1),IOCenter.ERR);
+						else throw new SprexorException(SprexorException.VARIABLE_ERR, cache.toString());
+						return;
+					}
+				}
+				
+				if((!lastSpace) && !cache.toString().isEmpty()) {
+					args[count ++] = cache.toString();
+					cache.delete(0, cache.capacity());
+				}
+				break;
+			}
+			if(!varMode) {
+				if(mod + smod == 1 && element == '\\' && pr == 0) {
+					pr = 1;
+					continue;
+				}
+				if(element == ' ' && smod == 0 && mod == 0) {
+					if(cache.toString().isEmpty())continue;
+					if(firstTime) {
+						id = cache.toString();
+						if(ignoreCase) id = id.toLowerCase();
+						if(!isExist(id)) {
+							if(!errorIn) {
+								if(impose.IdNotFound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
+								else logger(impose.IdNotFound(id), IOCenter.ERR);
+							} else throw new SprexorException(SprexorException.CMD_NOTFOUND, input);
+						}
+						if(id.indexOf(comment) != -1) {
+							IOCenter res = null;
+							CommandProvider obj = cmd.get(id);
+							CommandFactory cfObj = cmdlib.get(id);
+							try {
+								if(obj != null) res = obj.emptyArgs();
+								else res = cfObj.emptyArgs(this);
+								logger(res);
+							}catch(Exception e) {
+								logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
+							}
+							return;
+						}
+						if(id.indexOf(";") != -1 && dosem) {
+							if(id.charAt(0) == ';') 
+								if(!errorIn) 
+									logger(" " + input, IOCenter.ERR);
+								//
+							//
+							else throw new SprexorException(SprexorException.EXPRSS_ERR, "Expression incorrect : " + input);
+							StringBuilder sb = new StringBuilder();
+							StringTokenizer tkn = new StringTokenizer(input, ";");
+							logger(cmd.containsKey(id) ? cmd.get(id).emptyArgs() :
+								cmdlib.get(id).emptyArgs(this));
+							while(tkn.hasMoreTokens()) {
+								sb.append(tkn.nextToken());
+							}
+							run(sb.toString());
+							return;
+						}
+						firstTime = false;
+					} else args[count ++] = cache.toString();
+					cache.delete(0, capacity);
+					lastSpace = true; 
+					continue;
+				}
+				if(element == '\"') {
+					if(mod == 0 && smod == 0) {
+						wra[count] = true;
+						mod = 1;
+						if(canReflect) reflect.strmode_start();
+					}else {
+						if(pr == 1) {
+							pr = 0;
+							cache.append(element);
+							if(canReflect) reflect.strmode_end();
+							continue;
+						}else if(smod == 1) {
+							cache.append(element);
+							mod = 0;
+							continue;
+						}
+						args[count ++] = cache.toString();
+						cache.delete(0, capacity);
+						mod = 0;
+					}
+					continue;
+				}else if(element == '\'') {
+					if(mod == 0 && smod == 0) {
+						wra[count] = true;
+						smod = 1;
+						if(canReflect) reflect.strmode_start();
+					}else {
+						if(pr == 1) {
+							pr = 0;
+							cache.append(element);
+							if(canReflect) reflect.strmode_end();
+							continue;
+						}else if(mod == 1) {
+							cache.append(element);
+							smod = 0;
+							continue;
+						}
+						args[count ++] = cache.toString();
+						cache.delete(0, capacity);
+						smod = 0;
+					}
+					continue;
+				}else if(pr == 1) {
+					if(element == 'n'){
+						if(mod == 0 && smod == 0) {
+							wra[count] = true;
+							smod = 1;
+						}else {
+							if(pr == 1) {
+								pr = 0;
+								cache.append('\n');
+								continue;
+							}else if(mod == 1) {
+								cache.append('\n');
+							}
+							smod = 0;
+						}
+						continue;
+					}else if(element == 't'){
+						if(mod == 0 && smod == 0) {
+							wra[count] = true;
+							smod = 1;
+						}else {
+							if(pr == 1) {
+								pr = 0;
+								cache.append(element);
+								continue;
+							}else if(mod == 1) {
+								cache.append(element);
+							}
+							smod = 0;
+						}
+						continue;
+					}
+					
+					else {
+						cache.append('\\');
+						pr = 0;
+						continue;
+					}
+				}
+			}
+			lastSpace  = false;
+			if(doBasicSyn) {
+				if(smod + mod + pr == 0) {
+					
+					if(element == comment && mod == 0) {
+						cmtMode = true;
+						args[count++] = cache.toString();
+						wra[count] = false;
+						cache.delete(0, capacity);
+						continue;
+					}
+					if(element == '@' && !varMode) {
+						varMode = true;
+					}else {
+						if(varMode == true && element == '@') {
+							if(!errorIn)logger("Invalid expression detected - " + count,IOCenter.ERR);
+							else throw new SprexorException(SprexorException.EXPRSS_ERR, "@@");
+							return;
+						}else if(varMode){
+							if(element == ' ') {
+								varMode = false;
+								if(envVar.get(cache.substring(1)) != null) {
+									args[count++] = (envVar.get(cache.substring(1)) + "").trim();
+									if(canReflect) reflect.variable_replacing(cache.substring(1));
+									wra[count] = false;
+									cache.delete(0, capacity);
+								}else {
+									if(cache.toString().isEmpty()) {
+										if(!errorIn)logger("Variable name cannot be voided.",IOCenter.ERR);
+										else throw new SprexorException(SprexorException.EXPRSS_ERR, "Variable name cannot be voided.");
+										return;
+									}
+									if(!errorIn)logger("This is not exist : " + cache.substring(1),IOCenter.ERR);
+									else throw new SprexorException(SprexorException.VARIABLE_ERR,cache.toString());
+									return;
+								}
+							}
+						}
+					}
+				}
+			}
+			cache.append(element);
+		}
+		doParse = false;
+		if(count == 0) {
+			id = cache.toString();
+			if(id.indexOf(comment) != -1) {
+				IOCenter res = null;
+				id = id.split(comment + "")[0];
+				CommandProvider obj = cmd.get(id);
+				CommandFactory cfObj = cmdlib.get(id);
+				try {
+					if(obj != null) res = obj.emptyArgs();
+					else res = cfObj.emptyArgs(this);
+					logger(res);
+				}catch(Exception e) {
+					logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
+				}
+				return;
+			}
+			if(id.indexOf(";") != -1 && dosem) {
+				if(id.charAt(0) == ';') 
+					if(!errorIn) 
+						logger(" " + input, IOCenter.ERR);
+					//
+				//
+				else throw new SprexorException(SprexorException.EXPRSS_ERR, "Expression incorrect : " + input);
+				StringBuilder sb = new StringBuilder();
+				StringTokenizer tkn = new StringTokenizer(input, ";");
+				logger(cmd.containsKey(id) ? cmd.get(id).emptyArgs() :
+					cmdlib.get(id).emptyArgs(this));
+				while(tkn.hasMoreTokens()) {
+					sb.append(tkn.nextToken());
+				}
+				run(sb.toString());
+				return;
+			}
+			if(cmdlib.containsKey(id)) logger(cmdlib.get(id).emptyArgs(this));
+			else if(cmd.containsKey(id)) logger(cmd.get(id).emptyArgs());
+			else if(!errorIn) {
+					if(impose.IdNotFound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
+						else logger(impose.IdNotFound(id), IOCenter.ERR);
+					//
+				} else throw new SprexorException(SprexorException.CMD_NOTFOUND, input);
+			//
+			return;
+		} else args[count ++] = cache.toString();
+		switch(ClpCode) {
+		case 0: break;
+		case 1 : 
+			if(!errorIn) logger("Warning : Sprexor wasn't closed normally.", IOCenter.WARN);
+			else {
+				logger("Warning : Sprexor wasn't closed normally.", IOCenter.WARN);
+				ClpCode = 0;
+				return;
+			}
+			break;
+		default : break;
+		}
+		if(mod != 0 || smod != 0 || pr != 0) {
+			if(!errorIn) logger("Error : invalid literal syntax.", IOCenter.ERR);
+			else throw new SprexorException(SprexorException.EXPRSS_ERR, 
+					"invalid literal syntax.");
+			return;
+		}
+		
+		IOCenter res = null;
+		CommandProvider obj = cmd.get(id);
+		CommandFactory cfObj = cmdlib.get(id);
+		args = trimArr(args);
+		wra = trimArr(wra, count);
+		Component comval = new Component(args, wra);
+		try {
+			if(canReflect)comval = reflect.before_invoked(id, comval);
+			if(!entryMode) {
+				if(obj != null) res = obj.code(comval);
+				else res = cfObj.code(comval, this);
+				if(doEntry) {
+					entryMode = true;
+					entryId = id;
+				}
+			}
+			if(obj != null) {
+				if(obj.EntryMode(null) != null || doEntry) {
+					entryMode = true;
+					entryId = id;
+					doEntry = true;
+				}
+			}else {
+				if(cfObj.EntryMode(null) != null || doEntry) {
+					entryMode = true;
+					entryId = id;
+					doEntry = true;
+				}
+			}
+			
+		}catch(Exception e) {
+			if(obj != null)res = new IOCenter(obj.error(e), IOCenter.ERR);
+			else res = new IOCenter(cfObj.error(e), IOCenter.ERR);
+		}
+		
+		if(res == null)res = new IOCenter("", IOCenter.UNKNOWN);
+		else if(res.status == null)res.status = IOCenter.UNKNOWN;
+		
+		if(res != null) if(!res.Msg.isBlank()) logger(res);
+		if(nextFlag) {
+			run(nextStr);
+		}
+	}
+	/**
+	 * eval returns outcome to string.
+	 * @param com - string
+	 * @return result by string.
+	 */
+	@Activate_need
 	public String eval(String com) {
 		String[] args = Component.Parse(com);
 		Object obj = autoSelect(args[0]);

@@ -30,7 +30,7 @@ public class test {
 				System.out.print("root@test-pc:~$ ");
 				String ss = s.nextLine();
 				if(ss.trim().contentEquals("exit"))break;
-				n.exec(ss);
+				n.run(ss);
 			}
 		} catch (SprexorException e) {
 			System.out.println(e);

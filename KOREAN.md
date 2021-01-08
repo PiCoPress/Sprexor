@@ -1,4 +1,4 @@
-# 스프렉서 (Sprexor) - 0.2.18-alpha5 Venom
+# 스프렉서 (Sprexor) - 0.2.18-alpha6 Venom
 
 [0.2.18 수정사항](./Update.md)
 
@@ -11,52 +11,56 @@
 7. [cosmos.BasicPackages](#the-cosmos)
 8. [Exception](#exception)
 9. [Component](#component)
-9. [Basic Features](#basic-feature)
-10. [예시코드보기](./test.java)
-11. [메뉴얼](#menual)
+10. [Basic Features](#basic-feature)
+11. [예시코드보기](./test.java)
+12. [메뉴얼](#menual)
 
 
 #### Sprexor
 
->Sprexor s = new Sprexor(); : 스프렉서 초기화
+>**Classes**
 
->boolean isExist(String) : 이 커맨드가 존재하는지 확인합니다.
+>- boolean isExist(String) : 이 커맨드가 존재하는지 확인합니다.
 
->void setComment(String) : 주석을 사용할 문구를 정합니다.
+>- void setComment(String) : 주석을 사용할 문구를 정합니다.
 
->void register(String str, CommandProvider cp, String hd) : str( 커맨드 이름), cp(아래 참조), hd(help 명령어에서 사용될 도움말)
+>- void register(String str, CommandProvider cp, String hd) : str( 커맨드 이름), cp(아래 참조), hd(help 명령어에서 사용될 도움말)
 
->void exec(String com) throws CommandNotFoundException: com 이라는 문자열을 파싱 후, 자동으로 실행해줍니다.
+>- void exec(String com) throws CommandNotFoundException: com 이라는 문자열을 파싱 후, 자동으로 실행해줍니다.
 
->void exec(String id, String[] args)
+>- void exec(String id, String[] args)
 
->void exec(String id, String[] args, boolean[] isWrapped)
+>- void exec(String id, String[] args, boolean[] isWrapped)
 
->void useSyntax(boolean b) : 기본 문법을 사용할건지의 여부
+>- void useSyntax(boolean b) : 기본 문법을 사용할건지의 여부
 
->void importSprex(CommandProvider t) : t라는 클래스로부터 스프렉서 를 임폴트합니다. t 클래스는 CommandProvider 를 상속받아야 합니다.
+>- void importSprex(CommandProvider t) : t라는 클래스로부터 스프렉서 를 임폴트합니다. t 클래스는 CommandProvider 를 상속받아야 합니다.
 
->void send(String, IOCenter.TYPE) : 인스턴트 메세지를 전송합니다.
+>- void send(String, IOCenter.TYPE) : 인스턴트 메세지를 전송합니다.
 
->void activate() : 이것이 실행되어야만 exec메소드를 포함한 몇가지 메서드들를 실행할 수 있으며, 만일 실행되었을 경우 상세 설정을 할 수 없습니다. (충돌 방지)
+>- void activate() : 이것이 실행되어야만 exec메소드를 포함한 몇가지 메서드들를 실행할 수 있으며, 만일 실행되었을 경우 상세 설정을 할 수 없습니다. (충돌 방지)
 
->void call(문자열 키) : 키 값을 통해 정해진 명령을 실행합니다. 사용 가능 키: entry_on, entry_off
+>- void call(문자열 키) : 키 값을 통해 정해진 명령을 실행합니다. 사용 가능 키: entry_on, entry_off
 
->void error_strict() : 이 메서드가 실행된다면 애러를 IOCenter에 저장하는것 대신 오류를 던집니다.
+>- void error_strict() : 이 메서드가 실행된다면 애러를 IOCenter에 저장하는것 대신 오류를 던집니다.
 
->void unSemicolon() : 세미콜론 사용을 하지 않습니다.
+>- void unSemicolon() : 세미콜론 사용을 하지 않습니다.
 
->void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
+>- void unBasicFeatures() : 기본 명령어 등록을 하지 않습니다.
 
->void ignoreUpperCase() : 대소문자를 무시하여 실행합니다.
+>- void ignoreUpperCase() : 대소문자를 무시하여 실행합니다.
 
->String eval(String)
+>- String eval(String)
 
->Impose impose
+>- void run(String) : 더 향상된 성능과 기능들로 파라미터 한 줄을 실행합니다.
 
->Reflection reflect
+>**Fields**
 
->Object label
+>- Impose impose
+
+>- Reflection reflect
+
+>- Object label
 	
 	
 #### IOCenter

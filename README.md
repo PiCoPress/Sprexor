@@ -1,4 +1,4 @@
-Sprexor - 0.2.18-alpha5 Venom
+Sprexor - 0.2.18-alpha6 Venom
 =================
 [Updated Things](./Update.md)
 
@@ -20,45 +20,49 @@ Sprexor - 0.2.18-alpha5 Venom
 
 #### Sprexor
 
->Sprexor() : Sprexor constructor.
+>**Classes**
 
->boolean isExist(String) Check if the Command is exist.
+>- boolean isExist(String) Check if the Command is exist.
 
->void setComment(String) : Set a comment character.
+>- void setComment(String) : Set a comment character.
 
->void register(String str, CommandProvider cp, String hd) : str(command name), cp(refer below), hd(message to help)
+>- void register(String str, CommandProvider cp, String hd) : str(command name), cp(refer below), hd(message to help)
 
->void exec(String com) throws CommandNotFoundException: Execute command "com".
+>- void exec(String com) throws CommandNotFoundException: Execute command "com".
 
->void exec(String id, String[] args)
+>- void exec(String id, String[] args)
 
->void exec(String id, String[] args, boolean[] isWrapped)
+>- void exec(String id, String[] args, boolean[] isWrapped)
 
->void useSyntax(boolean b) : Whether check basic syntax.
+>- void useSyntax(boolean b) : Whether check basic syntax.
 
->void importSprex(sprexor.CommandProvider t) : Import Sprex to this(above) from T class.
+>- void importSprex(sprexor.CommandProvider t) : Import Sprex to this(above) from T class.
 
->void send(String, IOCenter.TYPE) : Send instant message.
+>- void send(String, IOCenter.TYPE) : Send instant message.
 
->void activate() : It should activate by this before use "exec" method. and if activate, it cannot setting properties.
+>- void activate() : It should activate by this before use "exec" method. and if activate, it cannot setting properties.
 
->void call(String key) : Control Sprexor to String key.
+>- void call(String key) : Control Sprexor to String key.
 
->void error_strict() : If it is called, throw SprexorException instead of print at IOCenter.
+>- void error_strict() : If it is called, throw SprexorException instead of print at IOCenter.
 
->void unSemicolon() : Semicolon is not abled to use.
+>- void unSemicolon() : Semicolon is not abled to use.
 
->void unBasicFeatures() : Basic commands are not registered.
+>- void unBasicFeatures() : Basic commands are not registered.
 
->void ignoreUpperCase() : Ignore Upper case of character.
+>- void ignoreUpperCase() : Ignore Upper case of character.
 
->String eval(String)
+>- String eval(String)
 
->Impose impose
+>- void run(String) : Execute parameter a line for more improved performance and functions.
 
->Reflection reflect
+>**Fields**
 
->String eval(String)
+>- Impose impose
+
+>- Reflection reflect
+
+>- Object label
 	
   
 #### IOCenter
@@ -147,6 +151,8 @@ Sprexor - 0.2.18-alpha5 Venom
 
 #### Component
 
+>String[] Parse(String)
+
 >String[] get() : Return string array.
 
 >Unit get(int) : Return Unit Class.
@@ -156,8 +162,6 @@ Sprexor - 0.2.18-alpha5 Venom
 >String gets(int) : Return a unit by ignoring options.
 
 >String[] getAllOption() : Get all of options.
-
->String[] Parse(String)
 
 >void add(String)
 

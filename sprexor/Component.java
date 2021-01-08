@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
-
+/**
+ * The Component that Iterable class provides functions for manage the arguments.
+ * @since 0.2.18
+ */
 public class Component implements Iterable<String> {
 	private String[] v;
 	private boolean[] isw;
@@ -52,6 +55,10 @@ public class Component implements Iterable<String> {
 		this.isw = new boolean[v.length];
 		reserved = new Object[1024];
 	}
+	/**
+	 * Add new argument at last index.
+	 * @param value - param values
+	 */
 	public void add(String value) {
 		v = Arrays.copyOf(v, v.length + 1);
 		v[v.length - 1] = value;
@@ -64,7 +71,7 @@ public class Component implements Iterable<String> {
 		return v;
 	}
 	/**
-	 * Return the Unit class.
+	 * It returns the class Unit that manage each of elements.
 	 * @param i - The index to get unit of arguments.
 	 * @return Unit Class
 	 */
@@ -75,7 +82,7 @@ public class Component implements Iterable<String> {
 	}
 	/**
 	 * 
-	 * @param i - The index to get unit of arguments.
+	 * @param i - The index to get a element of arguments.
 	 * @return String
 	 */
 	public String getsf(int i) {

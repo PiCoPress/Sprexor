@@ -2,7 +2,7 @@ package sprexor;
 
 public interface CommandFactory {
 	/**
-	 * This function will be called when occur error in the method : code. redefinable
+	 * This function will be called when occur error in the method : code.
 	 * @param e : Execption e
 	 * @return String
 	 */
@@ -10,7 +10,7 @@ public interface CommandFactory {
 		return "Error";
 	}
 	/**
-	 * this function will be called when argument is null. redefinable
+	 * It will be called when argument is empty.
 	 * @return IOCenter (any type which not array.)
 	 */
 	public default IOCenter emptyArgs(Sprexor SprexorInstance) {
@@ -26,15 +26,21 @@ public interface CommandFactory {
 		return null;
 	}
 	/**
-	 * for import other class(import class)
-	 * @return String
+	 * It will be used to inform detailed information help.
+	 * @return String - message.
 	 */
 	public abstract String help();
 	/**
-	 * for import other class(import class)
-	 * @return String
+	 * getCommandName defines command name as returned value.
+	 * @return String : The name has only English is recommended.
 	 */
 	public abstract String getCommandName();
+	/**
+	 * It should be overridden in mainly class.
+	 * <br> And, mainly class can be imported by importSprex.
+	 * <br> If class is only one, You may leave this method alone.
+	 * @return CommandFactory[] arrays.
+	 */
 	public default CommandFactory[] referenceClass() {
 		return null;
 	}

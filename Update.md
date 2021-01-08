@@ -1,21 +1,6 @@
-#0.2.18-alpha5 Venom
+#0.2.18-alpha6 Venom
 
 >**changes :**
 
->- GlobalData removed.
-
->- CommandNotFoundException merged with SprexorException.
-
->- cosmos.For improved.
-
->- Reflection improved.
-
->- InterruptChar removed.
-
->- label added.
-
->- Sprexor.eval added.
-
->- Sprexor Performance is improved.
-
->- Sprexor providing things upgraded internally.
+- bug fixed.
+- new function : run(String) in Sprexor.
