@@ -31,7 +31,7 @@ public class Sprexor {
 	@Deprecated protected Vector<Object[]> MessageLog = null;
 	@Deprecated protected Object[] recentMessage = null;
 	@Deprecated protected Vector<Object[]> blockMessage = new Vector<Object[]>();
-	public static final String VERSION = "0.2.18-be";
+	public static final String VERSION = "0.2.18-beta";
 	public static final String CODENAME = "Venom";
 	public Reflection reflect;
 	public Impose impose = new Impose() {};
