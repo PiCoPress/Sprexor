@@ -55,6 +55,14 @@ public class Component implements Iterable<String> {
 		this.isw = new boolean[v.length];
 		reserved = new Object[1024];
 	}
+	@Override 
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for(String str : v) {
+			sb.append(str).append(" ");
+		}
+		return sb.toString();
+	}
 	/**
 	 * Add new argument at last index.
 	 * @param value - param values
@@ -233,6 +241,9 @@ public class Component implements Iterable<String> {
 	 */
 	public int length() {
 		return v.length;
+	}
+	public boolean isEmpty() {
+		return v.length == 0;
 	}
 	protected void setLabel(int index, Object obj) {
 		reserved[index] = obj;

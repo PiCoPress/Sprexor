@@ -7,33 +7,32 @@ public class test {
 		Scanner s = new Scanner(System.in);
 		Sprexor n = new Sprexor();
 		n.importSprex(new BasicPackages());
-		
-		n.impose = new Sprexor.Impose(){
+		n.register("ee", new CommandProvider() {
+			
 			@Override
-			public String IdNotFound(String id) { // Redefine command_not_found error and "out" method.
-				return "This command is not usable : " + id;
+			public int code(IOCenter io) {
+				Component args = io.getComponent();
+				if(args.isEmpty())io.out.build().add("73\n").send();
+				io.in.delimiter = ';';
+				io.in.prompt(">");
+				io.out.println(io.in.flush());
+				return 0;
 			}
-			@Override
-			public void out(String msg, IOCenter.TYPE ii) { // This method will be invoked when print any message.
-				if(ii.equals(IOCenter.ERR)) System.err.println(msg);
-				else System.out.println(msg);
-			}
-		};
+			
+		}, "");
 		try {
 			n.activate();
 		} catch (SprexorException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} // activate
 		try {
 			while(true) {
-				System.out.print("root@test-pc:~$ ");
 				String ss = s.nextLine();
 				if(ss.trim().contentEquals("exit"))break;
-				n.run(ss);
+				n.exec(ss);
 			}
 		} catch (SprexorException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		s.close();
 	}

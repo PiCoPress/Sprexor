@@ -15,25 +15,19 @@ public class BasicPackages implements CommandFactory{
 	public String getCommandName() {
 		return "find";
 	}
-	
+	@Override
 	public String help() {
 		return "::: The BasicPackages 0.2.18 :::\n" +
 				"1. find : Find text(s) by the unit of line.\n" + 
 				"2. repeat : Repeat the text.";
 	}
-	
-	public Object emptyArgs() {
-		return help();
-	}
-	
+	@Override
 	public CommandFactory[] referenceClass() {
-		return Tools.toCFClasses(this, new For()); //Tools.toCFClasses();
+		return Tools.toCFClass(this, new For()); //Tools.toCFClasses();
 	}
-	
-	public String error(Exception e) {
-		return e.getMessage();
-	}
-	public IOCenter code(Component args, Sprexor sprex) {
+	@Override
+	public int code(IOCenter io, Sprexor SprexorInstance) {
+		Component args = io.getComponent();
 		String tmp = Tools.arg2String(Tools.excludeArr(args.get(), 0));
 		String find = args.gets(0);
 		String[] splitedStr = tmp.split("\n");
@@ -42,6 +36,7 @@ public class BasicPackages implements CommandFactory{
 		for(String it : splitedStr) {
 			if(it.indexOf(find) != -1)result += it + "\n";
 		}
-		return new IOCenter(result, IOCenter.STDOUT);
+		io.out.println(result);
+		return 0;
 	}
 }

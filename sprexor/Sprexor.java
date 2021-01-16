@@ -1,5 +1,6 @@
 package sprexor;
 
+import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,6 +8,7 @@ import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import sprexor.IOCenter.TYPE;
@@ -19,7 +21,7 @@ import sprexor.IOCenter.TYPE;
 	 */
 }
 /**
- * Sprexor : the String Parser & Executor 0.2.18-alpha6 Venom
+ * Sprexor : the String Parser & Executor 0.2.18-beta1
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
 public class Sprexor {
@@ -29,10 +31,10 @@ public class Sprexor {
 	@Deprecated protected Vector<Object[]> MessageLog = null;
 	@Deprecated protected Object[] recentMessage = null;
 	@Deprecated protected Vector<Object[]> blockMessage = new Vector<Object[]>();
-	public static final String VERSION = "0.2.18-alpha6";
+	public static final String VERSION = "0.2.18-beta1";
 	public static final String CODENAME = "Venom";
 	public Reflection reflect;
-	public Impose impose;
+	public Impose impose = new Impose() {};
 	public Object label;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -41,10 +43,8 @@ public class Sprexor {
 	private HashMap<String, String> helplib = null;
 	private String list = "";
 	private char comment = '#';
-	private boolean nextFlag = false;
 	private boolean doBasicSyn = true;
 	private Vector<String> vec = new Vector<String>();
-	private boolean errorIn = false;
 	private boolean dosem = true;
 	private boolean isInit = true;
 	private boolean ignoreCase = false;
@@ -52,11 +52,7 @@ public class Sprexor {
 	private boolean doParse = false;
 	private int ClpCode = 0;
 	protected HashMap<String, Object> envVar;
-	protected boolean entryMode = false;
-	protected boolean doEntry = false;
-	protected String entryId = "";
 	protected HashSet<CommandFactory> ImportedPackages;
-	
 	/**
 	 * The Impose class is used to customize working.
 	 * <br> Methods to implement : 
@@ -64,12 +60,75 @@ public class Sprexor {
 	 * <br> - out : This method will be invoked when print any message.
 	 */
 	public interface Impose {
-		public default String IdNotFound(String a) { return ""; }
-		public default void out(String str, IOCenter.TYPE type) { }
+		public default IOCenter InOut() {
+		return new IOCenter(new SprexorOstream((buf) -> {for(String s : buf)System.out.print(s);}) {
+
+			@Override
+			public void print(String msg) {
+				System.out.print(msg);
+			}
+			@Override
+			public void print(String msg, int Color) {
+				print(msg);
+			}
+			@Override
+			public void clear() {
+				
+			}
+			@Override
+			public void println(String msg) {
+				System.out.println(msg);
+			}
+			@Override
+			public void println(String msg, int Color) {
+				println(msg);
+			}
+		},
+		new SprexorIstream() {
+
+			@Override
+			public void prompt() {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			@Override
+			public void prompt(String msg) {
+				char ch;
+				try {
+					System.out.println(msg);
+					while((ch = (char) System.in.read()) != delimiter) {
+						buffering(ch + "");
+					}
+				} catch (IOException e) {
+					
+				}
+			}
+			@Override
+			public void prompt(String msg, int Color) {
+				prompt(msg);
+			}
+			@Override
+			public String getln() {
+				Scanner scan = new Scanner(System.in);
+				return scan.nextLine();
+			}
+			@Override
+			public String getln(String msg) {
+				System.out.println(msg);
+				return getln();
+			}
+			@Override
+			public String getln(String msg, int Color) {
+				return getln(msg);
+			}
+		}
+	);
+		}
 	}
 	/**
-	 * <b>Component before_invoked(String, Component)</b> : It will be invoked before run the parsed String.
-	 * <br>
 	 * <br><b>void token(String, String)</b> : It will be invoked every for-loop repeatition, and parameter is token that is stacked character.
 	 * <br>
 	 * <br><b>void strmode_start()</b> : It will be invoked when string wrapper(' or ") is detected first.
@@ -85,7 +144,6 @@ public class Sprexor {
 	 * @since 0.2.18
 	 */
 	public interface Reflection {
-		public default Component before_invoked(String id, Component comp) { return comp; }
 		public default void token(String value, String id) { }
 		//
 		public default void strmode_start() { }
@@ -118,11 +176,6 @@ public class Sprexor {
 		}
 		return false;
 	}
-	
-	private void logger(String oo, IOCenter.TYPE ii) {
-		impose.out(oo.trim(), ii);
-	}
-	private void logger(IOCenter ioc) { impose.out(ioc.Msg, ioc.status); }
 	private Object autoSelect(String id) {
 		if(cmd.containsKey(id)) return cmd.get(id);
 		else if(cmdlib.containsKey(id)) return cmdlib.get(id);
@@ -132,16 +185,13 @@ public class Sprexor {
 	//public methods.
 	//
 	public Sprexor() {
-		MessageLog = new Vector<Object[]>();
 		 cmd = new HashMap<String, CommandProvider>();
-		 recentMessage = new Object[2];
 		 envVar = new HashMap<String, Object>();
 		 helpDB = new HashMap<String, String>();
 		 cmdlib = new HashMap<String, CommandFactory>();
 		 helplib = new HashMap<String, String>();
 		 ImportedPackages = new HashSet<CommandFactory>();
 	}
-	
 	/**
 	 * importSprex is get command context(s) that created with class in this sprexor.
 	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
@@ -220,10 +270,11 @@ public class Sprexor {
 	 * @since 0.2.3
 	 * @see sprexor.IOCenter.TYPE
 	 */
+	@Deprecated
 	@Activate_need
 	public void send(String str, IOCenter.TYPE type) {
 		if(configType != 2)return;
-		impose.out(str, type);
+		//impose.out(str, type);
 	}
 	/**
 	 * send a instant message.
@@ -232,10 +283,11 @@ public class Sprexor {
 	 * @since 0.2.3
 	 * @see sprexor.IOCenter.TYPE
 	 */
+	@Deprecated
 	@Activate_need
 	public void send(String str) {
 		if(configType != 2)return;
-		impose.out(str, IOCenter.STDOUT);
+		//impose.out(str, IOCenter.STDOUT);
 	}
 	/** Ignore upper or lower case of character. 
 	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
@@ -257,91 +309,79 @@ public class Sprexor {
 		if(!isInit)return;
 		 cmd.put("help",new CommandProvider() {
 				@Override
-				public IOCenter code(Component args) {
+				public int code(IOCenter io) {
 					String Result = "";
+					Component args = io.getComponent();
 					if(isExist(args.gets(0))) {
 							Result = helpDB.get(args.gets(0));
 							if(Result == null) Result = helplib.get(args.gets(0));
 					}else {
 						Result = " ";
 					}
-					return new IOCenter(Result.trim(), IOCenter.STDOUT);
-				}
-				@Override
-				public String error(Exception e) {
-					return "1";
-				}
-				@Override 
-				public IOCenter emptyArgs() {
-					return new IOCenter("blanked name.");
+					io.out.print(Result.trim());
+					return 0;
 				}
 			 });
 			 cmd.put("var", new CommandProvider() {
 				@Override
-				public IOCenter code(Component args) {
-					if(!doBasicSyn) return new IOCenter("Syntax is not permitted.", IOCenter.ERR);
+				public int code(IOCenter io) {
+					if(!doBasicSyn) { 
+						io.out.setType(TYPE.ERR);
+						io.out.println("Syntax is not permitted.");
+						return 1;
+					}
+					Component args = io.component;
 					if(args.length() == 2) {	
 						if(envVar.containsKey(args.gets(0)))envVar.replace(args.gets(0), args.gets(1));
 						else envVar.put(args.gets(0), args.gets(1));
-						return new IOCenter(args.gets(1), IOCenter.STDOUT);
+						io.out.println(args.gets(1));
 					}else if(args.length() == 1) {
 						if(envVar.containsKey(args.gets(0)))envVar.replace(args.gets(0), IOCenter.NO_VALUE);
 						else envVar.put(args.gets(0),IOCenter.NO_VALUE);
-						return new IOCenter("NO_VALUE", IOCenter.NO_VALUE);
+						io.out.println("NO_VALUE");
 					}else {
-						return new IOCenter(emptyArgs().toString(), IOCenter.CMT);
+						io.out.println("USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"");
 					}
-				}
-				
-				@Override
-				public IOCenter emptyArgs() {
-					return new IOCenter("USAGE : var [NAME] [VALUE*]\n\tDEFAULT VALUE : \"NO_VALUE\"");
+					return 0;
 				}
 			 });
 			 cmd.put("echo", new CommandProvider() {
 				@Override
-				public IOCenter code(Component args) {
+				public int code(IOCenter io) {
 					String sum = "";
+					String[] args = io.component.get();
 					for(String str : args) {
 						sum += str + " ";
 					}
-					return new IOCenter(sum, IOCenter.STDOUT, "STRINGLABEL:FS_OUT/STDOUT");
-				}
-				
-				@Override
-				public IOCenter emptyArgs() {
-					return new IOCenter("", "STRINGLABEL:FS_OUT/STDOUT");
+					io.out.println(sum);
+					return 0;
 				}
 			});
 			 
 			 cmd.put("delete", new CommandProvider() {
 					@Override
-					public IOCenter code(Component args) {
+					public int code(IOCenter io) {
 						int i = 0;
+						Component args = io.component;
+						if(args.isEmpty()) {
+							io.out.println("");
+							return 0;
+						}
 						for(String name : args) {
 							Object returned = envVar.remove(name);
-							if(returned == null)logger(args.gets(i) + " : not existed variable.", TYPE.WARN);
+							if(returned == null)io.out.println(args.gets(i) + " : not existed variable.");
 							i ++;
 						}
-						return new IOCenter("variable(s) deleted.");
-					}
-					
-					@Override
-					public IOCenter emptyArgs() {
-						return new IOCenter("variable name is blank.");
+						io.out.println("variable(s) deleted.");
+						return 0;
 					}
 				});
 			 
 			 cmd.put("commands", new CommandProvider() {
-
 				@Override
-				public IOCenter code(Component args) {
-					return new IOCenter(list.trim());
-				}
-				
-				@Override
-				public IOCenter emptyArgs() {
-					return new IOCenter(list.trim());
+				public int code(IOCenter io) {
+					io.out.println(list);
+					return 0;
 				}
 			 });
 			 helpDB.put("help", "print this message.");
@@ -372,16 +412,6 @@ public class Sprexor {
 	public String getList() {
 		//return list;
 		return "";
-	}
-	
-	/**
-	 * If called this method, Error is thrown as a Exception rather than console print.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
-	 * @see sprexor.SprexorException
-	 */
-	public void error_strict() {
-		if(configType != 0)return;
-		errorIn = true;
 	}
 	/**
 	 * This method Register a command. Registring command name shouldn't be included special character like *, ^ etc...
@@ -432,7 +462,7 @@ public class Sprexor {
 		doBasicSyn = b;
 	}
 	
-	/**
+	/**@deprecated
 	 * It is method to control this system. 
 	 * <hr>--- Key Names ---
 	 * <br><li>entry_on : Enter the EntryMode.
@@ -443,17 +473,11 @@ public class Sprexor {
 	 * @param value : the key value.
 	 * @since 0.2.7
 	 */
+	@Deprecated
 	@Activate_need
 	public void call(String value) {
 		if(configType != 2)return;
 		switch(value) {
-		case "entry_on":
-			doEntry = true;
-		break;
-		case "entry_off":
-			doEntry = false;
-			entryId = "";
-		break;
 		case "break_parse" :
 			doParse = false;
 			ClpCode = 1;
@@ -479,48 +503,16 @@ public class Sprexor {
 	 */
 	@Activate_need
 	public void exec(String id, String[] args) throws SprexorException {
-		if(configType != 2) {
-			if(!errorIn)logger("sprexor was not prepared yet.", IOCenter.ERR);
-			else throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
-			return;
-		}
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
 		
 		if(!isExist(id))throw new SprexorException(SprexorException.CMD_NOTFOUND, id);
-		IOCenter res;
 		CommandProvider obj = cmd.get(id);
 		CommandFactory cfObj = cmdlib.get(id);
+		IOCenter res = impose.InOut();
 		args = trimArr(args);
-		try {
-			if(obj != null) res = obj.code(new Component(args, new boolean[args.length]));
-			else res = cfObj.code(new Component(args, new boolean[args.length]), this);
-			if(!res.Msg.isBlank()) logger(res);
-		}catch(Exception e) {
-			logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
-		}
+		if(obj != null) obj.code(res);
+		else cfObj.code(res, this);
 	}
-	@Activate_need
-	public void exec(String id, String[] args, boolean[] isWrapped) throws SprexorException {
-		if(configType != 2) {
-			if(!errorIn)logger("sprexor was not prepared yet.", IOCenter.ERR);
-			else throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
-			return;
-		}
-		
-		if(!isExist(id))throw new SprexorException(SprexorException.CMD_NOTFOUND, id);
-		IOCenter res;
-		CommandProvider obj = cmd.get(id);
-		CommandFactory cfObj = cmdlib.get(id);
-		Component comval = new Component(args, isWrapped);
-		args = trimArr(args);
-		try {
-			if(obj != null) res = obj.code(comval);
-			else res = cfObj.code(comval, this);
-			if(!res.Msg.isBlank()) logger(res);
-		}catch(Exception e) {
-			logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
-		}
-	}
-	
 	/**
 	 * It can execute line with powerful string parser,
 	 * <br> and it will be run that you configure. 
@@ -530,73 +522,34 @@ public class Sprexor {
 	 * @since 0.1
 	 */
 	@Activate_need
-	public void exec(String com) throws SprexorException {
+	public int exec(String com) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
-		if(entryMode) {
-			if(!doEntry) {
-				entryMode = false;
-				entryId = "";
-			}else {
-				reflect.entrymode(entryId, com);
-				logger(cmd.get(entryId) != null ? cmd.get(entryId).EntryMode(com) : cmdlib.get(entryId).EntryMode(com), IOCenter.STDOUT);
-				return;
-			}
-		}
 		String commentStr = comment + "";
 		boolean varMode = false;
 		com = com.trim();
 		String id = com.split(" ")[0].trim();
 		if (ignoreCase) id = id.toLowerCase();
-		if(com.contentEquals("")) {
-			return;
+		if(com.trim().contentEquals("")) {
+			return -1;
 		}else if(com.startsWith(commentStr)) {
-			return;
+			return -1;
 		}else if(!isExist(id)) {
-			if(!errorIn) { //how to throw error
-				if(impose.IdNotFound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
-				else logger(impose.IdNotFound(id), IOCenter.ERR); // It can be defined by "bound" Function.
-			}
-			else throw new SprexorException(SprexorException.CMD_NOTFOUND, com);
-			return;
+			throw new SprexorException(SprexorException.CMD_NOTFOUND, com);
 		}else if(id.indexOf(";") != -1) {
 			String[] tmpo = com.split(";");
 			if(tmpo.length > 1)exec(com.split(";")[1]);
-			if(tmpo.length == 0) {
-				if(!errorIn) logger("cannot parse : " + com, IOCenter.ERR);
-				else throw new SprexorException(SprexorException.EXPRSS_ERR, "cannot paese : " + com);
-				return;
-			}
-			logger(cmd.get(id) != null ? cmd.get(tmpo[0]).emptyArgs() : cmdlib.get(tmpo[0]).emptyArgs(this));
-			return;
+			if(tmpo.length == 0) {throw new SprexorException(SprexorException.EXPRSS_ERR, "cannot paese : " + com);
 		}
-		
-		if(com.indexOf(" ") == -1) {
-			logger(cmd.get(id) != null ? cmd.get(id).emptyArgs().Msg : cmdlib.get(id).emptyArgs(this).Msg, IOCenter.STDOUT);
-			return;
-		}
-		com = com.substring(id.length() + 1) + " ";
-		if(id.indexOf(comment) != -1) { // When encountered Comment.
-			IOCenter res = null;
-			CommandProvider obj = cmd.get(id);
-			CommandFactory cfObj = cmdlib.get(id);
-			try {
-				if(obj != null) res = obj.emptyArgs();
-				else res = cfObj.emptyArgs(this);
-				logger(res);
-			}catch(Exception e) {
-				logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
-			}
-			return;
-		}
+		return cmd.get(id) != null ? cmd.get(tmpo[0]).code(impose.InOut()) : cmdlib.get(tmpo[0]).code(impose.InOut(), this);
+	}
+		com = com.substring(com.split(" ")[0].length());
 		String[] comar = com.split(""),
 				args = new String[comar.length];
-		String nextStr = "";
 		short mod = 0,
 				count = 0,
 				pr = 0,
 				smod = 0;
 		int allCount = 0;
-		if(nextFlag) nextFlag = false;
 		boolean[] wra = new boolean[comar.length];
 		boolean lastSpace = false;
 		boolean cmtMode = false;
@@ -610,8 +563,6 @@ public class Sprexor {
 			if(cmtMode) {
 				if(c.contentEquals(";") && dosem) {
 					cmtMode = false;
-					nextFlag = true;
-					nextStr = com.substring(allCount + 1);
 					
 					if((!lastSpace) && !cache.trim().contentEquals("")) {
 						args[count ++] = cache;
@@ -623,8 +574,6 @@ public class Sprexor {
 			}
 			
 			if(c.contentEquals(";") && mod + smod == 0 && dosem) {
-				nextStr = com.substring(allCount + 1);
-				nextFlag = true;
 				
 				if(varMode) {
 					if(envVar.get(cache.trim().substring(1)) != null) {
@@ -633,13 +582,8 @@ public class Sprexor {
 						cache = "";
 					}else {
 						if(cache.trim().contentEquals("@")) {
-							if(!errorIn)logger("variable name is empty.",IOCenter.ERR);
-							else throw new SprexorException(SprexorException.EXPRSS_ERR, "variable name is empty.");
-							return;
-						}
-						if(!errorIn)logger("could not find variable : " + cache.trim().substring(1),IOCenter.ERR);
-						else throw new SprexorException(SprexorException.VARIABLE_ERR, cache.trim());
-						return;
+							throw new SprexorException(SprexorException.EXPRSS_ERR, "variable name is empty.");
+						} else throw new SprexorException(SprexorException.VARIABLE_ERR, cache.trim());
 					}
 				}
 				
@@ -664,6 +608,32 @@ public class Sprexor {
 					continue;
 				}
 				
+				
+				/*if(c.contentEquals("\"")) {
+					boolean asdf = false;
+					while(allCount < comar.length) {
+						mod = 1;
+						allCount ++;
+						c = comar[allCount];
+						if(c == "\\") {
+							if(asdf) {
+								cache += "\\";
+							}else {
+								asdf = true;
+								continue;
+							}
+						}else if(c == "\"") {
+							break;
+						}
+					}
+				}else if(c.contentEquals("'")) {
+					boolean asdf = false;
+					while(allCount < comar.length) {
+						
+					}
+				}*/
+				
+				
 				// escape
 				if(c.contentEquals("\"")) {
 					if(mod == 0 && smod == 0) {
@@ -681,8 +651,6 @@ public class Sprexor {
 							mod = 0;
 							continue;
 						}
-						args[count ++] = cache.trim();
-						cache = "";
 						mod = 0;
 					}
 					continue;
@@ -702,8 +670,6 @@ public class Sprexor {
 							smod = 0;
 							continue;
 						}
-						args[count ++] = cache.trim();
-						cache = "";
 						smod = 0;
 					}
 					continue;
@@ -754,7 +720,6 @@ public class Sprexor {
 				//--------------------------	Syntax	-------------------------------------------------------
 			if(doBasicSyn) {
 				if(smod + mod + pr == 0) {
-					
 					if(c.contentEquals(comment + "") && mod == 0) {
 						cmtMode = true;
 						args[count++] = cache;
@@ -765,27 +730,22 @@ public class Sprexor {
 					if(c.contentEquals("@") && !varMode) {			//----------------- variable 
 						varMode = true;
 					}else {
-						if(varMode == true && c.contentEquals("@")) {
-							if(!errorIn)logger("Invalid expression detected - " + count,IOCenter.ERR);
-							else throw new SprexorException(SprexorException.EXPRSS_ERR, "@@");
-							return;
+						if(varMode && c.contentEquals("@")) {
+							throw new SprexorException(SprexorException.EXPRSS_ERR, "Invalid expression detected - " + count);
 						}else if(varMode){
 							if(c.contentEquals(" ")) {
 								varMode = false;
 								if(envVar.get(cache.trim().substring(1)) != null) {
+									System.out.println(11);
 									args[count++] = (envVar.get(cache.trim().substring(1)) + "").trim();
 									if(canReflect) reflect.variable_replacing(cache.trim().substring(1));
 									wra[count] = false;
 									cache = "";
 								}else {
 									if(cache.trim().contentEquals("@")) {
-										if(!errorIn)logger("Variable name cannot be voided.",IOCenter.ERR);
-										else throw new SprexorException(SprexorException.EXPRSS_ERR, "Variable name cannot be voided.");
-										return;
+										throw new SprexorException(SprexorException.EXPRSS_ERR, "Variable name cannot be voided.");
 									}
-									if(!errorIn)logger("This is not exist : " + cache.trim().substring(1),IOCenter.ERR);
-									else throw new SprexorException(SprexorException.VARIABLE_ERR,cache.trim());
-									return;
+									else throw new SprexorException(SprexorException.VARIABLE_ERR, "This is not exist : " + cache.trim().substring(1));
 								}
 							}
 						}
@@ -796,99 +756,48 @@ public class Sprexor {
 		} 									// Parse Ended.
 		doParse = false;
 		switch(ClpCode) {
-		case 0: break;
 		case 1 : 
-			if(!errorIn) logger("Warning : Sprexor wasn't closed normally.", IOCenter.WARN);
-			else {
-				logger("Warning : Sprexor wasn't closed normally.", IOCenter.WARN);
-				ClpCode = 0;
-				return;
-			}
-			break;
+			ClpCode = 0;
+		break;
 		default : break;
 		}
 		if(mod != 0 || smod != 0 || pr != 0) {
-			if(!errorIn) logger("Error : invalid literal syntax.", IOCenter.ERR);
-			else throw new SprexorException(SprexorException.EXPRSS_ERR, 
+			throw new SprexorException(SprexorException.EXPRSS_ERR, 
 					"invalid literal syntax.");
-			return;
 		}
-		
-		IOCenter res = null;
-		CommandProvider obj = cmd.get(id);
-		CommandFactory cfObj = cmdlib.get(id);
+		if(!cache.isBlank()) {
+			if(varMode) {
+				String iii = envVar.get(cache.trim().substring(1)) != null ? (args[count] = envVar.get(cache.trim().substring(1)).toString()) : "";
+			} else args[count] = cache;
+		}
+		IOCenter res = impose.InOut();
 		args = trimArr(args);
 		wra = trimArr(wra, count);
-		Component comval = new Component(args, wra);
-		try {
-			if(canReflect)comval = reflect.before_invoked(id, comval);
-			if(!entryMode) {
-				if(obj != null) res = obj.code(comval);
-				else res = cfObj.code(comval, this);
-				if(doEntry) {
-					entryMode = true;
-					entryId = id;
-				}
-			}
-			if(obj != null) {
-				if(obj.EntryMode(null) != null || doEntry) {
-					entryMode = true;
-					entryId = id;
-					doEntry = true;
-				}
-			}else {
-				if(cfObj.EntryMode(null) != null || doEntry) {
-					entryMode = true;
-					entryId = id;
-					doEntry = true;
-				}
-			}
-			
-		}catch(Exception e) {
-			if(obj != null)res = new IOCenter(obj.error(e), IOCenter.ERR);
-			else res = new IOCenter(cfObj.error(e), IOCenter.ERR);
-		}
-		
-		if(res == null)res = new IOCenter("", IOCenter.UNKNOWN);
-		else if(res.status == null)res.status = IOCenter.UNKNOWN;
-		
-		if(res != null) if(!res.Msg.isBlank()) logger(res.Msg,res.status);
-		if(nextFlag) {
-			exec(nextStr);
-		}
+		res.component = new Component(args, wra);
+		return (cmd.containsKey(id) ? cmd.get(id).code(res) : cmdlib.get(id).code(res, this));
 	}
 	/**
 	 * It run a line with powerful string parser.
 	 * <br> And it will be run that configured. 
 	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
 	 * @param input
+	 * @return 
 	 * @since 0.2.18
 	 * @throws SprexorException
 	 */
 	@Activate_need
-	synchronized public void run(String input) throws SprexorException {
+	synchronized public int run(String input) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
-		if(entryMode) {
-			if(!doEntry) {
-				entryMode = false;
-				entryId = "";
-			}else {
-				reflect.entrymode(entryId, input);
-				logger(cmd.get(entryId) != null ? cmd.get(entryId).EntryMode(input) : cmdlib.get(entryId).EntryMode(input), IOCenter.STDOUT);
-				return;
-			}
-		}
 		boolean varMode = false;
 		String commentStr = comment + "";
 		input = input.trim();
-		if(input.isEmpty()) return;
+		if(input.isEmpty()) return 0;
 		String id = "";
 		if(input.startsWith(commentStr)) {
-			return;
+			return 0;
 		}
 		char[] chars = input.toCharArray();
 		String[] args = new String[chars.length];
-		String nextStr = "";
 		short mod = 0,
 				count = 0,
 				pr = 0,
@@ -897,7 +806,6 @@ public class Sprexor {
 		int le = chars.length;
 		StringBuilder cache = new StringBuilder();
 		int capacity = cache.capacity();
-		if(nextFlag) nextFlag = false;
 		boolean[] wra = new boolean[le];
 		boolean lastSpace = false;
 		boolean cmtMode = false;
@@ -910,8 +818,6 @@ public class Sprexor {
 			if(cmtMode) {
 				if(element == ';' && dosem) {
 					cmtMode = false;
-					nextFlag = true;
-					nextStr = input.substring(allCount + 1);
 					if((!lastSpace) && !cache.toString().isEmpty()) {
 						args[count ++] = cache.toString();
 						cache.delete(0, cache.capacity());
@@ -921,9 +827,6 @@ public class Sprexor {
 				continue;
 			}
 			if(element == ';' && mod + smod == 0 && dosem) {
-				nextStr = input.substring(allCount + 1);
-				nextFlag = true;
-				
 				if(varMode) {
 					if(envVar.get(cache.substring(1)) != null) {
 						args[count++] = envVar.get(cache.substring(1)) + "";
@@ -931,13 +834,9 @@ public class Sprexor {
 						cache.delete(0, cache.capacity());
 					}else {
 						if(cache.toString().contentEquals("@")) {
-							if(!errorIn)logger("variable name is empty.",IOCenter.ERR);
-							else throw new SprexorException(SprexorException.EXPRSS_ERR, "variable name is empty.");
-							return;
+							throw new SprexorException(SprexorException.EXPRSS_ERR, "variable name is empty.");
 						}
-						if(!errorIn)logger("could not find variable : " + cache.substring(1),IOCenter.ERR);
 						else throw new SprexorException(SprexorException.VARIABLE_ERR, cache.toString());
-						return;
 					}
 				}
 				
@@ -958,40 +857,16 @@ public class Sprexor {
 						id = cache.toString();
 						if(ignoreCase) id = id.toLowerCase();
 						if(!isExist(id)) {
-							if(!errorIn) {
-								if(impose.IdNotFound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
-								else logger(impose.IdNotFound(id), IOCenter.ERR);
-							} else throw new SprexorException(SprexorException.CMD_NOTFOUND, input);
-						}
-						if(id.indexOf(comment) != -1) {
-							IOCenter res = null;
-							CommandProvider obj = cmd.get(id);
-							CommandFactory cfObj = cmdlib.get(id);
-							try {
-								if(obj != null) res = obj.emptyArgs();
-								else res = cfObj.emptyArgs(this);
-								logger(res);
-							}catch(Exception e) {
-								logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
-							}
-							return;
+							throw new SprexorException(SprexorException.CMD_NOTFOUND, input);
 						}
 						if(id.indexOf(";") != -1 && dosem) {
-							if(id.charAt(0) == ';') 
-								if(!errorIn) 
-									logger(" " + input, IOCenter.ERR);
-								//
-							//
-							else throw new SprexorException(SprexorException.EXPRSS_ERR, "Expression incorrect : " + input);
 							StringBuilder sb = new StringBuilder();
 							StringTokenizer tkn = new StringTokenizer(input, ";");
-							logger(cmd.containsKey(id) ? cmd.get(id).emptyArgs() :
-								cmdlib.get(id).emptyArgs(this));
 							while(tkn.hasMoreTokens()) {
 								sb.append(tkn.nextToken());
 							}
 							run(sb.toString());
-							return;
+							return 0;
 						}
 						firstTime = false;
 					} else args[count ++] = cache.toString();
@@ -1096,9 +971,7 @@ public class Sprexor {
 						varMode = true;
 					}else {
 						if(varMode == true && element == '@') {
-							if(!errorIn)logger("Invalid expression detected - " + count,IOCenter.ERR);
-							else throw new SprexorException(SprexorException.EXPRSS_ERR, "@@");
-							return;
+							throw new SprexorException(SprexorException.EXPRSS_ERR, "@@");
 						}else if(varMode){
 							if(element == ' ') {
 								varMode = false;
@@ -1109,13 +982,9 @@ public class Sprexor {
 									cache.delete(0, capacity);
 								}else {
 									if(cache.toString().isEmpty()) {
-										if(!errorIn)logger("Variable name cannot be voided.",IOCenter.ERR);
-										else throw new SprexorException(SprexorException.EXPRSS_ERR, "Variable name cannot be voided.");
-										return;
+										throw new SprexorException(SprexorException.EXPRSS_ERR, "Variable name cannot be voided.");
 									}
-									if(!errorIn)logger("This is not exist : " + cache.substring(1),IOCenter.ERR);
-									else throw new SprexorException(SprexorException.VARIABLE_ERR,cache.toString());
-									return;
+									throw new SprexorException(SprexorException.VARIABLE_ERR,cache.toString());
 								}
 							}
 						}
@@ -1127,108 +996,33 @@ public class Sprexor {
 		doParse = false;
 		if(count == 0) {
 			id = cache.toString();
-			if(id.indexOf(comment) != -1) {
-				IOCenter res = null;
-				id = id.split(comment + "")[0];
-				CommandProvider obj = cmd.get(id);
-				CommandFactory cfObj = cmdlib.get(id);
-				try {
-					if(obj != null) res = obj.emptyArgs();
-					else res = cfObj.emptyArgs(this);
-					logger(res);
-				}catch(Exception e) {
-					logger(obj != null ? obj.error(e) : cfObj.error(e), IOCenter.ERR);
-				}
-				return;
-			}
 			if(id.indexOf(";") != -1 && dosem) {
-				if(id.charAt(0) == ';') 
-					if(!errorIn) 
-						logger(" " + input, IOCenter.ERR);
-					//
-				//
-				else throw new SprexorException(SprexorException.EXPRSS_ERR, "Expression incorrect : " + input);
 				StringBuilder sb = new StringBuilder();
 				StringTokenizer tkn = new StringTokenizer(input, ";");
-				logger(cmd.containsKey(id) ? cmd.get(id).emptyArgs() :
-					cmdlib.get(id).emptyArgs(this));
 				while(tkn.hasMoreTokens()) {
 					sb.append(tkn.nextToken());
 				}
-				run(sb.toString());
-				return;
+				return run(sb.toString());
 			}
-			if(cmdlib.containsKey(id)) logger(cmdlib.get(id).emptyArgs(this));
-			else if(cmd.containsKey(id)) logger(cmd.get(id).emptyArgs());
-			else if(!errorIn) {
-					if(impose.IdNotFound("").isEmpty()) logger(id + " : command not found.", IOCenter.ERR);
-						else logger(impose.IdNotFound(id), IOCenter.ERR);
-					//
-				} else throw new SprexorException(SprexorException.CMD_NOTFOUND, input);
-			//
-			return;
-		} else args[count ++] = cache.toString();
+			throw new SprexorException(SprexorException.CMD_NOTFOUND, input);
+			} else args[count ++] = cache.toString();
 		switch(ClpCode) {
-		case 0: break;
 		case 1 : 
-			if(!errorIn) logger("Warning : Sprexor wasn't closed normally.", IOCenter.WARN);
-			else {
-				logger("Warning : Sprexor wasn't closed normally.", IOCenter.WARN);
-				ClpCode = 0;
-				return;
-			}
+			ClpCode = 0;
 			break;
 		default : break;
 		}
 		if(mod != 0 || smod != 0 || pr != 0) {
-			if(!errorIn) logger("Error : invalid literal syntax.", IOCenter.ERR);
-			else throw new SprexorException(SprexorException.EXPRSS_ERR, 
+			throw new SprexorException(SprexorException.EXPRSS_ERR, 
 					"invalid literal syntax.");
-			return;
 		}
 		
-		IOCenter res = null;
-		CommandProvider obj = cmd.get(id);
-		CommandFactory cfObj = cmdlib.get(id);
+		IOCenter res = impose.InOut();
 		args = trimArr(args);
 		wra = trimArr(wra, count);
-		Component comval = new Component(args, wra);
-		try {
-			if(canReflect)comval = reflect.before_invoked(id, comval);
-			if(!entryMode) {
-				if(obj != null) res = obj.code(comval);
-				else res = cfObj.code(comval, this);
-				if(doEntry) {
-					entryMode = true;
-					entryId = id;
-				}
-			}
-			if(obj != null) {
-				if(obj.EntryMode(null) != null || doEntry) {
-					entryMode = true;
-					entryId = id;
-					doEntry = true;
-				}
-			}else {
-				if(cfObj.EntryMode(null) != null || doEntry) {
-					entryMode = true;
-					entryId = id;
-					doEntry = true;
-				}
-			}
-			
-		}catch(Exception e) {
-			if(obj != null)res = new IOCenter(obj.error(e), IOCenter.ERR);
-			else res = new IOCenter(cfObj.error(e), IOCenter.ERR);
-		}
-		
-		if(res == null)res = new IOCenter("", IOCenter.UNKNOWN);
-		else if(res.status == null)res.status = IOCenter.UNKNOWN;
-		
-		if(res != null) if(!res.Msg.isBlank()) logger(res);
-		if(nextFlag) {
-			run(nextStr);
-		}
+		res.component = new Component(args, wra);
+		if(cmd.containsKey(id)) return cmd.get(id).code(res);
+		else return cmdlib.get(id).code(res, this);
 	}
 	/**
 	 * eval returns outcome to string.
@@ -1236,21 +1030,17 @@ public class Sprexor {
 	 * @return result by string.
 	 */
 	@Activate_need
-	public String eval(String com) {
+	public int eval(String com) {
 		String[] args = Component.Parse(com);
 		Object obj = autoSelect(args[0]);
-		IOCenter toRes = null;
-		Component comp = new Component(Tools.cutArr(args, 1));
-		if(canReflect) comp = reflect.before_invoked(args[0], new Component(Tools.cutArr(args, 1)));
-		
+		IOCenter res = impose.InOut();
+		res.component = new Component(Tools.cutArr(args, 1));
 		if(obj instanceof CommandProvider) {
-			toRes = cmd.get(args[0])
-					.code(comp);
+			return cmd.get(args[0]).code(res);
 			
 		} else if(obj instanceof CommandFactory) {
-			toRes = cmdlib.get(args[0])
-					.code(comp, this);
+			return cmdlib.get(args[0]).code(res, this);
 		}
-		return toRes.Msg;
+		return -1;
 	}
 }

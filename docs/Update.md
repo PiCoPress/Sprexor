@@ -1,11 +1,21 @@
-# 0.2.18-alpha6 Venom
+# 0.2.18-alpha1
 
->**alpha6**
+>**beta1** : 2021.1.13
+
+>- Sprexor is changed entirely.
+>- emptyArgs, entryMode removed.
+>- strict mode removed.
+>- IOCenter code(Component) -> int code(IOCenter)
+>- IOCenter : getComponent()
+>- new Class : SprexorIstream, SprexorOstream
+>- Component.isEmpty() added.
+
+>**alpha6** : 2021.1.8
 
 >- bug fixed.
 >- new function : run(String) in Sprexor.
 
->**alpha5**
+>**alpha5** : 2021.1.2
 
 >- GlobalData removed.
 >- CommandNotFoundException merged with SprexorException.
@@ -17,7 +27,7 @@
 >- Sprexor Performance is improved.
 >- Sprexor providing things upgraded internally.
 
->**alpha4**
+>**alpha4** : 2020.12.30
 
 >- Documents improved.
 >- Ingrained null problem almost fixed.
@@ -34,13 +44,13 @@
 
 >>>- enum A ArgumentType (Default, SetType1, SetType2, Str)
 
->**alpha3**
+>**alpha3** : 2020.12.23
 
 >- New Class - Component : For manage arguments.
 >- Almost javadoc notes were improved.
 >- Parameters of "code" method changed in CommandProvider and CommandFactory.
 
->**alpha2**
+>**alpha2** : 2020.12.17
 
 >- sprexor.cosmos's Classes bugs fixed and changed feature.
 >- many bugs in Sprexor Class fixed (mainly conflit of EntryMode).
@@ -52,6 +62,6 @@
 >- CommandProvider methods : help, referenceClass moved to CommandFactory.
 >- IOCenter functionality increased.
 
->**alpha1**
+>**alpha1** : 2020.12.16
 
 >>*new Class : CommandFactory*
