@@ -1,83 +1,49 @@
 package sprexor;
 
-import java.util.Vector;
-
 /**
  * Standard Internal Output Center
  * @author PICOPress
  * @since 0.1.2
  */
 public class IOCenter {
-	private static Sprexor sp;
-	
-	protected static enum TYPE{
-		ERR, // red
-		CMT, // white or green
-		STDOUT, // white
+	public static enum TYPE {
+		ERR,
+		CMT, 
+		STDOUT,
 		NO_VALUE,
 		UNKNOWN,
-		custom1,
-		custom2,
-		custom3,
+		WARN,
 	}
-	
-	public static TYPE ERR = TYPE.ERR;
-	public static TYPE CMT = TYPE.CMT;
-	public static TYPE STDOUT = TYPE.STDOUT;
-	public static TYPE NO_VALUE = TYPE.NO_VALUE;
-	public static TYPE UNKNOWN = TYPE.UNKNOWN;
-	public static TYPE custom1 = TYPE.custom1;
-	public static TYPE custom2 = TYPE.custom2;
-	public static TYPE custom3 = TYPE.custom3;
-	
+	public static final TYPE ERR = TYPE.ERR;
+	public static final TYPE CMT = TYPE.CMT;
+	public static final TYPE STDOUT = TYPE.STDOUT;
+	public static final TYPE WARN = TYPE.WARN;
+	public static final TYPE NO_VALUE = TYPE.NO_VALUE;
+	public static final TYPE UNKNOWN = TYPE.UNKNOWN;
+	public static final TYPE err = TYPE.ERR;
+	public static final TYPE cmt = TYPE.CMT;
+	public static final TYPE stdout = TYPE.STDOUT;
+	public static final TYPE warn = TYPE.WARN;
+	public static final TYPE no_value = TYPE.NO_VALUE;
+	public static final TYPE unknown = TYPE.UNKNOWN;
+	//
+	protected Component component = null;
+	public Object label;
+	public SprexorOstream out;
+	public SprexorIstream in;
+	//
 	protected String Msg = "";
 	protected TYPE status = null;
-	
-	protected static void log(Object s, TYPE t) {
-		sp.recentMessage[0] = s;
-		sp.recentMessage[1] = t;
-	}
-	public IOCenter(Sprexor s) {
-		sp = s;
-	}
-	public IOCenter(String msg, TYPE ty) {
-		Msg = msg;
-		status = ty;
-	}
-	public IOCenter(String msg) {
-		Msg = msg;
-		status = STDOUT;
+	public IOCenter(SprexorOstream o, SprexorIstream i) {
+		out = o;
+		in = i;
 	}
 	/**
-	 * return recent Message.
-	 * @return Object[2], index 1 : message<br>index 2 : message TYPE
+	 * return arguments.
+	 * @return Component
 	 */
-	public Object[] getMessage() {
-		return sp.recentMessage;
-	}
-	/**
-	 * return all of message that printed in Sprexor.exec method. This range is smaller than range of getOutput().
-	 * @return Vector
-	 */
-	public Vector<Object[]> getBlockMessage() {
-		return sp.blockMessage;
-	}
-	/**
-	 * exit entry mode
-	 * @since 0.2.7
-	 */
-	public void exitEntry() {
-		sp.entryMode = false;
-		sp.entryId = "";
-		sp.doEntry = false;
-	}
-	/**
-	 * return all of message.
-	 * @return Vector(Object[2]),  index 1 : message<br>index 2 : message TYPE
-	 * @since 0.2.1
-	 */
-	public Vector<Object[]> getOutput(){
-		return sp.MessageLog;
+	public Component getComponent() {
+		return component;
 	}
 	
 }

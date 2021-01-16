@@ -1,47 +1,42 @@
 package sprexor.cosmos;
 
-import sprexor.CommandProvider;
-import sprexor.GlobalData;
+import sprexor.CommandFactory;
+import sprexor.Sprexor;
 import sprexor.IOCenter;
 import sprexor.Tools;
+import sprexor.Component;
 
 /**
- * example Convenience Register Command Class.
+ * It is a Class to provide BasicPackages and to make CommandClass for who don't know.
  * @author PICOPress
  * @since 0.2.4
  */
-public class BasicPackages implements CommandProvider{
+public class BasicPackages implements CommandFactory{
 	public String getCommandName() {
 		return "find";
 	}
-	
+	@Override
 	public String help() {
-		return "::: The BasicPackages 0.2.16 :::\n" +
+		return "::: The BasicPackages 0.2.18 :::\n" +
 				"1. find : Find text(s) by the unit of line.\n" + 
-				"2. for : Repeat and run commands for count.";
+				"2. repeat : Repeat the text.";
 	}
-	
-	public Object emptyArgs() {
-		return help();
+	@Override
+	public CommandFactory[] referenceClass() {
+		return Tools.toCFClass(this, new For()); //Tools.toCFClasses();
 	}
-	
-	public CommandProvider[] referenceClass() {
-		return Tools.toCPClass(this, new For()); //Tools.toCPClass();
-	}
-	
-	public IOCenter error(Exception e) {
-		return new IOCenter(e.getMessage(), IOCenter.ERR);
-	}
-	
-	@Override public IOCenter code(String[] args, boolean[] isWrapped, GlobalData scope) {
-		String tmp = Tools.arg2String(Tools.excludeArr(args, 0));
-		String find = args[0];
+	@Override
+	public int code(IOCenter io, Sprexor SprexorInstance) {
+		Component args = io.getComponent();
+		String tmp = Tools.arg2String(Tools.excludeArr(args.get(), 0));
+		String find = args.gets(0);
 		String[] splitedStr = tmp.split("\n");
 		String result = "";
 		
 		for(String it : splitedStr) {
 			if(it.indexOf(find) != -1)result += it + "\n";
 		}
-		return new IOCenter(result, IOCenter.STDOUT);
+		io.out.println(result);
+		return 0;
 	}
 }
