@@ -32,7 +32,7 @@ It has a lot of libraries, options, and customizing tools to use many of purpose
 
 # See Documentation
 - [English](./docs/docs_en.md)
-- [Korean](./docs/docs_kr.md)
+- [Korean](./docs/docs_ko.md)
 
 
 ## How to use 
