@@ -1,5 +1,5 @@
 # Old versions
-_The old versions is not recommended to use._
+_The old versions are not recommended to use._
 
 
 **0.2.10** `2020.9.24`
