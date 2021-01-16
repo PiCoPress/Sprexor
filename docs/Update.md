@@ -1,5 +1,3 @@
-# 0.2.18-alpha1
-
 >**beta1** : 2021.1.13
 
 >- Sprexor is changed entirely.
