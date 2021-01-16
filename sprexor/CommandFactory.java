@@ -22,7 +22,7 @@ public interface CommandFactory {
 	}
 	/**
 	 * Operate with java source overrided method.
-	 * @param args : The processed parameter.
+	 * @param io : The processed parameter.
 	 * @param SprexorInstance
 	 * @return IOCenter
 	 */

@@ -20,7 +20,7 @@ import sprexor.IOCenter.TYPE;
 	 * This Annotation is used to let if something method need to activate.
 	 */
 }
-/**
+/*
  * Sprexor : the String Parser & Executor 0.2.18-beta1
  *  copyright(c)  2020  by PICOPress, All rights reserved.
  */
@@ -194,7 +194,7 @@ public class Sprexor {
 	}
 	/**
 	 * importSprex is get command context(s) that created with class in this sprexor.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param cmp : Other class that implemented with CommandProvider
 	 * @see sprexor.CommandProvider
 	 * @see sprexor.cosmos.BasicPackages
@@ -232,7 +232,7 @@ public class Sprexor {
 	}
 	/**
 	 * check whether name is exist.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param s - command name.
 	 * @return return true if command name(s) is exist, other case false.
 	 * @since 0.2.0
@@ -254,7 +254,7 @@ public class Sprexor {
 	}
 	/**
 	 * basic features are not assigned.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * @since 0.2.11
 	 */
 	public void unBasicFeatures() {
@@ -264,7 +264,7 @@ public class Sprexor {
 	
 	/**
 	 * send a instant message.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param str : message to send at IOCenter.
 	 * @param type : message type
 	 * @since 0.2.3
@@ -278,7 +278,7 @@ public class Sprexor {
 	}
 	/**
 	 * send a instant message.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param str : message to send at IOCenter.
 	 * @since 0.2.3
 	 * @see sprexor.IOCenter.TYPE
@@ -290,7 +290,7 @@ public class Sprexor {
 		//impose.out(str, IOCenter.STDOUT);
 	}
 	/** Ignore upper or lower case of character. 
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * ex ) input : ABcD
 	 *		detect : abcd
 	 *@since 0.2.14
@@ -300,7 +300,7 @@ public class Sprexor {
 	}
 	/**
 	 * Acivate to use method exec, and cannot set value of properties of this sprexor.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * @throws SprexorException 
 	 * @since 0.2.3
 	 */
@@ -415,7 +415,7 @@ public class Sprexor {
 	}
 	/**
 	 * This method Register a command. Registring command name shouldn't be included special character like *, ^ etc...
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * @param str : command name that should not be contained special characters. 
 	 * @param cp : CommandProvider
 	 * @param hd : helping message is used in basic command - help.
@@ -432,7 +432,7 @@ public class Sprexor {
 	}
 	/**
 	 * If this function is run, ignore ';' when parsing.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * @since 0.2.11
 	 */
 	public void unSemicolon() {
@@ -442,8 +442,8 @@ public class Sprexor {
 	
 	/**
 	 * 
-	 * @param str : define annotate identifier character.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * @param c : define annotate identifier character.
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * @since 0.1.5
 	 */
 	public void setComment(char c) {
@@ -454,7 +454,7 @@ public class Sprexor {
 	/**
 	 * 
 	 * @param b : true - on, false - off.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 * @since 0.2.0
 	 */
 	public void useSyntax(boolean b) {
@@ -465,11 +465,13 @@ public class Sprexor {
 	/**@deprecated
 	 * It is method to control this system. 
 	 * <hr>--- Key Names ---
-	 * <br><li>entry_on : Enter the EntryMode.
-	 * <br><li>entry_off : Exit the EntryMode.
-	 * <br><li>break_parse : Stop parsing. This Key recommends to use for reflection.
+	 * <ul>
+	 * <li>entry_on : Enter the EntryMode.</li>
+	 * <li>entry_off : Exit the EntryMode.</li>
+	 * <li>break_parse : Stop parsing. This Key recommends to use for reflection.</li>
+	 * </ul>
 	 * <hr>
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param value : the key value.
 	 * @since 0.2.7
 	 */
@@ -487,7 +489,7 @@ public class Sprexor {
 	}
 	/**set Property to use reflection.
 	 * If not allow to use reflection, Sprexor won't use Reflection resource although you implemented methods.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
 	 */
 	public void allowReflection() {
 		if(configType != 0) return;
@@ -495,7 +497,7 @@ public class Sprexor {
 	}
 	/**
 	 * execute command as non-parse.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param id : command name
 	 * @param args : arguments
 	 * @throws SprexorException 
@@ -516,7 +518,7 @@ public class Sprexor {
 	/**
 	 * It can execute line with powerful string parser,
 	 * <br> and it will be run that you configure. 
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param com : command string to execute
 	 * @throws SprexorException 
 	 * @since 0.1
@@ -779,7 +781,7 @@ public class Sprexor {
 	/**
 	 * It run a line with powerful string parser.
 	 * <br> And it will be run that configured. 
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span><b>
+	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param input
 	 * @return 
 	 * @since 0.2.18

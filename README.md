@@ -4,7 +4,8 @@ It has a lot of libraries, options, and customizing tools to use many of purpose
 
 # Downloads
 - **Latest : 0.2.18-Beta1** `2021.1.16`
-
+    + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.18-beta1/Sprexor.0.2.18-b1.jar)
+    + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.18-beta1.zip)
 
 - **Stable : 0.2.16** `2020.11.16`
     + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.16/Sprexor.0.2.16-full.jar)
