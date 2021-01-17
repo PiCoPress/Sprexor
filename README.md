@@ -1,6 +1,6 @@
 # Sprexor Application Framework
 Sprexor is Framework that manages and runs command line in Java.
-It has a lot of libraries, options, and customizing tools to use many of purpose easily.
+It has a lot of libraries, options, and customizing tools to use in many of purpose easily.
 
 # Downloads
 - <b><span style="color:f478cd">Latest </span></b> **0.2.18-Beta1** `2021.1.16`
@@ -39,7 +39,7 @@ It has a lot of libraries, options, and customizing tools to use many of purpose
 
 
 ## How to use 
-It is two ways how to use Sprexor.
+There are two ways how to use Sprexor.
 
 ```java
 import sprex.*;
