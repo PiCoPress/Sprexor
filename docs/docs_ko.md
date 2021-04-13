@@ -13,7 +13,7 @@
 10. [SprexorOstream](#sprexorostream)
 11. [SprexorIstream](#sprexoristream)
 12. [Standard Commands](#standard-commands)
-13. [예시코드보기](./test.java)
+13. [예시코드보기](../test.java)
 
 
 #### Sprexor
