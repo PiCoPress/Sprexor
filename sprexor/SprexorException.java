@@ -11,21 +11,21 @@ public class SprexorException extends Exception {
 		VARIABLE_ERR,
 		EXPRSS_ERR,
 		ACTIVATION_FAILED,
-		CMD_NOTFOUND,
+		CMD_NOT_FOUND,
+		INTERNAL_ERROR,
 		NULL
 	}
 	
 	public static final ERROR_TYPE VARIABLE_ERR = ERROR_TYPE.VARIABLE_ERR;
 	public static final ERROR_TYPE EXPRSS_ERR = ERROR_TYPE.EXPRSS_ERR;
 	public static final ERROR_TYPE ACTIVATION_FAILED = ERROR_TYPE.ACTIVATION_FAILED;
-	public static final ERROR_TYPE CMD_NOTFOUND = ERROR_TYPE.CMD_NOTFOUND;
+	public static final ERROR_TYPE CMD_NOT_FOUND = ERROR_TYPE.CMD_NOT_FOUND;
+	public static final ERROR_TYPE INTERNAL_ERROR = ERROR_TYPE.INTERNAL_ERROR;
 	
-	public ERROR_TYPE status = ERROR_TYPE.NULL;
-	public String msg = "";
+	protected ERROR_TYPE status = ERROR_TYPE.NULL;
+	protected String msg = "";
 	
 	private String knock(ERROR_TYPE k, String s) {
-		status = k;
-		msg = s;
 		switch(k) {
 		case VARIABLE_ERR :
 			return ("cannot find a variable : " + s);
@@ -35,14 +35,23 @@ public class SprexorException extends Exception {
 		
 		case ACTIVATION_FAILED :
 			return "current state is not activated. ";
+			
+		case CMD_NOT_FOUND :
+			return s + " : command not found.";
+		
+		case INTERNAL_ERROR :
+			return s;
+			
 		default : return "";
 		}
 	}
 	@Override
 	public String getMessage() {
-		return knock(status, msg);
+		return status + " - " + knock(status, msg);
 	}
 	public SprexorException(ERROR_TYPE e, String s){
 		super(s);
+		status = e;
+		msg = s;
 	}
 }

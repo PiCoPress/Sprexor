@@ -11,7 +11,6 @@ import java.util.Vector;
  */
 public class Component implements Iterable<String> {
 	private String[] v;
-	private boolean[] isw;
 	private Object[] reserved;
 	enum A{
 		Default,
@@ -26,14 +25,13 @@ public class Component implements Iterable<String> {
 	 */
 	public class Unit{
 		String k = "";
-		boolean b;
+		int index;
 		public Object label;
 		public final A ArgumentType;
-		protected Unit(String k, boolean b) {
+		protected Unit(String k, int index) {
 			this.k = k;
-			this.b = b;
-			if(b) ArgumentType = A.Str;
-			else if(k.startsWith("--")) ArgumentType = A.SetType2;
+			this.index = index;
+			if(k.startsWith("--")) ArgumentType = A.SetType2;
 			else if(k.startsWith("-")) ArgumentType = A.SetType1;
 			else ArgumentType = A.Default;
 		}
@@ -41,18 +39,25 @@ public class Component implements Iterable<String> {
 		public String toString() {
 			return k;
 		}
-		public boolean isWrapped() {
-			return b;
+		/**
+		 * get a element of previous index
+		 * @return Unit
+		 */
+		public Unit prev() {
+			if(index <= 0) return null;
+			return new Unit(v[index - 1], index - 1);
 		}
-	}
-	protected Component(String[] v, boolean[] isw) {
-		this.v = v;
-		this.isw = isw;
-		reserved = new Object[1024];
+		/**
+		 * get a element of next index
+		 * @return Unit
+		*/
+		public Unit next() {
+			if(index + 1 >= v.length) return null;
+			return new Unit(v[index + 1], index + 1);
+		}
 	}
 	protected Component(String[] v) {
 		this.v = v;
-		this.isw = new boolean[v.length];
 		reserved = new Object[1024];
 	}
 	@Override 
@@ -80,11 +85,11 @@ public class Component implements Iterable<String> {
 	}
 	/**
 	 * It returns the class Unit that manage each of elements.
-	 * @param i - The index to get unit of arguments.
+	 * @param i - index to get unit of arguments.
 	 * @return Unit Class
 	 */
 	public Unit get(int i) {
-		Unit u = new Unit(v[i], isw[i]);
+		Unit u = new Unit(v[i], i);
 		u.label = reserved[i];
 		return u;
 	}
@@ -104,22 +109,21 @@ public class Component implements Iterable<String> {
 	public String gets(int i) {
 		int c = 0;
 		for(String s : v) {
-			if(!s.startsWith("-") || isw[c]) {
+			if(!s.startsWith("-")) {
 				if(c == i) return s;
 				c ++;
 			}
 		}
-		return null;
+		return "";
 	}
 	/**
 	 * Return Options to Array in order.
 	 * @return String[]
 	 */
 	public String[] getAllOption() {
-		int c = 0;
 		ArrayList<String> arr = new ArrayList<String>();
 		for(String s : v) {
-			if(s.startsWith("-") && !isw[c ++] && arr.contains(s)) {
+			if(s.startsWith("-") && arr.contains(s)) {
 				arr.add(s.substring(s.startsWith("--") ? 2 : 1));
 			}
 		}
@@ -131,6 +135,11 @@ public class Component implements Iterable<String> {
 		});
 		return arr.toArray(new String[arr.size()]);
 	}
+	/**
+	 * the lagacy parser.
+	 * @param str string line
+	 * @return
+	 */
 	public static String[] Parse(String str) {
 		String[] pops = str.split(""),
 				units = new String[pops.length];
@@ -140,8 +149,6 @@ public class Component implements Iterable<String> {
 				smod = 0;
 		int allCount = 0;
 		String cache = "";
-		
-		//------------------Parse start---------------------
 		for(;allCount < pops.length; allCount ++) {
 			String c = pops[allCount];
 			if(mod + smod == 1 && c.contentEquals("\\") && pr == 0) {
@@ -245,6 +252,34 @@ public class Component implements Iterable<String> {
 	public boolean isEmpty() {
 		return v.length == 0;
 	}
+	/**
+	 * get parameters without option starting
+	 * @return string array
+	 */
+	public String[] getValidParameters() {
+		Vector<String> v_ = new Vector<String>();
+		String tmp;
+		for(int i = 0; i < v.length; i ++) {
+			tmp = v[i];
+			if(tmp.startsWith("-") && !tmp.contains(" ")) v_.add(tmp);
+		}
+		return v_.toArray(new String[v_.size()]);
+	}
+	/**
+	 * get parameters without option starting
+	 * @param startAt 
+	 * @return string array
+	 */
+	public String[] getValidParameters(int startAt) {
+		Vector<String> v_ = new Vector<String>();
+		String tmp;
+		for(int i = startAt; i < v.length; i ++) {
+			tmp = v[i];
+			if(tmp.startsWith("-") && !tmp.contains(" ")) v_.add(tmp);
+		}
+		return v_.toArray(new String[v_.size()]);
+	}
+	
 	protected void setLabel(int index, Object obj) {
 		reserved[index] = obj;
 	}

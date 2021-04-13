@@ -3,7 +3,7 @@ package sprexor.cosmos;
 import sprexor.CommandFactory;
 import sprexor.Sprexor;
 import sprexor.IOCenter;
-import sprexor.Tools;
+import sprexor.lib.Utils;
 import sprexor.Component;
 
 /**
@@ -23,12 +23,12 @@ public class BasicPackages implements CommandFactory{
 	}
 	@Override
 	public CommandFactory[] referenceClass() {
-		return Tools.toCFClass(this, new For()); //Tools.toCFClasses();
+		return Utils.toCFClass(this, new For()); //Tools.toCFClasses();
 	}
 	@Override
 	public int code(IOCenter io, Sprexor SprexorInstance) {
 		Component args = io.getComponent();
-		String tmp = Tools.arg2String(Tools.excludeArr(args.get(), 0));
+		String tmp = Utils.arg2String(Utils.excludeArr(args.get(), 0));
 		String find = args.gets(0);
 		String[] splitedStr = tmp.split("\n");
 		String result = "";

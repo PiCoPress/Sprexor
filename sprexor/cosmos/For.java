@@ -4,9 +4,14 @@ import sprexor.Component;
 import sprexor.IOCenter;
 import sprexor.Sprexor;
 import sprexor.SprexorException;
-import sprexor.Tools;
+import sprexor.lib.Smt;
+import sprexor.lib.Utils;
 
 class For implements sprexor.CommandFactory {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public String getCommandName() {
 		return "for";
 	}
@@ -19,7 +24,7 @@ class For implements sprexor.CommandFactory {
 	public int code(IOCenter io, Sprexor SprexorInstance) {
 		Component args = io.getComponent();
 		if(args.isEmpty()) {
-			io.out.println(Tools.SMT_FORM(help()));
+			io.out.println(Smt.SMT_FORM(help()));
 			return 0;
 		}
 		String option_1 = args.getsf(0);
@@ -33,25 +38,25 @@ class For implements sprexor.CommandFactory {
 		case "-c" :
 		case "-C" :
 		case "--code" :
-			 run(Tools.cutArr(args.get(), 2), SprexorInstance, Integer.parseInt(args.gets(0)));
+			 run(Utils.cutArr(args.get(), 2), SprexorInstance, Integer.parseInt(args.gets(0)));
 			 return 0;
 		case "-h":
 		case "-H":
 		case "--help":
 		default :
-			io.out.println("Unknown option : " + option_1 + "\n" + Tools.SMT_FORM(help().substring(16)));
+			io.out.println("Unknown option : " + option_1 + "\n" + Smt.SMT_FORM(help().substring(16)));
 			return 1;
 		}
 	}
 	//
 	//features
-	private String text(String[] a, int i) { return Tools.arg2String(Tools.cutArr(a, 2), " ").repeat(i); }
+	private String text(String[] a, int i) { return Utils.arg2String(Utils.cutArr(a, 2), " ").repeat(i); }
 	//
 	private String run(String[] a, Sprexor sprex, int i) {
 		try {
-		for(int c = 0; c < i; c ++) sprex.exec(a[0], Tools.cutArr(a, 1));
+		for(int c = 0; c < i; c ++) sprex.exec(a[0], Utils.cutArr(a, 1));
 		} catch(SprexorException se) {
-			return se.status + "";
+			return "";
 		}
 		return "";
 	}

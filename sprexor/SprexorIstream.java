@@ -24,4 +24,7 @@ public abstract class SprexorIstream {
 	public void buffering(String str) {
 		sb.append(str);
 	}
+	public void buffering(char str) {
+		sb.append(str);
+	}
 }

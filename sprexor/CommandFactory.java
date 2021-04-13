@@ -1,6 +1,12 @@
 package sprexor;
 
-public interface CommandFactory {
+import java.io.Serializable;
+
+public interface CommandFactory extends Serializable {
+	/**
+	 * 
+	 */
+	static final long serialVersionUID = 1L;
 	/**
 	 * It will be used to inform detailed information help.
 	 * @return String - message.

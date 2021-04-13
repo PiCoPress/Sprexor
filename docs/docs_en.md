@@ -1,6 +1,6 @@
-Sprexor - 0.2.18-beta1
+Sprexor - 0.2.19
 =================
-[Updated Things](./Update.md)
+[Updated Things](./changeLog/0.2.19.md)
 
 
 **index**
@@ -8,19 +8,18 @@ Sprexor - 0.2.18-beta1
 2. [IOCenter](#iocenter)
 3. [CommandProvider](#commandprovider)
 4. [CommandFactory](#commandfactory)
-5. [Tools](#tools)
 7. [cosmos.BasicPackages](#the-cosmos)
 8. [Exception](#exception)
 9. [Component](#component)
 10. [SprexorOstream](#sprexorostream)
 11. [SprexorIstream](#sprexoristream)
-12. [Basic Features](#basic-feature)
+12. [Standard Commands](#standard-commands)
 13. [See example code](./test.java)
 
 
 #### Sprexor
 
->**Classes**
+>**Methods**
 
 >- boolean isExist(String) Check if the Command is exist.
 
@@ -32,23 +31,19 @@ Sprexor - 0.2.18-beta1
 
 >- void exec(String id, String[] args)
 
->- void useSyntax(boolean b) : Whether check basic syntax.
-
 >- void importSprex(sprexor.CommandProvider t) : Import Sprex to this(above) from T class.
 
 >- void activate() : It should activate by this before use "exec" method. and if activate, it cannot setting properties.
 
->- void unSemicolon() : Semicolon is not abled to use.
-
->- void unBasicFeatures() : Basic commands are not registered.
-
->- void ignoreUpperCase() : Ignore Upper case of character.
-
->- String eval(String)
-
 >- void run(String) : Execute parameter a line for more improved performance and functions.
 
 >**Fields**
+
+>- VERSION
+
+>- CODENAME
+
+>- LIST
 
 >- Impose impose
 
@@ -60,6 +55,12 @@ Sprexor - 0.2.18-beta1
 #### IOCenter
 
 >enum IOCenter.TYPE {STDOUT, CMT, ERR, NO_VALUE, UNKNOWN, WARN}
+
+>Component getComponent() : Get arguments.
+
+>SprexorIstream in
+
+>SprexorOstream out
 
     
   
@@ -79,31 +80,6 @@ Sprexor - 0.2.18-beta1
 >>public default String getCommandName() : For the ImportSprex.
 
 >>public default String help() : For the ImportSprex.
-    
-  
-#### Tools
-
->String Processer(String opt) : use subprocess (window : exe, linux : sh)
-
->String[] binder(String[] ar, int start) : bind String Array from start index to end.
-
->CommandFactory[] toCFClass(CommandFactory...) : It return CommandProvider array to arguments. (for referenceClass of CommandProvider)
-
->String arg2String(String[]) : It return String to array.
-
->String arg2String(String[], String) : Return the String by joining second argument.
-
->String[] excludeArr(String[], int) : It return array that excluded index of second parameter.
-
->String[] cutArr(String[], int startIndex) : Advanced excludeArr. It is similar to "String.substring".
-
->String SMT_FORM(String) : Replace certain tag in the String to tab or newline char.
-
->@Deprecated ~smooth(String[] all, String[] optList, Class cl)~ 
-
->@Deprecated ~AnalOption(String, boolean[])~
-
->@Deprecated ~OptionPrs(String, String, byte)~ throws Exception
 	
   
 #### The Cosmos
@@ -135,6 +111,10 @@ Sprexor - 0.2.18-beta1
 
 >String[] getAllOption() : Get all of options.
 
+>String[] getValidParameters() : get valid array
+
+>String[] getValidParameters(int startAt) : get valid array 
+
 >void add(String)
 
 >boolean isEmpty() : If argument is empty, return true.
@@ -145,9 +125,11 @@ Sprexor - 0.2.18-beta1
 
 >>- String toString()
 
->>- boolean isWrapped() : If it is wrapped with string, return true, otherwise false.
-
 >>- Object label
+
+>>Unit next()
+
+>>Unit prev()
 
 
 #### SprexorOstream
@@ -199,11 +181,11 @@ Sprexor - 0.2.18-beta1
 >- void buffering(String value)
 
 	
-#### Basic Feature
+#### Standard Commands
 
 >@(name) :  Load saved value.
 
->var (name) (value) : Define (name) = (value).
+>var [ACTION] args...
 
 >echo
 

@@ -7,6 +7,7 @@ public class test {
 		Scanner s = new Scanner(System.in);
 		Sprexor n = new Sprexor();
 		n.importSprex(new BasicPackages());
+		n.include(Sprexor.LIST);
 		n.register("ee", new CommandProvider() {
 			
 			@Override
@@ -29,7 +30,7 @@ public class test {
 			while(true) {
 				String ss = s.nextLine();
 				if(ss.trim().contentEquals("exit"))break;
-				n.exec(ss);
+				n.run(ss, "USE_VARIABLE;USE_COMMENT;WRAP_NAME");
 			}
 		} catch (SprexorException e) {
 			e.printStackTrace();

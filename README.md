@@ -1,15 +1,15 @@
 # Sprexor Application Framework
 Sprexor is Framework that manages and runs command line in Java.
-It has a lot of libraries, options, and customizing tools to use in many of purpose easily.
+It has a lot of libraries, functions, and customizing tools to use in many of purpose easily.
 
 # Downloads
-- <b><span style="color:f478cd">Latest </span></b> **0.2.18-Beta1** `2021.1.16`
-    + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.18-beta1/Sprexor.0.2.18-b1.jar)
-    + [javadoc](https://github.com/PiCoPress/Sprexor/releases/download/0.2.18-beta1/Sprexor.0.2.18-b1.jar)
-    + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.18-beta1.zip)
+- <b><span style="color:78a094">Stable</span></b> | <b><span style="color:f478cd">Latest</span></b> **0.2.19** `2021.4.13`
+    + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.19/Sprexor.0.2.19-full.jar)
+    + [Download binary only](https://github.com/PiCoPress/Sprexor/releases/download/0.2.19/Sprexor.0.2.19-bin.jar)
+    + [source](https://github.com/PiCoPress/Sprexor/archive/refs/tags/0.2.19.zip)
 
 
-- <b><span style="color:78a094">Stable </span></b>**0.2.16** `2020.11.16`
+- **0.2.16** `2020.11.16`
     + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.16/Sprexor.0.2.16-full.jar)
     + [Download binary only](https://github.com/PiCoPress/Sprexor/releases/download/0.2.16/Sprexor.0.2.16.binary.jar)
     + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.16.zip)
@@ -82,10 +82,6 @@ public class Test {
 		
 		//Set comment character like this : "//"
 		sprexorObject.setComment('#');
-		
-		
-		//If it is called, basic commands 'echo, help, commands, var, delete' is not provided.
-		sprexorObject.unBasicFeatures();
 		
 		
 		//It registers command Immediately.
