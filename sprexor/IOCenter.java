@@ -32,7 +32,6 @@ public class IOCenter {
 	public SprexorOstream out;
 	public SprexorIstream in;
 	//
-	protected String Msg = "";
 	protected TYPE status = null;
 	public IOCenter(SprexorOstream o, SprexorIstream i) {
 		out = o;
@@ -45,5 +44,8 @@ public class IOCenter {
 	public Component getComponent() {
 		return component;
 	}
-	
+	protected void reset() {
+		component = null;
+		out.type = stdout;
+	}
 }

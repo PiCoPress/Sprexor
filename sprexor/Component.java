@@ -99,7 +99,8 @@ public class Component implements Iterable<String> {
 	 * @return String
 	 */
 	public String getsf(int i) {
-		return v[i];
+		if(i < v.length) return v[i];
+		else return "";
 	}
 	/**
 	 * It gets String by Ignoring option.

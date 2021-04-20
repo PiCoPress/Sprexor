@@ -8,10 +8,13 @@ import sprexor.lib.Smt;
 import sprexor.lib.Utils;
 
 class For implements sprexor.CommandFactory {
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
+	
+	@Override
+	public int requireAPIversion() {
+		return 0;
+	}
 	public String getCommandName() {
 		return "for";
 	}
@@ -28,6 +31,7 @@ class For implements sprexor.CommandFactory {
 			return 0;
 		}
 		String option_1 = args.getsf(0);
+		
 		switch(option_1) {
 		case "-t" :
 		case "-T" :

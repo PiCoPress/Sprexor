@@ -3,10 +3,8 @@ package sprexor;
 import java.io.Serializable;
 
 public interface CommandFactory extends Serializable {
-	/**
-	 * 
-	 */
-	static final long serialVersionUID = 1L;
+	
+	static final long serialVersionUID = 0L;
 	/**
 	 * It will be used to inform detailed information help.
 	 * @return String - message.
@@ -29,8 +27,11 @@ public interface CommandFactory extends Serializable {
 	/**
 	 * Operate with java source overrided method.
 	 * @param io : The processed parameter.
-	 * @param SprexorInstance
-	 * @return IOCenter
+	 * @param Environment
+	 * @return int exit code
 	 */
-	public abstract int code(IOCenter io, Sprexor SprexorInstance);
+	public abstract int code(IOCenter io, Sprexor Environment);
+	public default int requireAPIversion() {
+		return 1;
+	}
 }

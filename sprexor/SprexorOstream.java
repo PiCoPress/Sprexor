@@ -17,13 +17,13 @@ public abstract class SprexorOstream{
 	}
 	public abstract void print(String msg);
 	public abstract void print(String msg, int Color);
+	public abstract void printf(String msg, Object...obj);
 	public abstract void println(String msg);
+	public void println() {
+		print("\n");
+	}
 	public abstract void println(String msg, int Color);
 	public SprexorOstream add(String msg) {
-		if(building) buffer.add(msg);
-		return this;
-	}
-	public SprexorOstream add(String msg, int color) {
 		if(building) buffer.add(msg);
 		return this;
 	}

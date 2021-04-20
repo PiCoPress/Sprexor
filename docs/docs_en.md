@@ -33,6 +33,8 @@ Sprexor - 0.2.19
 
 >- void importSprex(sprexor.CommandProvider t) : Import Sprex to this(above) from T class.
 
+>- void include(String array) : Select and include the commands that are embeded in Sprexor.
+
 >- void activate() : It should activate by this before use "exec" method. and if activate, it cannot setting properties.
 
 >- void run(String) : Execute parameter a line for more improved performance and functions.
@@ -141,6 +143,8 @@ Sprexor - 0.2.19
 >void print(String msg)
 
 >void print(String msg, int value)
+
+>void printf(String msg, Object...obj)
 
 >void println()
 

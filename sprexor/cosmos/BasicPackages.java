@@ -12,6 +12,14 @@ import sprexor.Component;
  * @since 0.2.4
  */
 public class BasicPackages implements CommandFactory{
+	
+	private static final long serialVersionUID = 2L;
+	
+	@Override
+	public int requireAPIversion() {
+		return 0;
+	}
+	
 	public String getCommandName() {
 		return "find";
 	}

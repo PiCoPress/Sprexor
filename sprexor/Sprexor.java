@@ -1,5 +1,6 @@
 package sprexor;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +11,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
-import java.util.StringTokenizer;
+import java.util.Enumeration;
+import java.util.jar.JarFile;
+import java.util.jar.JarEntry;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import sprexor.IOCenter.TYPE;
 import sprexor.lib.Smt;
 import sprexor.lib.Utils;
@@ -19,22 +30,50 @@ import sprexor.lib.Utils;
 @Retention(RetentionPolicy.CLASS)
 @interface Activate_need { 
 	/*
-	 * This Annotation is used to let if something method need to activate.
+	 * This Annotation is used to let when something method need to activate.
 	 */
 }
-
-/*
- * Sprexor : the String Parser & Executor 0.2.19
- *  copyright(c)  2020  by PICOPress, All rights reserved.
- */
 public class Sprexor {
+	static {
+		JarFile jar;
+		try {
+			jar = new JarFile(ClassLoader.getSystemClassLoader().getResource(".").getPath());
+			Enumeration<JarEntry> ent = jar.entries();
+			while(ent.hasMoreElements()) {
+				JarEntry je = ent.nextElement();
+				if(je.getName().endsWith(File.separator))System.out.println(je.getName());
+			}
+		} catch (IOException e) {
+			String sep = File.separator;
+			File file;
+			try {
+				file = new File(ClassLoader.getSystemClassLoader().getResource(".")
+						.getPath()
+						.split(System.getProperty("os.name") == "windows"? "\\\\bin\\\\" : "/bin/")[0] + 
+						sep + "Sprexor" + sep + "sprexor" + sep + "resource" + sep + "sconfig.xml");
+				System.out.println(file.getPath());
+				if(!file.exists()) {
+					System.err.println("Could not load Sprexor : Sprexor has been broken.");
+				}else { // for eclipse IDE
+					Element xml = DocumentBuilderFactory
+							.newInstance()
+							.newDocumentBuilder()
+							.parse(file)
+							.getDocumentElement();
+					
+					
+				}
+			} catch(Exception ef) { ef.printStackTrace(); }
+		}
+	}
 	//
 	// Internal Variables.
 	//
-	public static final String VERSION = "0.2.19";
-	public static final String CODENAME = "Venom";
+	public static final String VERSION = "1.0.0";
+	public static final String CODENAME = "Candle";
+	public static final int APIversion = 1;
 	public static final String[] LIST = {"help", "commands", "echo", "var"};
-	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME"};
+	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG"};
 	public Reflection reflect;
 	public Impose impose = new Impose() {};
 	public Object label;
@@ -83,6 +122,10 @@ public class Sprexor {
 			@Override
 			public void println(String msg, int Color) {
 				println(msg);
+			}
+			@Override
+			public void printf(String msg, Object... obj) {
+				System.out.print(String.format(msg, obj));
 			}
 		},
 		new SprexorIstream() {
@@ -219,6 +262,7 @@ public class Sprexor {
 			cmdlib.put(cmp.getCommandName(), cmp);
 			String hlpMsg = cmp.help();
 			if(hlpMsg.startsWith("**USE_SMT_FORM**")) hlpMsg = Smt.SMT_FORM(hlpMsg.substring(16));
+			if(cmp.requireAPIversion() > APIversion) System.err.printf("Did not import : %s  required API = %d | current API = %d\n", cmp.getCommandName(), cmp.requireAPIversion(), APIversion);
 			helplib.put(cmp.getCommandName(), hlpMsg);
 			listObject.add(cmp.getCommandName());
 			ImportedPackages.add(cmp);
@@ -231,6 +275,10 @@ public class Sprexor {
 				else if(tmpname.matches("\n|\r|#|@"))return;
 				if(cmd.containsKey(cp.getCommandName())) continue;
 				
+				if(cp.requireAPIversion() > APIversion) {
+					System.err.printf("Did not import ' %s '\t required API = %d \t current API = %d\n", cp.getCommandName(), cp.requireAPIversion(), APIversion);
+					continue;
+				}
 				cmdlib.put(tmpname, cp);
 				String hlpMsg = cp.help();
 				if(hlpMsg.startsWith("**USE_SMT_FORM**")) hlpMsg = Smt.SMT_FORM(hlpMsg.substring(16));
@@ -294,7 +342,7 @@ public class Sprexor {
 					}else {
 						Result = " ";
 					}
-					io.out.print(Result.trim());
+					io.out.println(Result.trim());
 					return 0;
 				}
 			 });
@@ -382,30 +430,15 @@ public class Sprexor {
 			 cmd.put("commands", new CommandProvider() {
 				@Override
 				public int code(IOCenter io) {
-					io.out.println(Utils.arg2String(listObject.toArray(new String[listObject.size()]), "\n"));
+					io.out.printf(Utils.arg2String(listObject.toArray(new String[listObject.size()]), "\t") + "\n");
 					return 0;
 				}
 			 });
 			 helpDB.put("commands", "print all commands.");
 			 listObject.add("commands");
-		 }
-			if(!ImportedPackages.isEmpty()) {
-				try {
-					for(CommandFactory cf : ImportedPackages) {
-						if(cf.getClass().getPackageName().startsWith("sprexor.cosmos")) {
-							try {
-							cf.getClass().getDeclaredField("cc").set(cf, cmd);
-							cf.getClass().getDeclaredField("cl").set(cf, cmdlib);
-							}catch(NoSuchFieldException nsfe) { }
-						}
-					}
-				}catch(IllegalAccessException iae) {
-					iae.printStackTrace();
-					throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
-				}
-			}
-			iostream = impose.InOut();
-			if(configType == 0)configType = 2;
+		}
+		iostream = impose.InOut();
+		if(configType == 0)configType = 2;
 	}
 	
 	@Deprecated
@@ -424,7 +457,7 @@ public class Sprexor {
 	 */
 	public void register(String str, CommandProvider cp, String hd) {
 		if(configType != 0)return;
-		else if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]", "\s") || str.contentEquals(""))return;
+		else if(isExist(str) || fil(str, " ", "'", "\"", "\\", "$", "*", "^", "(", ")", "{", "}", ":", "?", ";", "<", ">", ",", ".", "!", "#", "@", "&", "%", "~", "`", "[", "]") || str.contentEquals(""))return;
 		else if(ignoreCase) str.toLowerCase();
 		cmd.put(str, cp);
 		listObject.add(str);
@@ -595,6 +628,7 @@ public class Sprexor {
 		boolean vari = indexOf("USE_VARIABLE", lists);
 		boolean com = indexOf("USE_COMMENT", lists);
 		boolean wrap = indexOf("WRAP_NAME", lists);
+		boolean debug = indexOf("DEBUG",lists);
 		
 		int nn = 0;
 		String id = "";
@@ -730,7 +764,6 @@ public class Sprexor {
 							if(args[count] == null) args[count] = "";
 							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, "Invalid variable name : " + tmp);
 							if(envVar.containsKey(tmp)) args[count ++] += envVar.get(tmp).toString();
-							
 							else throw new SprexorException(SprexorException.VARIABLE_ERR, "no variable");
 							continue;
 						}
@@ -854,12 +887,20 @@ public class Sprexor {
 			}
 		}
 		if(count != 0 || cache.length() != 0) args[count ++] = cache.toString();
-		IOCenter res = impose.InOut();
 		args = trimArr(args);
-		res.component = new Component(args);
+		iostream.component = new Component(args);
+		int exitCode = 0;
 		if(id.isBlank()) return 0;
-		else if(cmd.containsKey(id)) return cmd.get(id).code(res);
-		else if(cmdlib.containsKey(id)) return cmdlib.get(id).code(res, this);
+		if(cmd.containsKey(id)) {
+			if(debug) try { cmd.get(id).code(iostream); } catch(Exception e) { iostream.out.print(id); }
+			else cmd.get(id).code(iostream);
+		}
+		else if(cmdlib.containsKey(id)) {
+			if(debug) try { cmdlib.get(id).code(iostream, this); } catch(Exception e) { iostream.out.print(""); }
+			else cmdlib.get(id).code(iostream, this);
+		}
 		else throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
+		iostream.reset();
+		return exitCode;
 	}
 }

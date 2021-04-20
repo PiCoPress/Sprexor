@@ -32,6 +32,8 @@
 
 >- void importSprex(CommandProvider t) : t라는 클래스로부터 스프렉서 를 임폴트합니다. t 클래스는 CommandProvider 를 상속받아야 합니다.
 
+>- void include(String array) : Sprexor에 탑재된 명령어를 지정하여 포함시키도록 합니다. 
+
 >- void activate() : 이것이 실행되어야만 exec메소드를 포함한 몇가지 메서드들를 실행할 수 있으며, 만일 실행되었을 경우 상세 설정을 할 수 없습니다. (충돌 방지)
 
 >- void run(String input, String options) : 더 향상된 성능과 기능들로 파라미터 한 줄을 실행합니다.
@@ -133,6 +135,8 @@
 >void print(String msg)
 
 >void print(String msg, int value)
+
+>void printf(String msg, Object...obj)
 
 >void println()
 
