@@ -14,14 +14,15 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import sprexor.IOCenter.TYPE;
 import sprexor.lib.Smt;
 import sprexor.lib.Utils;
@@ -34,6 +35,7 @@ import sprexor.lib.Utils;
 	 */
 }
 public class Sprexor {
+	static HashMap<String, String> manifest = new HashMap<String, String>();
 	static {
 		JarFile jar;
 		try {
@@ -50,28 +52,34 @@ public class Sprexor {
 				file = new File(ClassLoader.getSystemClassLoader().getResource(".")
 						.getPath()
 						.split(System.getProperty("os.name") == "windows"? "\\\\bin\\\\" : "/bin/")[0] + 
-						sep + "Sprexor" + sep + "sprexor" + sep + "resource" + sep + "sconfig.xml");
+						sep + "Sprexor" + sep + "config.xml");
 				System.out.println(file.getPath());
 				if(!file.exists()) {
 					System.err.println("Could not load Sprexor : Sprexor has been broken.");
 				}else { // for eclipse IDE
-					Element xml = DocumentBuilderFactory
-							.newInstance()
-							.newDocumentBuilder()
-							.parse(file)
-							.getDocumentElement();
 					
-					
+					resourceLoader(file);
 				}
 			} catch(Exception ef) { ef.printStackTrace(); }
 		}
 	}
+	
+	static private void resourceLoader(File file) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
+		XPath xp = XPathFactory.newInstance().newXPath();
+		Document doc = DocumentBuilderFactory
+				.newInstance()
+				.newDocumentBuilder()
+				.parse(file);
+		manifest.put("sprexor.version", xp.evaluate("//version", doc));
+		manifest.put("sprexor.codename", xp.evaluate("//codename", doc));
+		manifest.put("sprexor.apiversion", xp.evaluate("//apiversion", doc));
+	}
 	//
 	// Internal Variables.
 	//
-	public static final String VERSION = "1.0.0";
-	public static final String CODENAME = "Candle";
-	public static final int APIversion = 1;
+	public static final String VERSION = manifest.get("sprexor.version");
+	public static final String CODENAME = manifest.get("sprexor.codename");
+	public static final int APIversion = Integer.parseInt(manifest.get("sprexor.apiversion"));
 	public static final String[] LIST = {"help", "commands", "echo", "var"};
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG"};
 	public Reflection reflect;
@@ -892,11 +900,11 @@ public class Sprexor {
 		int exitCode = 0;
 		if(id.isBlank()) return 0;
 		if(cmd.containsKey(id)) {
-			if(debug) try { cmd.get(id).code(iostream); } catch(Exception e) { iostream.out.print(id); }
+			if(!debug) try { cmd.get(id).code(iostream); } catch(Exception e) { iostream.out.printf("%s : Application stopped (%s)\n", id, e.getStackTrace()[0].getLineNumber()); }
 			else cmd.get(id).code(iostream);
 		}
 		else if(cmdlib.containsKey(id)) {
-			if(debug) try { cmdlib.get(id).code(iostream, this); } catch(Exception e) { iostream.out.print(""); }
+			if(!debug) try { cmdlib.get(id).code(iostream, this); } catch(Exception e) { iostream.out.printf("%s : Application stopped (%s)\n", id, e.getStackTrace()[0].getLineNumber()); }
 			else cmdlib.get(id).code(iostream, this);
 		}
 		else throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);

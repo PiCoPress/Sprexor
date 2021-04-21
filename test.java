@@ -23,13 +23,13 @@ public class test {
 			@Override
 			public int code(IOCenter io) {
 				try {
-					for(int i = 0; i < 50; i ++) {
+					for(int i = 0; i < 30; i ++) {
 						io.out.printf("%c turning dash...\r", prog(i));
 						Thread.sleep(100);
 					}
 				} catch(Exception e) {
-						
 				}
+				String[] s=new String[1];
 				io.out.println("finished.      ");
 				return 0;
 			}}, "");
@@ -42,7 +42,7 @@ public class test {
 			while(true) {
 				String ss = s.nextLine();
 				if(ss.trim().contentEquals("exit"))break;
-				n.run(ss, "USE_VARIABLE;USE_COMMENT;WRAP_NAME;DEBUG");
+				n.run(ss, "USE_VARIABLE;USE_COMMENT;WRAP_NAME");
 			}
 		} catch (SprexorException e) {
 			e.printStackTrace();
