@@ -187,14 +187,9 @@ Sprexor - 0.2.19
 	
 #### Standard Commands
 
->@(name) :  Load saved value.
-
->var [ACTION] args...
-
->echo
-
->help : Print message to help.
-
->delete (name) : Delete variable.
-
->commands : Print the Command list.
+| Command | Description |
+|---|-------------|
+| help | print command's help |
+| var | Create or delete variable. And load value by concating name after @ |
+| commands | get all runnable commands |
+| echo | print same text |

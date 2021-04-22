@@ -35,14 +35,17 @@
 			<error>
 				<notbsyn>var : can not be used (basicsyn : false)</notbsyn>
 				<badformat>invalid declaring format</badformat>
-				<default>unknown param : </default>
+				<default>unknown param : %s\n</default>
 			</error>
 			<menual>
 (!) : no action[n]
-usage : var [ACTION] ...[nnt]
-delete : delete variables[nnt]
-set : set variables, (ex) abc=1 def="123" ...[nnt]
-help : show this message</menual>
+usage : var [ACTION] ...
+
+[t]delete : delete variables
+
+[t]set : set variables, (ex) abc=1 def="123" ...
+
+[t]help : show this message</menual>
 			<helpmsg>manage variable</helpmsg>
 		</var>
 		
@@ -71,7 +74,47 @@ help : show this message</menual>
 			<syntax>invalid literal syntax.</syntax>
 			<bsp>'BASIC' must use separately</bsp>
 			<nv>no variable</nv>
-			<iv>Invalid variable name : </iv>
+			<iv>Invalid variable name : %s\n</iv>
+			<st>%s : Application stopped (%s)\n</st>
 		</error>
 	</parser>
+	
+	<load>
+	version
+	codename
+	apiversion
+	
+	fnls/basic
+	fnls/uv
+	fnls/uc
+	fnls/wn
+	fnls/db
+	
+	bcml/a
+	bcml/b
+	bcml/c
+	bcml/d
+	
+	bcm/help
+	bcm/help/name
+	bcm/help/helpmsg
+	bcm/var/name
+	bcm/var/error/notbysn
+	bcm/var/error/badformat
+	bcm/var/error/default
+	bcm/var/menual
+	bcm/var/helpmsg
+	bcm/echo/name
+	bcm/var/helpmsg
+	bcm/commands/name
+	bcm/commands/helpmsg
+	
+	import/error
+	activate/error
+	
+	parser/error/syntax
+	parser/error/bsp
+	parser/error/nv
+	parser/error.iv
+	</load>
 </sprexor>

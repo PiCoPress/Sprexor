@@ -139,7 +139,7 @@ public class Component implements Iterable<String> {
 	/**
 	 * the lagacy parser.
 	 * @param str string line
-	 * @return
+	 * @return string array
 	 */
 	public static String[] Parse(String str) {
 		String[] pops = str.split(""),

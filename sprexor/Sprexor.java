@@ -11,18 +11,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
-import java.util.Enumeration;
-import java.util.jar.JarFile;
-import java.util.jar.JarEntry;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
 import sprexor.IOCenter.TYPE;
 import sprexor.lib.Smt;
 import sprexor.lib.Utils;
@@ -35,51 +25,43 @@ import sprexor.lib.Utils;
 	 */
 }
 public class Sprexor {
-	static HashMap<String, String> manifest = new HashMap<String, String>();
+	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
+	static SprexorLoader resource;
 	static {
-		JarFile jar;
-		try {
-			jar = new JarFile(ClassLoader.getSystemClassLoader().getResource(".").getPath());
-			Enumeration<JarEntry> ent = jar.entries();
-			while(ent.hasMoreElements()) {
-				JarEntry je = ent.nextElement();
-				if(je.getName().endsWith(File.separator))System.out.println(je.getName());
-			}
-		} catch (IOException e) {
 			String sep = File.separator;
 			File file;
 			try {
-				file = new File(ClassLoader.getSystemClassLoader().getResource(".")
-						.getPath()
-						.split(System.getProperty("os.name") == "windows"? "\\\\bin\\\\" : "/bin/")[0] + 
-						sep + "Sprexor" + sep + "config.xml");
-				System.out.println(file.getPath());
-				if(!file.exists()) {
-					System.err.println("Could not load Sprexor : Sprexor has been broken.");
+				file = new File(resourcePath + sep + "config.xml");
+				if(!file.isFile()) {
+					file = new File(ClassLoader.getSystemClassLoader().getResource(".")
+							.getPath()
+							.split(System.getProperty("os.name") == "windows"? "\\\\bin\\\\" : "/bin/")[0] + 
+							sep + "Sprexor" + sep + "config.xml");
+					if(!file.isFile()) {
+						System.err.println("no configuration file : config.xml");
+						System.exit(1);
+					}
+					Document doc = DocumentBuilderFactory
+							.newInstance()
+							.newDocumentBuilder()
+							.parse(file);
+					resource = new SprexorLoader(doc);
 				}else { // for eclipse IDE
-					
-					resourceLoader(file);
+					Document doc = DocumentBuilderFactory
+							.newInstance()
+							.newDocumentBuilder()
+							.parse(file);
+					resource = new SprexorLoader(doc);
 				}
+				System.out.println(file.getPath());
 			} catch(Exception ef) { ef.printStackTrace(); }
-		}
-	}
-	
-	static private void resourceLoader(File file) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
-		XPath xp = XPathFactory.newInstance().newXPath();
-		Document doc = DocumentBuilderFactory
-				.newInstance()
-				.newDocumentBuilder()
-				.parse(file);
-		manifest.put("sprexor.version", xp.evaluate("//version", doc));
-		manifest.put("sprexor.codename", xp.evaluate("//codename", doc));
-		manifest.put("sprexor.apiversion", xp.evaluate("//apiversion", doc));
 	}
 	//
 	// Internal Variables.
 	//
-	public static final String VERSION = manifest.get("sprexor.version");
-	public static final String CODENAME = manifest.get("sprexor.codename");
-	public static final int APIversion = Integer.parseInt(manifest.get("sprexor.apiversion"));
+	public static final String VERSION = resource.get("version");
+	public static final String CODENAME = resource.get("codename");
+	public static final int APIversion = Integer.parseInt(resource.get("apiversion"));
 	public static final String[] LIST = {"help", "commands", "echo", "var"};
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG"};
 	public Reflection reflect;
@@ -270,7 +252,10 @@ public class Sprexor {
 			cmdlib.put(cmp.getCommandName(), cmp);
 			String hlpMsg = cmp.help();
 			if(hlpMsg.startsWith("**USE_SMT_FORM**")) hlpMsg = Smt.SMT_FORM(hlpMsg.substring(16));
-			if(cmp.requireAPIversion() > APIversion) System.err.printf("Did not import : %s  required API = %d | current API = %d\n", cmp.getCommandName(), cmp.requireAPIversion(), APIversion);
+			if(cmp.requireAPIversion() > APIversion) {
+				System.err.printf(resource.get("import/error"), cmp.getCommandName(), cmp.requireAPIversion(), APIversion);
+				return;
+			}
 			helplib.put(cmp.getCommandName(), hlpMsg);
 			listObject.add(cmp.getCommandName());
 			ImportedPackages.add(cmp);
@@ -284,7 +269,7 @@ public class Sprexor {
 				if(cmd.containsKey(cp.getCommandName())) continue;
 				
 				if(cp.requireAPIversion() > APIversion) {
-					System.err.printf("Did not import ' %s '\t required API = %d \t current API = %d\n", cp.getCommandName(), cp.requireAPIversion(), APIversion);
+					System.err.printf(resource.get("import/error"), cp.getCommandName(), cp.requireAPIversion(), APIversion);
 					continue;
 				}
 				cmdlib.put(tmpname, cp);
@@ -338,8 +323,8 @@ public class Sprexor {
 	public void activate() throws SprexorException {
 		if(configType != 0) return;
 		if(!isInit)return;
-		 if(indexOf("help", included)) {
-			 cmd.put("help",new CommandProvider() {
+		 if(indexOf(resource.get("bcm/help/name"), included)) {
+			 cmd.put(resource.get("bcm/help/name"),new CommandProvider() {
 				@Override
 				public int code(IOCenter io) {
 					String Result = "";
@@ -354,16 +339,16 @@ public class Sprexor {
 					return 0;
 				}
 			 });
-			 helpDB.put("help", "print this message.");
-			 listObject.add("help");
+			 helpDB.put(resource.get("bcm/help/name"), resource.get("bcm/help/helpmsg"));
+			 listObject.add(resource.get("bcm/help/name"));
 		 }
-		 if(indexOf("var", included)) {
-			 cmd.put("var", new CommandProvider() {
+		 if(indexOf(resource.get("bcm/var/name"), included)) {
+			 cmd.put(resource.get("bcm/var/name"), new CommandProvider() {
 				@Override
 				public int code(IOCenter io) {
 					if(!doBasicSyn) { 
 						io.out.setType(TYPE.ERR);
-						io.out.println("var : can not be used (basicsyn : false)");
+						io.out.println(resource.get("bcm/var/error/notbsyn"));
 						return 1;
 					}
 					Component args = io.component;
@@ -389,37 +374,29 @@ public class Sprexor {
 						}
 						}catch(Exception e) {
 							io.out.setType(TYPE.ERR);
-							io.out.println("invalid declaring format");
+							io.out.println(resource.get("bcm/var/error/badformat"));
 						}
 						break;
 					
 					case "help" :
-						io.out.println(Smt.SMT_FORM("(!) : no action[n]" + 
-								"usage : var [ACTION] ...[nnt]" +
-								"delete : delete variables[nnt]" + 
-								"set : set variables, (ex) abc=1 def=\"123\" ...[nnt]" +
-								"help : show this message"));
+						io.out.println(Smt.SMT_FORM(resource.get("bcm/var/menual")));
 						break;
 						
 					default : 
-						io.out.println("unknown param : " + args.gets(0));
+						io.out.printf(resource.get("bcm/var/error/default"), args.gets(0));
 						return 1;
 					}
 					else {
-					io.out.println(Smt.SMT_FORM("(!) : no action[n]" + 
-					"usage : var [ACTION] ...[nnt]" +
-					"delete : delete variables[nnt]" + 
-					"set : set variables, (ex) abc=1 def=\"123\" ...[nnt]" + 
-					"help : show this message"));
+					io.out.println(Smt.SMT_FORM(resource.get("bcm/var/menual")));
 					}
 					return 0;
 				}
 			 });
-			 helpDB.put("var","manage variable");
-			 listObject.add("var");
+			 helpDB.put(resource.get("bcm/var/name"), resource.get("bcm/var/helpmsg"));
+			 listObject.add(resource.get("bcm/var/name"));
 		 }
-		 if(indexOf("echo", included)) {
-			 cmd.put("echo", new CommandProvider() {
+		 if(indexOf(resource.get("bcm/echo/name"), included)) {
+			 cmd.put(resource.get("bcm/echo/name"), new CommandProvider() {
 				@Override
 				public int code(IOCenter io) {
 					String sum = "";
@@ -431,19 +408,19 @@ public class Sprexor {
 					return 0;
 				}
 			});
-			 helpDB.put("echo", "print text.");
-			 listObject.add("echo");
+			 helpDB.put(resource.get("bcm/echo/name"), resource.get("bcm/echo/helpmsg"));
+			 listObject.add(resource.get("bcm/echo/name"));
 		 }
-		 if(indexOf("commands", included) || indexOf("list", included)) {
-			 cmd.put("commands", new CommandProvider() {
+		 if(indexOf(resource.get("bcm/commands/name"), included) || indexOf("list", included)) {
+			 cmd.put(resource.get("bcm/commands/name"), new CommandProvider() {
 				@Override
 				public int code(IOCenter io) {
 					io.out.printf(Utils.arg2String(listObject.toArray(new String[listObject.size()]), "\t") + "\n");
 					return 0;
 				}
 			 });
-			 helpDB.put("commands", "print all commands.");
-			 listObject.add("commands");
+			 helpDB.put(resource.get("bcm/commands/name"), resource.get("bcm/commands/helpmsg"));
+			 listObject.add(resource.get("bcm/commands/name"));
 		}
 		iostream = impose.InOut();
 		if(configType == 0)configType = 2;
@@ -527,7 +504,7 @@ public class Sprexor {
 	 */
 	@Activate_need
 	public int exec(String com) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, resource.get("activate/error"));
 		com = com.trim();
 		String id = split(com, ' ')[0].trim();
 		if (ignoreCase) id = id.toLowerCase();
@@ -568,7 +545,7 @@ public class Sprexor {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										"invalid literal syntax.");
+										resource.get("parser/error/syntax"));
 								}
 							}else if(c == '"'){
 								bl = 0;
@@ -576,7 +553,7 @@ public class Sprexor {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								"invalid literal syntax.");
+								resource.get("parser/error/syntax"));
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
@@ -595,7 +572,7 @@ public class Sprexor {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										"invalid literal syntax.");
+										resource.get("parser/error/syntax"));
 								}
 							}else if(c == '\''){
 								bl = 0;
@@ -603,7 +580,7 @@ public class Sprexor {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								"invalid literal syntax.");
+								resource.get("parser/error/syntax"));
 						continue;
 					}
 				cache.append(c);
@@ -628,11 +605,11 @@ public class Sprexor {
 	 */
 	@Activate_need
 	synchronized public int run(String input, String options) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, resource.get("activate/error"));
 		if(options.contentEquals("BASIC")) return exec(input);
 		input = input.trim();
 		String[] lists = split(options, ';');
-		if(lists.length > 1 && indexOf("BASIC", lists)) throw new SprexorException(SprexorException.INTERNAL_ERROR, "'BASIC' must use separately");
+		if(lists.length > 1 && indexOf("BASIC", lists)) throw new SprexorException(SprexorException.INTERNAL_ERROR, resource.get("parser/err/bsp"));
 		boolean vari = indexOf("USE_VARIABLE", lists);
 		boolean com = indexOf("USE_COMMENT", lists);
 		boolean wrap = indexOf("WRAP_NAME", lists);
@@ -712,7 +689,7 @@ public class Sprexor {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										"invalid literal syntax.");
+										resource.get("parser/error/syntax"));
 								}
 							}else if(c == '"'){
 								bl = 0;
@@ -720,7 +697,7 @@ public class Sprexor {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								"invalid literal syntax.");
+								resource.get("parser/error/syntax"));
 						reflect.strmode_end();
 						continue;
 					}else if(c == '\'') {
@@ -740,7 +717,7 @@ public class Sprexor {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										"invalid literal syntax.");
+										resource.get("parser/error/syntax"));
 								}
 							}else if(c == '\''){
 								bl = 0;
@@ -748,7 +725,7 @@ public class Sprexor {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								"invalid literal syntax.");
+								resource.get("parser/error/syntax"));
 						continue;
 					/*
 					 * variable
@@ -764,15 +741,16 @@ public class Sprexor {
 									if(args[count] == null) args[count] = "";
 									String tmp = sb.toString();
 									if(envVar.containsKey(tmp)) args[count] += envVar.get(tmp).toString();
-									else throw new SprexorException(SprexorException.VARIABLE_ERR, "no variable");
+									else throw new SprexorException(SprexorException.VARIABLE_ERR, resource.get("parser/error/nv"));
 									sb.setLength(0);
 								}else break;
 							}
 							String tmp = sb.toString();
 							if(args[count] == null) args[count] = "";
-							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, "Invalid variable name : " + tmp);
+							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR,
+									String.format(resource.get("parser/error/iv"), tmp));
 							if(envVar.containsKey(tmp)) args[count ++] += envVar.get(tmp).toString();
-							else throw new SprexorException(SprexorException.VARIABLE_ERR, "no variable");
+							else throw new SprexorException(SprexorException.VARIABLE_ERR, resource.get("parser/error/nv"));
 							continue;
 						}
 					}else if(c == comment) { // comment (note)
@@ -817,7 +795,7 @@ public class Sprexor {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										"invalid literal syntax.");
+										resource.get("parser/error/syntax"));
 								}
 							}else if(c == '"'){
 								bl = 0;
@@ -825,7 +803,7 @@ public class Sprexor {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								"invalid literal syntax.");
+								resource.get("parser/error/syntax"));
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
@@ -844,7 +822,7 @@ public class Sprexor {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										"invalid literal syntax.");
+										resource.get("parser/error/syntax"));
 								}
 							}else if(c == '\''){
 								bl = 0;
@@ -852,7 +830,7 @@ public class Sprexor {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								"invalid literal syntax.");
+								resource.get("parser/error/syntax"));
 						continue; 
 					} else if(c == '@') {
 						if(vari) {
@@ -865,16 +843,16 @@ public class Sprexor {
 									if(args[count] == null) args[count] = "";
 									String tmp = sb.toString();
 									if(envVar.containsKey(tmp)) args[count] += envVar.get(tmp).toString();
-									else throw new SprexorException(SprexorException.VARIABLE_ERR, "no variable");
+									else throw new SprexorException(SprexorException.VARIABLE_ERR, resource.get("parser/error/nv"));
 									sb.setLength(0);
 								} else break;
 								
 							}
 							String tmp = sb.toString();
 							if(args[count] == null) args[count] = "";
-							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, "Invalid variable name : " + tmp);
+							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, resource.get("parser/error/iv"));
 							if(envVar.containsKey(tmp)) args[count ++] += envVar.get(tmp).toString();
-							else throw new SprexorException(SprexorException.VARIABLE_ERR, "no variable");
+							else throw new SprexorException(SprexorException.VARIABLE_ERR, resource.get("parser/error/nv"));
 							continue;
 						}
 					}else if(c == comment) { // comment (note)
@@ -900,11 +878,11 @@ public class Sprexor {
 		int exitCode = 0;
 		if(id.isBlank()) return 0;
 		if(cmd.containsKey(id)) {
-			if(!debug) try { cmd.get(id).code(iostream); } catch(Exception e) { iostream.out.printf("%s : Application stopped (%s)\n", id, e.getStackTrace()[0].getLineNumber()); }
+			if(!debug) try { cmd.get(id).code(iostream); } catch(Exception e) { iostream.out.printf(resource.get("parser/error/st"), id, e.getStackTrace()[0].getLineNumber()); }
 			else cmd.get(id).code(iostream);
 		}
 		else if(cmdlib.containsKey(id)) {
-			if(!debug) try { cmdlib.get(id).code(iostream, this); } catch(Exception e) { iostream.out.printf("%s : Application stopped (%s)\n", id, e.getStackTrace()[0].getLineNumber()); }
+			if(!debug) try { cmdlib.get(id).code(iostream, this); } catch(Exception e) { iostream.out.printf(resource.get("parser/error/st"), id, e.getStackTrace()[0].getLineNumber()); }
 			else cmdlib.get(id).code(iostream, this);
 		}
 		else throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);

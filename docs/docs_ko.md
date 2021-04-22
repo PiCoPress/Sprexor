@@ -179,14 +179,9 @@
 
 #### Standard Commands
 
->@(name) :  저장된 값을 불러옵니다.
-
->var [ACTION] args...
-
->echo
-
->help : 도움말을 출력합니다.
-
->delete (name) : 변수를 삭제합니다.
-
->commands : 사용 가능 커맨드를 출력합니다. 넣으면 알아서 파싱 후 잘 실행해 주고, 만일 다른 parser를 사용할 경우나 직접 인자를 넣어 실행하려면 매개변수에 String id, String[] args를 넣으면 됩니다.
+| Command | Description |
+|---|-------------|
+| help | 명령어의 도움말을 출력합니다. |
+| var | 변수를 생성하거나 삭제합니다. @ 뒤에 이름을 붙여 해당 값을 불러올 수 있습니다. |
+| commands | 실행 가능한 모든 명령어를 가져옵니다. |
+| echo | 입력한 것을 그대로 출력합니다. |
