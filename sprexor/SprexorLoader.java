@@ -7,8 +7,8 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 
 class SprexorLoader {
-	private LinkedHashMap<String, String> reg = new LinkedHashMap<String, String>();
-	XPath xp = XPathFactory.newInstance().newXPath();
+	private static final LinkedHashMap<String, String> reg = new LinkedHashMap<String, String>();
+	private static final XPath xp = XPathFactory.newInstance().newXPath();
 	Document doc;
 	SprexorLoader(Document doc) throws XPathExpressionException{
 		final String[] lstr = xp.evaluate("//load", doc).split("\n");

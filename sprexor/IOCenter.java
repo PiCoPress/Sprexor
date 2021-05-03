@@ -27,7 +27,7 @@ public class IOCenter {
 	public static final TYPE no_value = TYPE.NO_VALUE;
 	public static final TYPE unknown = TYPE.UNKNOWN;
 	//
-	protected Component component = null;
+	protected SParameter component = null;
 	public Object label;
 	public SprexorOstream out;
 	public SprexorIstream in;
@@ -41,7 +41,7 @@ public class IOCenter {
 	 * return arguments.
 	 * @return Component
 	 */
-	public Component getComponent() {
+	public SParameter getComponent() {
 		return component;
 	}
 	protected void reset() {

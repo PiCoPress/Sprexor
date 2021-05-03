@@ -1,70 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <sprexor>
-	<version>1.0.0</version>
-	<codename>Candle</codename>
-	<apiversion>1</apiversion>
-	<fnls>
-		<basic>BASIC</basic>
-		<uv>USE_VARIABLE</uv>
-		<uc>USE_COMMENT</uc>
-		<wn>WRAP_NAME</wn>
-		<db>DEBUG</db>
-	</fnls>
-	
-	<bcml>
-		<a>help</a>
-		<b>commands</b>
-		<c>echo</c>
-		<d>var</d>
-		
-		<e></e>
-		<f></f>
-		<g></g>
-		<h></h>
-	</bcml>
-	
-	<bcm>
-		<help>
-			<name>help</name>
-			<helpmsg>print this message.</helpmsg>
-		</help>
-		
-		<var>
-		<name>var</name>
-			<error>
-				<notbsyn>var : can not be used (basicsyn : false)</notbsyn>
-				<badformat>invalid declaring format</badformat>
-				<default>unknown param : %s\n</default>
-			</error>
-			<menual>
-(!) : no action[n]
-usage : var [ACTION] ...
-
-[t]delete : delete variables
-
-[t]set : set variables, (ex) abc=1 def="123" ...
-
-[t]help : show this message</menual>
-			<helpmsg>manage variable</helpmsg>
-		</var>
-		
-		<echo>
-			<name>echo</name>
-			<helpmsg>print text.</helpmsg>
-		</echo>
-		
-		<commands>
-			<name>commands</name>
-			<helpmsg>print all commands</helpmsg>
-		</commands>
-	</bcm>
-	
-	<import>
-		<error>Did not import : %s  required API = %d | current API = %d
-</error>
-	</import>
-	
 	<activate>
 		<error>Activation failed.</error>
 	</activate>
@@ -80,36 +16,6 @@ usage : var [ACTION] ...
 	</parser>
 	
 	<load>
-	version
-	codename
-	apiversion
-	
-	fnls/basic
-	fnls/uv
-	fnls/uc
-	fnls/wn
-	fnls/db
-	
-	bcml/a
-	bcml/b
-	bcml/c
-	bcml/d
-	
-	bcm/help
-	bcm/help/name
-	bcm/help/helpmsg
-	bcm/var/name
-	bcm/var/error/notbysn
-	bcm/var/error/badformat
-	bcm/var/error/default
-	bcm/var/menual
-	bcm/var/helpmsg
-	bcm/echo/name
-	bcm/var/helpmsg
-	bcm/commands/name
-	bcm/commands/helpmsg
-	
-	import/error
 	activate/error
 	
 	parser/error/syntax

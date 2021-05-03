@@ -1,30 +1,76 @@
 package sprexor.lib;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
-import sprexor.CommandFactory;
+import sprexor.SCommand;
 
 public class Utils {
-
-	public static CommandFactory[] toCFClass(CommandFactory  ... cp) {
-		return cp;
+	/**<pre>
+	 * quick array creator
+	 * <strong>issue : Type safety: Potential heap pollution 
+	 * 			via varargs parameter sc </strong></pre>
+	 * @param p 
+	 * @return Objects
+	 */
+	public static <T> T[] a(T...p) {
+		return p;
 	}
-	
-	public static String arg2String(String[] args) {
+	/**<pre>
+	 * quick array creator for SCommand
+	 * <strong>issue : Type safety: Potential heap pollution 
+	 * 			via varargs parameter sc </strong></pre>
+	 * @param p 
+	 * @return Objects
+	 */
+	public static SCommand[] a(Class<? extends SCommand>...sc) {
+		SCommand[] arr = new SCommand[sc.length];
+		int i = 0;
+		for(Class<? extends SCommand> cl : sc) {
+			arr[i ++ ] = g(cl);
+		}
+		return arr;
+	}
+	/**
+	 * get an instance for SCommand
+	 * @param sc
+	 * @return SCommand
+	 */
+	public static SCommand g(Class<? extends SCommand> sc) {
+		try {
+			return sc.getConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+		return null;
+		}
+	}
+	/**
+	 * @param args string array
+	 * @return string text
+	 */
+	public static String join(String[] args) {
 		String tmp = "";
 		if(args == null) return "";
 		for(String str : args) tmp += str;
 		return tmp;
 	}
-	
-	public static String arg2String(String[] args, String ch) {
+	/**
+	 * @param args string array
+	 * @param ch join with
+	 * @return string text
+	 */
+	public static String join(String[] args, String ch) {
 		String tmp = "";
 		for(String str : args) tmp += str + ch;
 		return tmp.substring(0 , tmp.length() - 1);
 	}
-	
-	public static String[] excludeArr(String[] arg, int a) {
-		String[] tmp = {"",};
+	/**
+	 * @param arg objec array
+	 * @param a index of exclude element
+	 * @return object array
+	 */
+	public static Object[] excludeArr(Object[] arg, int a) {
+		Object[] tmp = {"",};
 		int le = arg.length;
 		int count = 0;
 		
@@ -36,17 +82,25 @@ public class Utils {
 		if(arg.length <= 1) return null;
 		return tmp;
 	}
-	
-	public static String[] cutArr(String[] arr, int startIndex) {
+	/**
+	 * @param arr
+	 * @param startIndex
+	 * @return object array
+	 */
+	public static Object[] cutArr(Object[] arr, int startIndex) {
 		if(startIndex == 0)return arr;
-		String[] tmp = new String[arr.length - startIndex];
+		Object[] tmp = new String[arr.length - startIndex];
 		for(int i = startIndex; i < arr.length; i ++) {
 			tmp[i - startIndex] = arr[i];
 		}
 		return tmp;
 	}
-
-	public static String[] binder(String[] a, int start) {
+	/**
+	 * @param a string array
+	 * @param start string appending at
+	 * @return String array
+	 */
+	public static String[] bind(String[] a, int start) {
 		Vector<String> v = new Vector<String>();
 		String tmp = "";
 		for(int i = 0; i < a.length; i ++) {
@@ -64,5 +118,14 @@ public class Utils {
 		if(tmp.trim().isEmpty())return strarr;
 		v.add(tmp);
 		return strarr;
+	}
+	
+	public static String[] ots(Object[] arr) {
+		String[] sa = new String[arr.length];
+		int i = 0;
+		for(Object obj : arr) {
+			sa[i ++] = obj.toString();
+		}
+		return sa;
 	}
 }

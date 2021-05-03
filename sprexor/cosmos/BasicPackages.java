@@ -1,42 +1,27 @@
 package sprexor.cosmos;
 
-import sprexor.CommandFactory;
+import sprexor.SFrame;
+import sprexor.SParameter;
+import sprexor.SCommand;
 import sprexor.Sprexor;
 import sprexor.IOCenter;
 import sprexor.lib.Utils;
-import sprexor.Component;
+import static sprexor.lib.Utils.a;
 
 /**
  * It is a Class to provide BasicPackages and to make CommandClass for who don't know.
  * @author PICOPress
  * @since 0.2.4
  */
-public class BasicPackages implements CommandFactory{
-	
-	private static final long serialVersionUID = 2L;
-	
+public class BasicPackages implements SFrame{
 	@Override
-	public int requireAPIversion() {
-		return 0;
+	public SCommand[] references() {
+		return a(For.class, SprexorCmdlst.class, SprexorEcho.class, SprexorVar.class); //better way is call a constructor directly.
 	}
 	
-	public String getCommandName() {
-		return "find";
-	}
-	@Override
-	public String help() {
-		return "::: The BasicPackages 0.2.18 :::\n" +
-				"1. find : Find text(s) by the unit of line.\n" + 
-				"2. repeat : Repeat the text.";
-	}
-	@Override
-	public CommandFactory[] referenceClass() {
-		return Utils.toCFClass(this, new For()); //Tools.toCFClasses();
-	}
-	@Override
-	public int code(IOCenter io, Sprexor SprexorInstance) {
-		Component args = io.getComponent();
-		String tmp = Utils.arg2String(Utils.excludeArr(args.get(), 0));
+	public int main(IOCenter io, Sprexor SprexorInstance) {
+		SParameter args = io.getComponent();
+		String tmp = Utils.join((String[])Utils.excludeArr(args.get(), 0));
 		String find = args.gets(0);
 		String[] splitedStr = tmp.split("\n");
 		String result = "";
@@ -46,5 +31,10 @@ public class BasicPackages implements CommandFactory{
 		}
 		io.out.println(result);
 		return 0;
+	}
+
+	@Override
+	public String PackageName() {
+		return "basic";
 	}
 }
