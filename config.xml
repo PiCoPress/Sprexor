@@ -10,8 +10,8 @@
 			<syntax>invalid literal syntax.</syntax>
 			<bsp>'BASIC' must use separately</bsp>
 			<nv>no variable</nv>
-			<iv>Invalid variable name : %s\n</iv>
-			<st>%s : Application stopped (%s)\n</st>
+			<iv>Invalid variable name : %s%n</iv>
+			<st>%s : Application stopped (%d)%n</st>
 		</error>
 	</parser>
 	
@@ -21,6 +21,7 @@
 	parser/error/syntax
 	parser/error/bsp
 	parser/error/nv
-	parser/error.iv
+	parser/error/iv
+	parser/error/st
 	</load>
 </sprexor>
