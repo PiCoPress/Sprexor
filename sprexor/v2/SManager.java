@@ -1,6 +1,5 @@
 package sprexor.v2;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
+
+import sprexor.SOutputs;
 import sprexor.v0.GlobalData;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SFrame;
@@ -24,46 +23,12 @@ import sprexor.v2.components.SParameter;
 	 * This Annotation is used to let when something method need to activate.
 	 */
 }
+/*
+ * Sprexor : Command Executor 1.0.0
+ */
 public class SManager {
 	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
-	public static final String VERSION = "2.0.0";
-	public static final String CODENAME = "Discovery";
-	public static final int APIversion = 1;
-	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG", "ALIAS", "IGNCASE"};
-	
-	static SprexorLoader resource;
-	static {
-			String sep = File.separator;
-			File file;
-			try {
-				file = new File(resourcePath + sep + "config.xml");
-				if(!file.isFile()) {
-					file = new File(ClassLoader.getSystemClassLoader().getResource(".")
-							.getPath()
-							.split(System.getProperty("os.name") == "windows"? "\\\\bin\\\\" : "/bin/")[0] + 
-							sep + "Sprexor" + sep + "config.xml");
-					if(!file.isFile()) {
-						System.err.println("no configuration file : config.xml");
-						System.exit(1);
-					}
-					Document doc = DocumentBuilderFactory
-							.newInstance()
-							.newDocumentBuilder()
-							.parse(file);
-					resource = new SprexorLoader(doc);
-				}else { // for eclipse IDE
-					Document doc = DocumentBuilderFactory
-							.newInstance()
-							.newDocumentBuilder()
-							.parse(file);
-					resource = new SprexorLoader(doc);
-				}
-				System.out.println(file.getPath());
-			} catch(Exception ef) { ef.printStackTrace(); }
-	}
-	//
-	// Internal Variables.
-	//
+	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG", "ALIAS"};
 	public Impose impose = new Impose() {};
 	public Object label;
 	public GlobalData SystemVar;
@@ -80,6 +45,8 @@ public class SManager {
 	protected HashMap<String, Object> envVar;
 	protected HashMap<String, String> desc;
 	protected HashMap<String, String> version;
+	protected StringBuilder log;
+	
 	/**
 	 * The Impose class is used to customize working.
 	 * <br> Methods to implement : 
@@ -205,8 +172,11 @@ public class SManager {
 		 cmd = new HashMap<String, SCommand>();
 		 envVar = new HashMap<String, Object>();
 		 desc = new HashMap<String, String>();
+		 version = new HashMap<String, String>();
 		 SystemVar = new GlobalData();
 		 SystemVar.putData("CURRENT_DIRECTORY", "");
+		 SystemVar.putData("ALIAS", "");
+		 log = new StringBuilder();
 	}
 	/**
 	 * importSprex is get command context(s) that created with class in this sprexor.
@@ -346,6 +316,10 @@ public class SManager {
 		doLog = bool;
 	}
 	
+	public String getLog() {
+		return log.toString();
+	}
+	
 	public String getVersion(String cmdName) {
 		return version.get(cmdName);
 	}
@@ -377,7 +351,7 @@ public class SManager {
 	 */
 	@Activation_need
 	public int exec(String com) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, resource.get("activate/error"));
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		com = com.trim();
 		String id = split(com, ' ')[0].trim();
 		if (ignoreCase) id = id.toLowerCase();
@@ -418,7 +392,7 @@ public class SManager {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										resource.get("parser/error/syntax"));
+										SOutputs.syn);
 								}
 							}else if(c == '"'){
 								bl = 0;
@@ -426,7 +400,7 @@ public class SManager {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								resource.get("parser/error/syntax"));
+								SOutputs.syn);
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
@@ -445,7 +419,7 @@ public class SManager {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										resource.get("parser/error/syntax"));
+											SOutputs.syn);
 								}
 							}else if(c == '\''){
 								bl = 0;
@@ -453,7 +427,7 @@ public class SManager {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								resource.get("parser/error/syntax"));
+								SOutputs.syn);
 						continue;
 					}
 				cache.append(c);
@@ -477,17 +451,16 @@ public class SManager {
 	 */
 	@Activation_need
 	synchronized public int run(String input, String options) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, resource.get("activate/error"));
+		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		if(options.contentEquals("BASIC")) return exec(input);
 		input = input.trim();
 		String[] lists = split(options, ';');
-		if(lists.length > 1 && indexOf("BASIC", lists)) throw new SprexorException(SprexorException.INTERNAL_ERROR, resource.get("parser/err/bsp"));
+		if(lists.length > 1 && indexOf("BASIC", lists)) throw new SprexorException(SprexorException.INTERNAL_ERROR, SOutputs.bsp);
 		boolean vari = indexOf("USE_VARIABLE", lists);
 		boolean com = indexOf("USE_COMMENT", lists);
 		boolean wrap = indexOf("WRAP_NAME", lists);
 		boolean debug = indexOf("DEBUG",lists);
-		boolean alias = indexOf("ALIAS", lists); // impl
-		boolean ignCase = indexOf("IGNCASE", lists); // impl
+		boolean alias = indexOf("ALIAS", lists);
 		
 		int nn = 0;
 		String id = "";
@@ -528,6 +501,7 @@ public class SManager {
 			id = input.split(" ")[0];
 			nn = id.length();
 		}
+		
 		char[] comar = input.substring(nn).trim().toCharArray();
 		String[] args = new String[comar.length];
 		byte count = 0;
@@ -558,7 +532,7 @@ public class SManager {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										resource.get("parser/error/syntax"));
+											SOutputs.syn);
 								}
 							}else if(c == '"'){
 								bl = 0;
@@ -566,7 +540,7 @@ public class SManager {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								resource.get("parser/error/syntax"));
+								SOutputs.syn);
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
@@ -585,7 +559,7 @@ public class SManager {
 								continue;
 								}catch(Exception e) {
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										resource.get("parser/error/syntax"));
+											SOutputs.syn);
 								}
 							}else if(c == '\''){
 								bl = 0;
@@ -593,7 +567,7 @@ public class SManager {
 							}else cache.append(c);
 						}
 						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								resource.get("parser/error/syntax"));
+								SOutputs.syn);
 						continue; 
 					} else if(c == '@') {
 						if(vari) {
@@ -606,16 +580,16 @@ public class SManager {
 									if(args[count] == null) args[count] = "";
 									String tmp = sb.toString();
 									if(envVar.containsKey(tmp)) args[count] += envVar.get(tmp).toString();
-									else throw new SprexorException(SprexorException.VARIABLE_ERR, resource.get("parser/error/nv"));
+									else throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
 									sb.setLength(0);
 								} else break;
 								
 							}
 							String tmp = sb.toString();
 							if(args[count] == null) args[count] = "";
-							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, resource.get("parser/error/iv"));
+							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, String.format(SOutputs.iv, tmp));
 							if(envVar.containsKey(tmp)) args[count ++] += envVar.get(tmp).toString();
-							else throw new SprexorException(SprexorException.VARIABLE_ERR, resource.get("parser/error/nv"));
+							else throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
 							continue;
 						}
 					}else if(c == comment) { // comment (note)
@@ -623,10 +597,10 @@ public class SManager {
 							while(++ allCount < comar.length) {
 								c = comar[allCount];
 								if(c == ';' || c == '\n') {
-									IOCenter res = impose.InOut();
 									args = trimArr(args);
-									res.component = new SParameter(args);
-									if(cmd.containsKey(id)) return cmd.get(id).main(res, this);
+									iostream.component = new SParameter(args);
+									if(cmd.containsKey(id)) return cmd.get(id).main(iostream, this);
+									iostream.reset();
 								}
 							}
 						}
@@ -639,17 +613,33 @@ public class SManager {
 		int exitCode = 0;
 		if(id.isBlank()) return 0;
 		if(cmd.containsKey(id)) {
-			if(!debug) try { 
+			if(!debug) try {
 				cmd.get(id).main(iostream, this); 
 			} catch(Exception e) {
-				iostream.out.printf(resource.get("parser/error/st"), id, e.getStackTrace()[0].getLineNumber());
+				iostream.out.printf(SOutputs.st, id, e.getStackTrace()[0].getLineNumber());
 			}
 			
 			else cmd.get(id).main(iostream, this);
 		}
-		else throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
+		else if(alias) {
+			String Aliass = SystemVar.getData("ALIAS").toString();
+			String[] tmpArr = split(Aliass, '\n');
+			String[] k;
+			for(String s : tmpArr) {
+				k = split(s, '=');
+				if(k[1].contentEquals(id)) {
+					if(!debug) try {
+						cmd.get(k[1]).main(iostream, this); 
+					} catch(Exception e) {
+						iostream.out.printf(SOutputs.st, k[0], e.getStackTrace()[0].getLineNumber());
+					}
+					break;
+				}
+			}
+		} else {
+			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
+		}
 		iostream.reset();
 		return exitCode;
 	}
-	
 }

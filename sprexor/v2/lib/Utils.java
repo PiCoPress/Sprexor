@@ -3,6 +3,7 @@ package sprexor.v2.lib;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
+import sprexor.SOutputs;
 import sprexor.v2.components.SCommand;
 
 public class Utils {
@@ -43,6 +44,29 @@ public class Utils {
 				| NoSuchMethodException | SecurityException e) {
 		return null;
 		}
+	}
+	/**
+	 * get property of key
+	 * <br>
+	 * format :<br>
+	 * <pre>
+	 * a=b
+	 * c=d
+	 * e=f
+	 * ...
+	 * </pre>
+	 * @param raw
+	 * @param name
+	 * @return string value
+	 */
+	public static String keymap(String raw, String name) {
+		String[] tmpArr = raw.split("\n");
+		String[] k;
+		for(String s : tmpArr) {
+			k = s.split("=");
+			if(k[0].contentEquals(name)) return k[1];
+		}
+		return "";
 	}
 	/**
 	 * @param args string array

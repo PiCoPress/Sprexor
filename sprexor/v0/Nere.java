@@ -6,16 +6,9 @@ import java.util.Vector;
 
 
 /*
- * Nere : Command String Parser & Executor 0.3.0
- *  copyright(c)  2020  by PICOPress, All rights reserved.
+ * Nere : Command Executor 1.0.0
  */
-
-
 public class Nere {
-	public final String VERSION = "0.3.0";
-	
-	//protected static Vector<String> msg = new Vector<String>();
-	//protected static Vector<String> err = new Vector<String>();
 	protected Vector<Object[]> MessageLog = null;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;

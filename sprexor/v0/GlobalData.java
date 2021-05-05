@@ -45,7 +45,7 @@ public final class GlobalData {
 	}
 	
 	public boolean modifyData(String key, Object data) {
-		if(existKey(key) || key.toCharArray()[key.length() -1] == '_')return false;
+		if(!existKey(key) || key.toCharArray()[key.length() -1] == '_')return false;
 		obj.replace(key, data);
 		return true;
 	}

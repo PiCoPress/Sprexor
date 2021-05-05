@@ -29,7 +29,8 @@ public class SprexorFor implements SCommand {
 		case "-T" :
 		case "--text" :
 			int i = Integer.parseInt(args.getsf(1));
-			io.out.println(text(args.get(), i));
+			for(int n = 0; n < i; n ++)
+			io.out.print(Utils.join((String[]) Utils.cutArr(args.get(), 2), " "));
 			return 0;
 		case "-c" :
 		case "-C" :
@@ -44,9 +45,6 @@ public class SprexorFor implements SCommand {
 			return 1;
 		}
 	}
-	//
-	//features
-	private String text(String[] a, int i) { return Utils.join((String[]) Utils.cutArr(a, 2), " ").repeat(i); }
 	//
 	private String run(String[] a, SManager sprex, int i) {
 		try {

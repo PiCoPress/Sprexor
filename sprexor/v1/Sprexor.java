@@ -23,15 +23,9 @@ import sprexor.v1.lib.Utils;
 }
 
 /*
- * Sprexor : the String Parser & Executor 1.0.0
- *  copyright(c)  2020  by PICOPress, All rights reserved.
+ * Sprexor : Command Executor 1.0.0
  */
 public class Sprexor {
-	//
-	// Internal Variables.
-	//
-	public static final String VERSION = "1.0.0";
-	public static final String CODENAME = "Venom";
 	public static final String[] LIST = {"help", "commands", "echo", "var"};
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME"};
 	public Reflection reflect;
