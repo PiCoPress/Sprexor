@@ -9,6 +9,11 @@ import sprexor.v2.lib.Smt;
 import sprexor.v2.lib.Utils;
 
 public class SprexorVar implements SCommand {
+	private static final String HELP = Smt.SMT_FORM("(!) : no action[n]"
+			+ "usage : var [ACTION] ...[nnt]"
+			+ "delete : delete variables[nnt]"
+			+ "set : set variables, (ex) abc=1 def=\"123\" ...[nnt]"
+			+ "help : show this message");
 	@Override
 	public String name() {
 		return "var";
@@ -23,10 +28,10 @@ public class SprexorVar implements SCommand {
 	}
 	SParameter args = io.getComponent();
 	int leng_arg = args.length();
-	if(leng_arg >= 1) switch(args.gets(0)) {
+	if(leng_arg >= 1) switch(args.getElement(0)) {
 	case "delete" :
 		if(leng_arg < 2) return 0;
-		String[] Names = (String[]) Utils.cutArr(args.get(), 1);
+		String[] Names = (String[]) Utils.cutArr(args.getArrays(), 1);
 		for(String strs : Names) {
 			Environment.deleteVariable(strs);
 		}
@@ -34,7 +39,7 @@ public class SprexorVar implements SCommand {
 	
 	case "set" :
 		if(leng_arg < 2) return 0;
-		String[] prm = (String[]) Utils.cutArr(args.get(), 1);
+		String[] prm = (String[]) Utils.cutArr(args.getArrays(), 1);
 		//var set a=7 a=9...
 		try {
 		for(String assignment : prm) {
@@ -49,23 +54,15 @@ public class SprexorVar implements SCommand {
 		break;
 	
 	case "help" :
-		io.out.println(Smt.SMT_FORM("(!) : no action[n]"
-				+ "usage : var [ACTION] ...[nnt]"
-				+ "delete : delete variables[nnt]"
-				+ "set : set variables, (ex) abc=1 def=\"123\" ...[nnt]"
-				+ "help : show this message"));
+		io.out.println(HELP);
 		break;
 		
 	default : 
-		io.out.printf("unknown param : %s\n", args.gets(0));
+		io.out.printf("unknown param : %s\n", args.getElement(0));
 		return 1;
 	}
 	else {
-	io.out.println(Smt.SMT_FORM("(!) : no action[n]"
-			+ "usage : var [ACTION] ...[nnt]"
-			+ "delete : delete variables[nnt]"
-			+ "set : set variables, (ex) abc=1 def=\"123\" ...[nnt]"
-			+ "help : show this message"));
+	io.out.println(HELP);
 	}
 	return 0;
 	}

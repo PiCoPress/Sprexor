@@ -1,5 +1,7 @@
 package sprexor.v2;
 
+import sprexor.SOutputs;
+
 public class SprexorException extends Exception {
 	
 	/**
@@ -26,28 +28,23 @@ public class SprexorException extends Exception {
 	protected String msg = "";
 	
 	private String knock(ERROR_TYPE k, String s) {
-		switch(k) {
-		case VARIABLE_ERR :
-			return ("cannot find a variable : " + s);
+		return switch(k) {
+		case VARIABLE_ERR -> String.format(SOutputs.nov, s);
 			
-		case EXPRSS_ERR :
-			return s;
+		case EXPRSS_ERR -> s;
 		
-		case ACTIVATION_FAILED :
-			return "current state is not activated. ";
+		case ACTIVATION_FAILED -> SOutputs.noact;
 			
-		case CMD_NOT_FOUND :
-			return s + " : command not found.";
+		case CMD_NOT_FOUND -> String.format(SOutputs.notf, s);
 		
-		case INTERNAL_ERROR :
-			return s;
+		case INTERNAL_ERROR -> s;
 			
-		default : return "";
-		}
+		default -> SOutputs.nul;
+		};
 	}
 	@Override
 	public String getMessage() {
-		return status + " - " + knock(status, msg);
+		return knock(status, msg);
 	}
 	public SprexorException(ERROR_TYPE e, String s){
 		super(s);

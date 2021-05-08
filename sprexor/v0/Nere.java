@@ -15,13 +15,10 @@ public class Nere {
 	private HashMap<String, String> helpDB;
 	private String list = "";
 	private String comment = "#";
-	
 	private GlobalData gd = null;
 	private boolean doBasicSyn = true;
-	
 	private HashMap<String, Object> envVar = new HashMap<String, Object>();
 	private Vector<String> vec = new Vector<String>();
-	
 	protected Object[] recentMessage = null;
 	
 	private String[] trimArr(String[] in) {

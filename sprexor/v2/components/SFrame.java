@@ -1,5 +1,8 @@
 package sprexor.v2.components;
 
+/**
+ * SFrame : The concept of Sprexor Application Package
+ */
 public interface SFrame {
 	public default String getDescription() {
 		return "no description";
@@ -7,9 +10,7 @@ public interface SFrame {
 	public abstract String PackageName();
 
 	/**
-	 * It should be overridden in mainly class.
-	 * <br> And, mainly class can be imported by importSprex.
-	 * <br> If class is only one, You may leave this method alone.
+	 * reference Classes of commands to use
 	 * @return SCommand arrays.
 	 */
 	public abstract SCommand[] references();

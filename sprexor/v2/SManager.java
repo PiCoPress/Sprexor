@@ -1,6 +1,7 @@
 package sprexor.v2;
 
 import java.io.IOException;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -308,6 +309,16 @@ public class SManager {
 	
 	public String getVersion(String cmdName) {
 		return version.get(cmdName);
+	}
+	
+	public boolean merge(SManager sm) {
+		if(configType == 2) return false;
+		if(this.hashCode() == sm.hashCode()) return false;
+		cmd.putAll(sm.cmd);
+		SecurityManager k = new SecurityManager();
+		java.io.FilePermission a = new java.io.FilePermission("", "");
+		
+		return true;
 	}
 	/**
 	 * execute command as non-parse.

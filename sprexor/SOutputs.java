@@ -1,10 +1,15 @@
 package sprexor;
 
 public class SOutputs {
-	static public String act = "Setup was no finished";
-	static public String syn = "invalid literal syntax.";
-	static public String bsp = "'BASIC' must use separately";
-	static public String nv = "no variable";
-	static public String iv = "Invalid variable name : %s%n";
-	static public String st = "%s : Application stopped (%d)%n";
+	static public final String act = "Setup was no finished",
+							   syn = "invalid literal syntax.",
+							   bsp = "'BASIC' must use separately",
+							   nv = "no variable",
+							   iv = "Invalid variable name : %s%n",
+							   st = "%s : Application stopped (%d)%n",
+							   ///////////////////////////////////////
+							   nov = "cannot find a variable : %s%n",
+							   noact = "did not setup",
+							   notf = "%s : command not found %n",
+							   nul = "";
 }
