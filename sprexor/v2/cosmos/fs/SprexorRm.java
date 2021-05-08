@@ -1,23 +1,18 @@
-package sprexor.v2.cosmos;
+package sprexor.v2.cosmos.fs;
 
 import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
 import sprexor.v2.components.SCommand;
 
-public class SprexorEcho implements SCommand {
+public class SprexorRm implements SCommand {
+
 	@Override
 	public String name() {
-		return "echo";
+		return "rm";
 	}
 
 	@Override
 	public int main(IOCenter io, SManager Environment) {
-		StringBuilder sb = new StringBuilder();
-		String[] args = io.getComponent().getArrays();
-		for(String str : args) {
-			sb.append(str);
-		}
-		io.out.println(sb.toString());
 		return 0;
 	}
 

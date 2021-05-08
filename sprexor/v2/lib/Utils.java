@@ -73,10 +73,10 @@ public class Utils {
 	 * @return string text
 	 */
 	public static String join(String[] args) {
-		String tmp = "";
+		StringBuilder tmp = new StringBuilder();
 		if(args == null) return "";
-		for(String str : args) tmp += str;
-		return tmp;
+		for(String str : args) tmp.append(str);
+		return tmp.toString();
 	}
 	/**
 	 * @param args string array
@@ -84,8 +84,8 @@ public class Utils {
 	 * @return string text
 	 */
 	public static String join(String[] args, String ch) {
-		String tmp = "";
-		for(String str : args) tmp += str + ch;
+		StringBuilder tmp = new StringBuilder();
+		for(String str : args) tmp.append(str).append(ch);
 		return tmp.substring(0 , tmp.length() - 1);
 	}
 	/**

@@ -22,20 +22,20 @@ public class SprexorFor implements SCommand {
 			io.out.println(Smt.SMT_FORM(help()));
 			return 0;
 		}
-		String option_1 = args.getsf(0);
+		String option_1 = args.getElement(0);
 		
 		switch(option_1) {
 		case "-t" :
 		case "-T" :
 		case "--text" :
-			int i = Integer.parseInt(args.getsf(1));
+			int i = Integer.parseInt(args.getElement(1));
 			for(int n = 0; n < i; n ++)
-			io.out.print(Utils.join((String[]) Utils.cutArr(args.get(), 2), " "));
+			io.out.print(Utils.join((String[]) Utils.cutArr(args.getArrays(), 2), " "));
 			return 0;
 		case "-c" :
 		case "-C" :
 		case "--code" :
-			 run((String[])Utils.cutArr(args.get(), 2), SprexorInstance, Integer.parseInt(args.gets(0)));
+			 run((String[])Utils.cutArr(args.getArrays(), 2), SprexorInstance, Integer.parseInt(args.getElement(0)));
 			 return 0;
 		case "-h":
 		case "-H":

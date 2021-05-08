@@ -13,8 +13,7 @@ public class BasicPackages implements SFrame{
 	@Override
 	public SCommand[] references() {
 		//return a(SprexorFor.class, SprexorCmdlst.class, SprexorEcho.class, SprexorVar.class); //better way is call a constructor directly.
-		return Utils.<SCommand>a(new SprexorFor(), new SprexorCmdlst(), new SprexorEcho(), new SprexorVar(), 
-				new SprexorChangeD(), new SprexorMkdir(), new SprexorRm());
+		return Utils.<SCommand>a(new SprexorFor(), new SprexorCmdlst(), new SprexorEcho(), new SprexorVar());
 	}
 	@Override
 	public String getDescription() {

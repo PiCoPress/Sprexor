@@ -1,4 +1,4 @@
-package sprexor.v2.cosmos;
+package sprexor.v2.cosmos.fs;
 
 import java.io.File;
 import sprexor.v2.IOCenter;

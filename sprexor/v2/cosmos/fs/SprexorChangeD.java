@@ -1,4 +1,4 @@
-package sprexor.v2.cosmos;
+package sprexor.v2.cosmos.fs;
 
 import java.io.File;
 
@@ -18,7 +18,7 @@ public class SprexorChangeD implements SCommand {
 	@Override
 	public int main(IOCenter io, SManager Environment) {
 		SParameter args = io.getComponent();
-		String sum = Utils.join(args.get(), " ") + " ";
+		String sum = Utils.join(args.getArrays(), " ") + " ";
 		File f = new File(sum.toCharArray()[1] == ':' || sum.startsWith("/")?
 				sum.trim() : Environment.SystemVar.getData("CURRENT_DIRECTORY").toString().concat(File.separator).concat(sum).trim());
 		System.out.println(f.getAbsolutePath());

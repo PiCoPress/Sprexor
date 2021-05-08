@@ -18,7 +18,7 @@ import sprexor.v2.components.SParameter;
 public class SManager {
 	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG", "ALIAS"};
-	public Impose impose = new Impose() {};
+	public Impose impose = new Impose();
 	public Object label;
 	public GlobalData SystemVar;
 	private int configType = 0;
@@ -42,8 +42,8 @@ public class SManager {
 	 * <br> - IdNotFound : This method will be invoked when could not find a command to run.
 	 * <br> - out : This method will be invoked when print any message.
 	 */
-	public interface Impose {
-		public default IOCenter InOut() {
+	public class Impose {
+		public IOCenter InOut() {
 		return new IOCenter(new SprexorOstream((buf) -> {for(String s : buf)System.out.print(s);}) {
 
 			@Override
@@ -593,6 +593,7 @@ public class SManager {
 		if(count != 0 || cache.length() != 0) args[count ++] = cache.toString();
 		args = trimArr(args);
 		iostream.component = new SParameter(args);
+		iostream.component.raw = input;
 		int exitCode = 0;
 		if(id.isBlank()) return 0;
 		if(cmd.containsKey(id)) {
@@ -620,6 +621,7 @@ public class SManager {
 				}
 			}
 		} else {
+			iostream.reset();
 			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
 		}
 		iostream.reset();

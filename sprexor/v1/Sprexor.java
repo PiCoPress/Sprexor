@@ -17,7 +17,7 @@ public class Sprexor {
 	public static final String[] LIST = {"help", "commands", "echo", "var"};
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME"};
 	public Reflection reflect;
-	public Impose impose = new Impose() {};
+	public Impose impose = new Impose();
 	public Object label;
 	private int configType = 0;
 	private HashMap<String, CommandProvider> cmd = null;
@@ -41,8 +41,8 @@ public class Sprexor {
 	 * <br> - IdNotFound : This method will be invoked when could not find a command to run.
 	 * <br> - out : This method will be invoked when print any message.
 	 */
-	public interface Impose {
-		public default IOCenter InOut() {
+	public class Impose {
+		public IOCenter InOut() {
 		return new IOCenter(new SprexorOstream((buf) -> {for(String s : buf)System.out.print(s);}) {
 
 			@Override

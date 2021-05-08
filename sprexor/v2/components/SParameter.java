@@ -2,22 +2,18 @@ package sprexor.v2.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
+
 /**
- * The Component that Iterable class provides functions for manage the arguments.
+ * SParameter is useful argument managing tool for Sprexor.
  * @since 0.2.18
  */
 public class SParameter implements Iterable<String> {
 	private String[] v;
 	private Object[] reserved;
-	enum A{
-		Default,
-		Str,
-		SetType1,
-		SetType2
-	}
+	public String raw = "";
+	
 	/**
 	 * This Unit Class provide methods for a unit of Arguments.
 	 * @since 0.2.18
@@ -27,14 +23,11 @@ public class SParameter implements Iterable<String> {
 		String k = "";
 		int index;
 		public Object label;
-		public final A ArgumentType;
 		protected Unit(String k, int index) {
 			this.k = k;
 			this.index = index;
-			if(k.startsWith("--")) ArgumentType = A.SetType2;
-			else if(k.startsWith("-")) ArgumentType = A.SetType1;
-			else ArgumentType = A.Default;
 		}
+		
 		@Override
 		public String toString() {
 			return k;
@@ -60,6 +53,7 @@ public class SParameter implements Iterable<String> {
 		this.v = v;
 		reserved = new Object[1024];
 	}
+	
 	@Override 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -80,7 +74,7 @@ public class SParameter implements Iterable<String> {
 	 *Return all of arguments to string array. 
 	 * @return
 	 */
-	public String[] get() {
+	public String[] getArrays() {
 		return v;
 	}
 	/**
@@ -88,7 +82,7 @@ public class SParameter implements Iterable<String> {
 	 * @param i - index to get unit of arguments.
 	 * @return Unit Class
 	 */
-	public Unit get(int i) {
+	public Unit getUnit(int i) {
 		Unit u = new Unit(v[i], i);
 		u.label = reserved[i];
 		return u;
@@ -98,7 +92,7 @@ public class SParameter implements Iterable<String> {
 	 * @param i - The index to get a element of arguments.
 	 * @return String
 	 */
-	public String getsf(int i) {
+	public String getElement(int i) {
 		if(i < v.length) return v[i];
 		else return "";
 	}
@@ -107,7 +101,7 @@ public class SParameter implements Iterable<String> {
 	 * @param i
 	 * @return String
 	 */
-	public String gets(int i) {
+	public String getValidElement(int i) {
 		int c = 0;
 		for(String s : v) {
 			if(!s.startsWith("-")) {
@@ -128,14 +122,23 @@ public class SParameter implements Iterable<String> {
 				arr.add(s.substring(s.startsWith("--") ? 2 : 1));
 			}
 		}
-		arr.sort(new Comparator<String>() {
-			@Override
-			public int compare(String s, String ss) {
-				return s.compareTo(ss);
-			}
-		});
 		return arr.toArray(new String[arr.size()]);
 	}
+	
+	/**
+	 * get all options specific prefix
+	 * @param prefix
+	 * @return string array
+	 */
+	public String[] getAllOption(String prefix) {
+		ArrayList<String> arr = new ArrayList<String>();
+		int size = prefix.length();
+		for(String s : v) {
+				arr.add(s.substring(size));
+			}
+		return arr.toArray(new String[arr.size()]);
+	}
+	
 	/**
 	 * the lagacy parser.
 	 * @param str string line
@@ -250,6 +253,10 @@ public class SParameter implements Iterable<String> {
 	public int length() {
 		return v.length;
 	}
+	
+	/**
+	 * @return boolean true if argument is empy, otherwise false.
+	 */
 	public boolean isEmpty() {
 		return v.length == 0;
 	}
@@ -262,7 +269,7 @@ public class SParameter implements Iterable<String> {
 		String tmp;
 		for(int i = 0; i < v.length; i ++) {
 			tmp = v[i];
-			if(tmp.startsWith("-") && !tmp.contains(" ")) v_.add(tmp);
+			if(tmp.startsWith("-")) v_.add(tmp);
 		}
 		return v_.toArray(new String[v_.size()]);
 	}
@@ -276,14 +283,35 @@ public class SParameter implements Iterable<String> {
 		String tmp;
 		for(int i = startAt; i < v.length; i ++) {
 			tmp = v[i];
-			if(tmp.startsWith("-") && !tmp.contains(" ")) v_.add(tmp);
+			if(tmp.startsWith("-")) v_.add(tmp);
 		}
 		return v_.toArray(new String[v_.size()]);
+	}
+	
+	/**
+	 * get parameters without option starting
+	 * @param startAt 
+	 * @param prefix option delimiter
+	 * @return string array
+	 */
+	public String[] getValidParameters(int startAt, String prefix) {
+		Vector<String> v_ = new Vector<String>();
+		String tmp;
+		for(int i = startAt; i < v.length; i ++) {
+			tmp = v[i];
+			if(tmp.startsWith(prefix)) v_.add(tmp);
+		}
+		return v_.toArray(new String[v_.size()]);
+	}
+	
+	public String getRaw() {
+		return raw;
 	}
 	
 	protected void setLabel(int index, Object obj) {
 		reserved[index] = obj;
 	}
+	
 	@Override
 	public Iterator<String> iterator() {
 		return new Iterator<String>() {

@@ -4,7 +4,6 @@ import sprexor.v2.components.SParameter;
 
 /**
  * Standard Internal Output Center
- * @author PICOPress
  * @since 0.1.2
  */
 public class IOCenter {
@@ -16,6 +15,7 @@ public class IOCenter {
 		UNKNOWN,
 		WARN,
 	}
+	
 	public static final TYPE ERR = TYPE.ERR;
 	public static final TYPE CMT = TYPE.CMT;
 	public static final TYPE STDOUT = TYPE.STDOUT;
