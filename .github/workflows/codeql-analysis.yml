@@ -58,11 +58,11 @@ jobs:
       with: 
         distribution: 'adopt'
         java-version: '15'
-        - run: |
-          cd /home/runner/work
-          mkdir tmpj
-          javac -d /home/rumner/work/tmpj -cp ./Sprexor/Sprexor $(find ./Sprexor/Sprexor/ -name *.java) # /home/runner/Sprexor/Sprexor/*.java
-          java tmpj/*
+      - run: |
+        cd /home/runner/work
+        mkdir tmpj
+        javac -d /home/rumner/work/tmpj -cp ./Sprexor/Sprexor $(find ./Sprexor/Sprexor/ -name *.java) # /home/runner/Sprexor/Sprexor/*.java
+        java tmpj/*
     #  uses: github/codeql-action/autobuild@v1
 
     # ℹ️ Command-line programs to run using the OS shell.
