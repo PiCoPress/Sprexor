@@ -1,10 +1,6 @@
 package sprexor.v1;
 
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,14 +9,6 @@ import java.util.Vector;
 import sprexor.v1.IOCenter.TYPE;
 import sprexor.v1.lib.Smt;
 import sprexor.v1.lib.Utils;
-
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.CLASS)
-@interface Activate_need { 
-	/*
-	 * This Annotation is used to let if something method need to activate.
-	 */
-}
 
 /*
  * Sprexor : Command Executor 1.0.0
@@ -239,7 +227,6 @@ public class Sprexor {
 	 * @return return true if command name(s) is exist, other case false.
 	 * @since 0.2.0
 	 */
-	@Activate_need
 	public boolean isExist(String s) {
 		if(configType != 2)return false;
 		if(listObject.isEmpty())return false;
@@ -454,7 +441,6 @@ public class Sprexor {
 	 * @throws SprexorException 
 	 * @since 0.2.3
 	 */
-	@Activate_need
 	public void exec(String id, String[] args) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
 		
@@ -474,7 +460,6 @@ public class Sprexor {
 	 * @throws SprexorException 
 	 * @since 0.1
 	 */
-	@Activate_need
 	public int exec(String com) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
 		com = com.trim();
@@ -575,7 +560,6 @@ public class Sprexor {
 	 * @since 0.2.18
 	 * @throws SprexorException
 	 */
-	@Activate_need
 	synchronized public int run(String input, String options) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "Activation failed.");
 		if(options.contentEquals("BASIC")) return exec(input);

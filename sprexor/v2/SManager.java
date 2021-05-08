@@ -1,10 +1,6 @@
 package sprexor.v2;
 
 import java.io.IOException;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,13 +12,6 @@ import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SFrame;
 import sprexor.v2.components.SParameter;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.CLASS)
-@interface Activation_need { 
-	/*
-	 * This Annotation is used to let when something method need to activate.
-	 */
-}
 /*
  * Sprexor : Command Executor 1.0.0
  */
@@ -216,7 +205,6 @@ public class SManager {
 	 * @return return true if command name(s) is exist, other case false.
 	 * @since 0.2.0
 	 */
-	@Activation_need
 	public boolean isExist(String s) {
 		if(configType != 2)return false;
 		return cmd.containsKey(s);
@@ -226,7 +214,6 @@ public class SManager {
 	 * @param cmdName
 	 * @return string
 	 */
-	@Activation_need
 	public String getCommandDescription(String cmdName) {
 		if(desc.containsKey(cmdName) && configType == 2) return desc.get(cmdName);
 		return null;
@@ -246,7 +233,6 @@ public class SManager {
 	 * get list of usable commands
 	 * @return string array
 	 */
-	@Activation_need
 	public String[] getList() {
 		return cmd.keySet().toArray(new String[cmd.size()]);
 	}
@@ -331,7 +317,6 @@ public class SManager {
 	 * @throws SprexorException 
 	 * @since 0.2.3
 	 */
-	@Activation_need
 	public int exec(String id, String[] args) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
 		
@@ -349,7 +334,6 @@ public class SManager {
 	 * @throws SprexorException 
 	 * @since 0.1
 	 */
-	@Activation_need
 	public int exec(String com) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		com = com.trim();
@@ -449,7 +433,6 @@ public class SManager {
 	 * @since 0.2.18
 	 * @throws SprexorException
 	 */
-	@Activation_need
 	synchronized public int run(String input, String options) throws SprexorException {
 		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		if(options.contentEquals("BASIC")) return exec(input);
