@@ -57,7 +57,7 @@ jobs:
       run: |
         cd /home/runner
         mkdir tmpj
-        javac /home/runner/Sprexor/Sprexor/* -d /home/runner/tmpj
+        javac -d /home/rumner/tmpj -cp . *.java # /home/runner/Sprexor/Sprexor/*.java
         java tmpj/*
     #  uses: github/codeql-action/autobuild@v1
 
