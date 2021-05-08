@@ -55,9 +55,9 @@ jobs:
     # If this step fails, then you should remove it and run the build manually (see below)
     - name: Autobuild
       run: |
-        cd /home/runner
+        cd /home/runner/work
         mkdir tmpj
-        javac -d /home/rumner/tmpj -cp ./Sprexor/Sprexor/ -d tmpj/ $(find ./Sprexor/Sprexor/*.java) # /home/runner/Sprexor/Sprexor/*.java
+        javac -d /home/rumner/work/tmpj -cp ./Sprexor/Sprexor/ $(find ./Sprexor/Sprexor/*.java) # /home/runner/Sprexor/Sprexor/*.java
         java tmpj/*
     #  uses: github/codeql-action/autobuild@v1
 
