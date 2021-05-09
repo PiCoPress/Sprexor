@@ -45,7 +45,7 @@ jobs:
       uses: actions/setup-java@v2.0.0
       with: 
         java-version: '14'
-        distribution: 'jdk'
+        distribution: 'zulu'
         
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
