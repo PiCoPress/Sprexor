@@ -1,15 +1,15 @@
-package test;
+package sprexor;
 
-import sprexor.v0.*;
-import sprexor.v1.*;
-
-import sprexor.v2.*;
-import sprexor.v2.cosmos.BasicPackages;
 import java.util.Scanner;
+import org.junit.Test;
 
-public class sprexorText {
-	public static void main(String[] args) {
-		Scanner s = new Scanner(System.in);
+import sprexor.v2.cosmos.BasicPackages;
+import sprexor.v2.SManager;
+
+public class Sprexorv2Test {
+    @Test
+    public void shouldAnswerWithTrue() {
+        Scanner s = new Scanner(System.in);
 		SManager n = new SManager();
 		n.use(BasicPackages.class);
 		n.setup();
@@ -23,5 +23,5 @@ public class sprexorText {
 			e.printStackTrace();
 		}
 		s.close();
-	}
+    }
 }
