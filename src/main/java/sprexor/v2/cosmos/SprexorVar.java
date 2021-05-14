@@ -5,28 +5,25 @@ import sprexor.v2.SManager;
 import sprexor.v2.IOCenter.TYPE;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
+import sprexor.v2.components.annotations.name;
 import sprexor.v2.lib.Smt;
 import sprexor.v2.lib.Utils;
 
+@name("var")
 public class SprexorVar implements SCommand {
 	private static final String HELP = Smt.SMT_FORM("(!) : no action[n]"
 			+ "usage : var [ACTION] ...[nnt]"
 			+ "delete : delete variables[nnt]"
 			+ "set : set variables, (ex) abc=1 def=\"123\" ...[nnt]"
 			+ "help : show this message");
-	@Override
-	public String name() {
-		return "var";
-	}
 
 	@Override
-	public int main(IOCenter io, SManager Environment) {
+	public int main(IOCenter io, SParameter args, SManager Environment) {
 		if(!Environment.useVariableExpression()) { 
 		io.out.setType(TYPE.ERR);
 		io.out.println("can nont use Variable : disabled");
 		return 1;
 	}
-	SParameter args = io.getComponent();
 	int leng_arg = args.length();
 	if(leng_arg >= 1) switch(args.getElement(0)) {
 	case "delete" :
@@ -65,11 +62,6 @@ public class SprexorVar implements SCommand {
 	io.out.println(HELP);
 	}
 	return 0;
-	}
-
-	@Override
-	public String version() {
-		return "0.0.0";
 	}
 
 }

@@ -5,17 +5,13 @@ import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
+import sprexor.v2.components.annotations.name;
 
+@name("mkdir")
 public class SprexorMkdir implements SCommand {
-
+	
 	@Override
-	public String name() {
-		return "mkdir";
-	}
-
-	@Override
-	public int main(IOCenter io, SManager Environment) {
-		SParameter args = io.getComponent();
+	public int main(IOCenter io, SParameter args, SManager Environment) {
 		String ks = Environment.SystemVar.getData("CURRENT_DIRECTORY").toString();
 		File f;
 		for(String s : args) {
@@ -29,10 +25,4 @@ public class SprexorMkdir implements SCommand {
 		}
 		return 0;
 	}
-
-	@Override
-	public String version() {
-		return "0.0.0";
-	}
-
 }

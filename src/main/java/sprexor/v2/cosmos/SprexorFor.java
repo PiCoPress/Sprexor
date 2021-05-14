@@ -5,9 +5,11 @@ import sprexor.v2.SManager;
 import sprexor.v2.SprexorException;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
+import sprexor.v2.components.annotations.name;
 import sprexor.v2.lib.Smt;
 import sprexor.v2.lib.Utils;
 
+@name("for")
 public class SprexorFor implements SCommand {
 	private String help() {
 		return "USAGE : for [OPTION] [NUM] ARGS...[nnt]" +
@@ -16,8 +18,7 @@ public class SprexorFor implements SCommand {
 				"-h, -H, --help[tt] : Print this message.";
 	}
 	@Override
-	public int main(IOCenter io, SManager SprexorInstance) {
-		SParameter args = io.getComponent();
+	public int main(IOCenter io, SParameter args, SManager SprexorInstance) {
 		if(args.isEmpty()) {
 			io.out.println(Smt.SMT_FORM(help()));
 			return 0;
@@ -53,13 +54,5 @@ public class SprexorFor implements SCommand {
 			return "";
 		}
 		return "";
-	}
-	@Override
-	public String name() {
-		return "for";
-	}
-	@Override
-	public String version() {
-		return "0.0.0";
 	}
 }

@@ -1,28 +1,34 @@
 package sprexor.v2;
 
+import java.io.FileOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Vector;
 
 import sprexor.SOutputs;
+import sprexor.Space;
 import sprexor.v0.GlobalData;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SFrame;
 import sprexor.v2.components.SParameter;
+import sprexor.v2.components.SParser;
+import sprexor.v2.components.annotations.*;
+import sprexor.v2.standard.DefaultParser;
 
 /*
  * Sprexor : Command Executor 1.0.0
  */
 public class SManager {
+	
 	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG", "ALIAS"};
-	public Impose impose = new Impose();
 	public Object label;
 	public GlobalData SystemVar;
-	private int configType = 0;
+	private boolean open = false;
 	protected HashMap<String, SCommand> cmd = null;
 	protected char comment = '#';
 	protected boolean doBasicSyn = true;
@@ -34,99 +40,16 @@ public class SManager {
 	protected ArrayList<String> listObject;
 	protected HashMap<String, Object> envVar;
 	protected HashMap<String, String> desc;
-	protected HashMap<String, String> version;
-	protected StringBuilder log;
+	protected HashMap<String, String> versionMap;
+	protected SParser sparser;
+	protected FileOutputStream logf;
+	protected boolean belog = false;
+	protected String logPath = "";
 	
-	/**
-	 * The Impose class is used to customize working.
-	 * <br> Methods to implement : 
-	 * <br> - IdNotFound : This method will be invoked when could not find a command to run.
-	 * <br> - out : This method will be invoked when print any message.
-	 */
-	public class Impose {
-		public IOCenter InOut() {
-		return new IOCenter(new SprexorOstream((buf) -> {for(String s : buf)System.out.print(s);}) {
-
-			@Override
-			public void print(String msg) {
-				System.out.print(msg);
-			}
-			@Override
-			public void print(String msg, int Color) {
-				print(msg);
-			}
-			@Override
-			public void clear() {
-				
-			}
-			@Override
-			public void println(String msg) {
-				System.out.println(msg);
-			}
-			@Override
-			public void println(String msg, int Color) {
-				println(msg);
-			}
-			@Override
-			public void printf(String msg, Object... obj) {
-				System.out.print(String.format(msg, obj));
-			}
-		},
-		new SprexorIstream() {
-
-			@Override
-			public void prompt() {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			@Override
-			public void prompt(String msg) {
-				char ch;
-				try {
-					System.out.println(msg);
-					while((ch = (char) System.in.read()) != delimiter) {
-						buffering(ch);
-					}
-				} catch (IOException e) {
-					
-				}
-			}
-			@Override
-			public void prompt(String msg, int Color) {
-				prompt(msg);
-			}
-			@Override
-			public String getln() {
-				char ch;
-				StringBuffer sb = new StringBuffer();
-				try {
-					while((ch = (char) System.in.read()) != '\n') {
-						sb.append(ch);
-					}
-				} catch (IOException e) {
-					return "";
-				}
-				return sb.toString();
-			}
-			@Override
-			public String getln(String msg) {
-				System.out.println(msg);
-				return getln();
-			}
-			@Override
-			public String getln(String msg, int Color) {
-				return getln(msg);
-			}
-		}
-	);
-		}
-	}
 	//
 	// private methods.
 	//
+	
 	private String[] trimArr(String[] in) {
 		vec.clear();
 		for(String eval : in) {
@@ -135,10 +58,12 @@ public class SManager {
 		}
 		return Arrays.copyOf(vec.toArray(), vec.size(), String[].class);
 	}
+	
 	private boolean indexOf(String e, String[] arr) {
 		for(String i : arr) if(i.contentEquals(e)) return true;
 		return false;
 	}
+	
 	private String[] split(String v, char deli) {
 		char[] seq = v.toCharArray();
 		ArrayList<String> arr = new ArrayList<String>();
@@ -155,6 +80,13 @@ public class SManager {
 		arr.add(buffer);
 		return arr.toArray(new String[index + 1]);
 	}
+	
+	public void logger(String str) {
+		if(belog)
+			try {
+				logf.write((new Date().toString().concat(" ] ") + str + "\n").getBytes());
+			} catch (IOException e) { }
+	}
 	//
 	//public methods.
 	//
@@ -162,11 +94,44 @@ public class SManager {
 		 cmd = new HashMap<String, SCommand>();
 		 envVar = new HashMap<String, Object>();
 		 desc = new HashMap<String, String>();
-		 version = new HashMap<String, String>();
+		 versionMap = new HashMap<String, String>();
 		 SystemVar = new GlobalData();
 		 SystemVar.putData("CURRENT_DIRECTORY", "");
 		 SystemVar.putData("ALIAS", "");
-		 log = new StringBuilder();
+	}
+	
+	public SManager(String logPath) {
+		 cmd = new HashMap<String, SCommand>();
+		 envVar = new HashMap<String, Object>();
+		 desc = new HashMap<String, String>();
+		 versionMap = new HashMap<String, String>();
+		 SystemVar = new GlobalData();
+		 SystemVar.putData("CURRENT_DIRECTORY", "");
+		 SystemVar.putData("ALIAS", "");
+		 try {
+			logf = new FileOutputStream(new File(logPath + ((logPath.endsWith(File.separator))? "" : File.separator).concat("sprexor.log")));
+			belog = true;
+			logf.write(String.format("\t | | |  Initializing Sprexor Logger %s  | | |%n", Space.Version).getBytes());
+			this.logPath = logPath.concat("sprexor.log");
+		} catch (IOException e) {
+			System.out.println("cannot logging");
+		}
+		 
+	}
+	
+	public void setOut(SprexorOstream spo) {
+		if(open) return;
+		iostream.out = spo;
+	}
+	
+	public void setIn(SprexorIstream spi) {
+		if(open) return;
+		iostream.in = spi;
+	}
+	
+	public void setParser(SParser sp) {
+		if(open) return;
+		sparser = sp;
 	}
 	/**
 	 * importSprex is get command context(s) that created with class in this sprexor.
@@ -175,7 +140,7 @@ public class SManager {
 	 * @since 0.2.3
 	 */
 	public void use(Class<? extends SFrame> sf) {
-		if(configType != 0)return;
+		if(open)return;
 		
 		SCommand[] sc;
 		SFrame sframe;
@@ -187,15 +152,25 @@ public class SManager {
 			return;
 		}
 		String n;
+		version v;
+		target t;
+		Class<? extends SCommand> cl;
 		for(SCommand s : sc) {
-			n = s.name();
-			// System.out.println(n);
+			cl = s.getClass();
+			n = s.getClass().getAnnotation(name.class).value();
 			if(cmd.containsKey(n)) {
-				System.out.printf("conflict : %s\n", n);
+				logger(String.format("%s conflicted '%s'", "< ERROR >", n));
 				continue;
+			}else if((t = cl.getAnnotation(target.class)) != null) {
+				int i = Space.Version.compareTo/*<*/(t.value());
+				if(i < 0) {
+					logger(String.format(" %s  not supported '%s' (current version : %s, require version : %s)", "< ERROR >", n, Space.Version, t.value()));
+					continue;
+				}
 			}
 			cmd.put(n, s);
-			version.put(n, s.version());
+			logger("< INFO > Command imported : ".concat(sframe.PackageName()).concat("::").concat(n));
+			versionMap.put(n, (v = cl.getAnnotation(version.class)) != null? v.value() : "0.0.1");
 		}
 		desc.put(sframe.PackageName(), sframe.getDescription());
 	}
@@ -207,7 +182,7 @@ public class SManager {
 	 * @since 0.2.0
 	 */
 	public boolean isExist(String s) {
-		if(configType != 2)return false;
+		if(!open)return false;
 		return cmd.containsKey(s);
 	}
 	/**
@@ -216,8 +191,8 @@ public class SManager {
 	 * @return string
 	 */
 	public String getCommandDescription(String cmdName) {
-		if(desc.containsKey(cmdName) && configType == 2) return desc.get(cmdName);
-		return null;
+		if(desc.containsKey(cmdName) && open) return desc.get(cmdName);
+		return "";
 	}
 	/**
 	 * If all configure finished, then be able to run command line. This means settings of sprexor prevent to modify secretly.
@@ -226,9 +201,13 @@ public class SManager {
 	 * @since 0.2.3
 	 */
 	public void setup() {
-		if(configType != 0 || !isInit) return;
-		iostream = impose.InOut();
-		if(configType == 0)configType = 2;
+		if(open || !isInit) return;
+		if(sparser == null) {
+			logger("< INFO > parser was not selected. switching to default parser...");
+			sparser = new DefaultParser();
+		}
+		if(!open)open = !open;
+		logger("< INFO > Sprexor setup successful");
 	}
 	/**
 	 * get list of usable commands
@@ -248,8 +227,8 @@ public class SManager {
 	 */
 	@Deprecated
 	public void register(String str, SCommand cp, String hd) {
-		if(configType != 0)return;
-		else if(isExist(str) || str.contentEquals(""))return;
+		if(open) return;
+		else if(isExist(str) || str.isEmpty()) return;
 		else if(ignoreCase) str.toLowerCase();
 		listObject.add(str);
 		cmd.put(str, cp);
@@ -261,8 +240,8 @@ public class SManager {
 	 * @since 0.1.5
 	 */
 	public void setComment(char c) {
-		if(configType != 0)return;
-		if(c != '\0')comment = c;
+		if(open) return;
+		if(c != '\0') comment = c;
 	}
 	
 	public SManager copySprexor() {
@@ -299,140 +278,63 @@ public class SManager {
 		return doBasicSyn;
 	}
 	
-	public void setLogging(boolean bool) {
-		doLog = bool;
-	}
-	
-	public String getLog() {
-		return log.toString();
-	}
-	
 	public String getVersion(String cmdName) {
-		return version.get(cmdName);
+		return versionMap.get(cmdName);
 	}
 	
 	public boolean merge(SManager sm) {
-		if(configType == 2) return false;
+		if(!open) return false;
 		if(this.hashCode() == sm.hashCode()) return false;
 		cmd.putAll(sm.cmd);
-		SecurityManager k = new SecurityManager();
-		java.io.FilePermission a = new java.io.FilePermission("", "");
-		
+		logger(String.format("< INFO > Sprexor merged with : %d", sm.hashCode()));
 		return true;
 	}
+	
+	public void clearLog() {
+		File f = new File(logPath);
+		if(belog) {
+			f.delete();
+			try {
+				f.createNewFile();
+			} catch (IOException e) { }
+		}
+	}
 	/**
-	 * execute command as non-parse.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
+	 * execute command line lightly.
 	 * @param id : command name
 	 * @param args : arguments
 	 * @throws SprexorException 
 	 * @since 0.2.3
 	 */
 	public int exec(String id, String[] args) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
+		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
 		
-		if(!isExist(id))throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
+		if(!isExist(id)) {
+			logger("< CRITICAL > Command not found : " + id);
+			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
+		}
 		SCommand obj = cmd.get(id);
-		IOCenter res = iostream;
-		iostream.component = new SParameter(args);
-		return obj.main(res, this);
+		int i = obj.main(iostream, new SParameter(args), this);
+		return i;
 	}
 	/**
 	 * run a command line lightly.
-	 * <br> and it will be run that you configured. 
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
+	 * <br> and it will be run that you configured.
 	 * @param com : command string to execute
 	 * @throws SprexorException 
 	 * @since 0.1
 	 */
 	public int exec(String com) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
-		com = com.trim();
-		String id = split(com, ' ')[0].trim();
-		if (ignoreCase) id = id.toLowerCase();
-		if(com.isBlank()) {
-			return -1;
-		}else if(!isExist(id)) {
+		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
+		
+		String id = sparser.id(com);
+		if(isExist(id)) {
+			logger("< CRITICAL > Command not found : " + id);
 			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
 		}
-		com = com.substring(split(com, ' ')[0].length());
-		final char[] comar = com.toCharArray();
-		String[] args = new String[comar.length];
-		byte count = 0;
-		int allCount = 0;
-		final StringBuilder cache = new StringBuilder();
-		
-			char c;
-			for(;allCount < comar.length; allCount ++) {
-				c = comar[allCount];
-				if(c == ' ') {
-						if(cache.length() == 0)continue;
-						args[count ++] = cache.toString();
-						cache.setLength(0);
-						continue;
-					}else if(c == '"'){
-						byte bl = 1;
-						while(++ allCount < comar.length) {
-							c = comar[allCount];
-							if(c == '\\') {
-								try {
-								char nextChar = comar[++ allCount];
-								cache.append(switch (nextChar) {
-								case 't' -> '\t';
-								case 'n' -> '\n';
-								case '"' -> '"';
-								case '\\' -> '\\';
-								default -> nextChar;
-								});
-								continue;
-								}catch(Exception e) {
-									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										SOutputs.syn);
-								}
-							}else if(c == '"'){
-								bl = 0;
-								break;
-							}else cache.append(c);
-						}
-						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								SOutputs.syn);
-						continue;
-					}else if(c == '\'') {
-						byte bl = 1;
-						while(++ allCount < comar.length) {
-							c = comar[allCount];
-							if(c == '\\') {
-								try {
-								char nextChar = comar[++ allCount];
-								cache.append(switch (nextChar) {
-								case 't' -> '\t';
-								case 'n' -> '\n';
-								case '"' -> '"';
-								case '\\' -> '\\';
-								default -> nextChar;
-								});
-								continue;
-								}catch(Exception e) {
-									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-											SOutputs.syn);
-								}
-							}else if(c == '\''){
-								bl = 0;
-								break;
-							}else cache.append(c);
-						}
-						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
-								SOutputs.syn);
-						continue;
-					}
-				cache.append(c);
-			
-		}
-		if(cache.length() != 0) args[count] = cache.toString();
-		final IOCenter res = impose.InOut();
-		args = trimArr(args);
-		res.component = new SParameter(args);
-		return cmd.get(id).main(res, this);
+		com = com.substring(id.length() + 1);
+		SParameter component = new SParameter(sparser.processing(com));
+		return cmd.get(id).main(iostream, component, this);
 	}
 	/**
 	 * It run a line with powerful string parser but, unstable.
@@ -445,7 +347,7 @@ public class SManager {
 	 * @throws SprexorException
 	 */
 	synchronized public int run(String input, String options) throws SprexorException {
-		if(configType != 2) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
+		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		if(options.contentEquals("BASIC")) return exec(input);
 		input = input.trim();
 		String[] lists = split(options, ';');
@@ -525,16 +427,20 @@ public class SManager {
 								});
 								continue;
 								}catch(Exception e) {
+									logger("< CRITICAL > invalid expression  : " + cache.toString());
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-											SOutputs.syn);
+										SOutputs.syn);
 								}
 							}else if(c == '"'){
 								bl = 0;
 								break;
 							}else cache.append(c);
 						}
-						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
+						if(bl == 1) {
+							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							throw new SprexorException(SprexorException.EXPRSS_ERR, 
 								SOutputs.syn);
+						}
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
@@ -552,16 +458,20 @@ public class SManager {
 								});
 								continue;
 								}catch(Exception e) {
+									logger("< CRITICAL > invalid expression  : " + cache.toString());
 									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-											SOutputs.syn);
+										SOutputs.syn);
 								}
 							}else if(c == '\''){
 								bl = 0;
 								break;
 							}else cache.append(c);
 						}
-						if(bl == 1) throw new SprexorException(SprexorException.EXPRSS_ERR, 
+						if(bl == 1) {
+							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							throw new SprexorException(SprexorException.EXPRSS_ERR, 
 								SOutputs.syn);
+						};
 						continue; 
 					} else if(c == '@') {
 						if(vari) {
@@ -574,16 +484,25 @@ public class SManager {
 									if(args[count] == null) args[count] = "";
 									String tmp = sb.toString();
 									if(envVar.containsKey(tmp)) args[count] += envVar.get(tmp).toString();
-									else throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
+									else {
+											logger("< CRITICAL > variable not found  : " + tmp);
+										throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
+									}
 									sb.setLength(0);
 								} else break;
 								
 							}
 							String tmp = sb.toString();
 							if(args[count] == null) args[count] = "";
-							if(!tmp.matches("^[a-zA-Z0-9_]+$"))throw new SprexorException(SprexorException.EXPRSS_ERR, String.format(SOutputs.iv, tmp));
+							if(!tmp.matches("^[a-zA-Z0-9_]+$")) {
+									logger("< CRITICAL > invalid expression : " + cache.toString());
+								throw new SprexorException(SprexorException.EXPRSS_ERR, String.format(SOutputs.iv, tmp));
+							}
 							if(envVar.containsKey(tmp)) args[count ++] += envVar.get(tmp).toString();
-							else throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
+							else {
+								logger("< CRITICAL > variable not found  : " + cache.toString());
+								throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
+							}
 							continue;
 						}
 					}else if(c == comment) { // comment (note)
@@ -592,9 +511,8 @@ public class SManager {
 								c = comar[allCount];
 								if(c == ';' || c == '\n') {
 									args = trimArr(args);
-									iostream.component = new SParameter(args);
-									if(cmd.containsKey(id)) return cmd.get(id).main(iostream, this);
-									iostream.reset();
+									SParameter component = new SParameter(args);
+									if(cmd.containsKey(id)) return cmd.get(id).main(iostream, component, this);
 								}
 							}
 						}
@@ -603,18 +521,18 @@ public class SManager {
 		}
 		if(count != 0 || cache.length() != 0) args[count ++] = cache.toString();
 		args = trimArr(args);
-		iostream.component = new SParameter(args);
-		iostream.component.raw = input;
+		SParameter component = new SParameter(args);
+		component.raw = input;
 		int exitCode = 0;
 		if(id.isBlank()) return 0;
 		if(cmd.containsKey(id)) {
 			if(!debug) try {
-				cmd.get(id).main(iostream, this); 
+				cmd.get(id).main(iostream, component, this); 
 			} catch(Exception e) {
 				iostream.out.printf(SOutputs.st, id, e.getStackTrace()[0].getLineNumber());
 			}
 			
-			else cmd.get(id).main(iostream, this);
+			else cmd.get(id).main(iostream, component, this);
 		}
 		else if(alias) {
 			String Aliass = SystemVar.getData("ALIAS").toString();
@@ -624,7 +542,7 @@ public class SManager {
 				k = split(s, '=');
 				if(k[1].contentEquals(id)) {
 					if(!debug) try {
-						cmd.get(k[1]).main(iostream, this); 
+						cmd.get(k[1]).main(iostream, component, this); 
 					} catch(Exception e) {
 						iostream.out.printf(SOutputs.st, k[0], e.getStackTrace()[0].getLineNumber());
 					}
@@ -632,10 +550,92 @@ public class SManager {
 				}
 			}
 		} else {
-			iostream.reset();
+			logger("< CRITICAL > Command not found : " + id);
 			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
 		}
-		iostream.reset();
+		logger(String.format("< INFO > Program '%s' exit code : %d", id, exitCode));
 		return exitCode;
 	}
+	
+	{
+		iostream = new IOCenter();
+		this.iostream.out = new SprexorOstream((buf) -> {for(String s : buf)System.out.print(s);}) {
+
+			@Override
+			public void print(String msg) {
+				System.out.print(msg);
+			}
+			@Override
+			public void print(String msg, int Color) {
+				print(msg);
+			}
+			@Override
+			public void clear() {
+				
+			}
+			@Override
+			public void println(String msg) {
+				System.out.println(msg);
+			}
+			@Override
+			public void println(String msg, int Color) {
+				println(msg);
+			}
+			@Override
+			public void printf(String msg, Object... obj) {
+				System.out.print(String.format(msg, obj));
+			}
+		};
+		
+		this.iostream.in = new SprexorIstream() {
+
+			@Override
+			public void prompt() {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			@Override
+			public void prompt(String msg) {
+				char ch;
+				try {
+					System.out.println(msg);
+					while((ch = (char) System.in.read()) != delimiter) {
+						buffering(ch);
+					}
+				} catch (IOException e) {
+					
+				}
+			}
+			@Override
+			public void prompt(String msg, int Color) {
+				prompt(msg);
+			}
+			@Override
+			public String getln() {
+				char ch;
+				StringBuffer sb = new StringBuffer();
+				try {
+					while((ch = (char) System.in.read()) != '\n') {
+						sb.append(ch);
+					}
+				} catch (IOException e) {
+					return "";
+				}
+				return sb.toString();
+			}
+			@Override
+			public String getln(String msg) {
+				System.out.println(msg);
+				return getln();
+			}
+			@Override
+			public String getln(String msg, int Color) {
+				return getln(msg);
+			}
+		};
+	}
+	
 }

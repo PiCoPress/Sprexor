@@ -1,7 +1,5 @@
 package sprexor.v2;
 
-import sprexor.v2.components.SParameter;
-
 /**
  * Standard Internal Output Center
  * @since 0.1.2
@@ -29,7 +27,6 @@ public class IOCenter {
 	public static final TYPE no_value = TYPE.NO_VALUE;
 	public static final TYPE unknown = TYPE.UNKNOWN;
 	//
-	protected SParameter component = null;
 	public Object label;
 	public SprexorOstream out;
 	public SprexorIstream in;
@@ -39,15 +36,5 @@ public class IOCenter {
 		out = o;
 		in = i;
 	}
-	/**
-	 * return arguments.
-	 * @return Component
-	 */
-	public SParameter getComponent() {
-		return component;
-	}
-	protected void reset() {
-		component = null;
-		out.type = stdout;
-	}
+	public IOCenter() { }
 }
