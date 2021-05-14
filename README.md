@@ -1,9 +1,14 @@
+<!--Stable mark : <b><span style="color:78a094">Stable</span></b>-->
+<!--Latest mark : <b><span style="color:f478cd">Latest</span></b>-->
+
+<img src='./docs/img/Sprexor_mono.png' width='400'>
+
 # Sprexor Application Framework
 Sprexor is Framework that manages and runs command line in Java.
 It has a lot of libraries, functions, and customizing tools to use in many of purpose easily.
 
 # Downloads
-- <b><span style="color:78a094">Stable</span></b> | <b><span style="color:f478cd">Latest</span></b> **0.2.19** `2021.4.13`
+- <b><span style="color:f478cd">Latest</span></b> **0.2.19** `2021.4.13`
     + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.19/Sprexor.0.2.19-full.jar)
     + [Download binary only](https://github.com/PiCoPress/Sprexor/releases/download/0.2.19/Sprexor.0.2.19-bin.jar)
     + [source](https://github.com/PiCoPress/Sprexor/archive/refs/tags/0.2.19.zip)
@@ -16,18 +21,7 @@ It has a lot of libraries, functions, and customizing tools to use in many of pu
     
     
 - **0.2.14** `2020.11.13`
-    + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.14a/Sprexor.0.2.14.jar)
     + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.14a.zip)
-    
-    
-- **0.2.13** `2020.10.13`
-    + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.13/Sprexor.0.2.13.jar)
-    + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.13.zip)
-
-
-- **0.2.11** `2020.10.2`
-    + [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.11/Sprexor.0.2.11.jar)
-    + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.11.zip)
 
 
 - [Download ohter versions](./docs/other.md)
@@ -39,6 +33,10 @@ It has a lot of libraries, functions, and customizing tools to use in many of pu
 
 
 ## How to use 
+`Requirement : JDK-14.0.2`
+
+[Download JDK14](https://www.oracle.com/kr/java/technologies/javase/jdk14-archive-downloads.html)
+
 There are two ways how to use Sprexor.
 
 ```java

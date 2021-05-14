@@ -2,13 +2,14 @@
 _The old versions are not recommended to use._
 
 
+**0.2.13** `2020.10.13`
++ [source](https://github.com/PiCoPress/Sprexor/archive/0.2.13.zip)
+
 **0.2.10** `2020.9.24`
-+ [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.10/Sprexor.0.2.10.jar)
-+ [source](https://github.com/PiCoPress/Sprexor/archive/0.2.10.zip)
++ [source](https://github.com/PiCoPress/Sprexor/archive0.2.10.zip)
 
 
 **0.2.7** `2020.9.21`
-+ [Install](https://github.com/PiCoPress/Sprexor/releases/download/0.2.7-Beta/Sprexor.0.2.7.Beta.jar)
 + [source](https://github.com/PiCoPress/Sprexor/archive/0.2.7-Beta.zip)
 
 
