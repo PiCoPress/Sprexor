@@ -7,7 +7,6 @@ import sprexor.v2.components.SParameter;
 import sprexor.v2.components.annotations.CommandInfo;
 import sprexor.v2.lib.Utils;
 
-@name("commands")
 @CommandInfo(name = "commands", version = "0.0.1")
 public class SprexorCmdlst implements SCommand {
 
