@@ -4,10 +4,11 @@ import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
-import sprexor.v2.components.annotations.name;
+import sprexor.v2.components.annotations.CommandInfo;
 import sprexor.v2.lib.Utils;
 
 @name("commands")
+@CommandInfo(name = "commands", version = "0.0.1")
 public class SprexorCmdlst implements SCommand {
 
 	@Override

@@ -3,17 +3,19 @@ package sprexor.v2;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.Vector;
 
 import sprexor.SOutputs;
 import sprexor.Space;
 import sprexor.v0.GlobalData;
+import sprexor.v2.components.Importable;
 import sprexor.v2.components.SCommand;
-import sprexor.v2.components.SFrame;
 import sprexor.v2.components.SParameter;
 import sprexor.v2.components.SParser;
 import sprexor.v2.components.annotations.*;
@@ -25,25 +27,24 @@ import sprexor.v2.standard.DefaultParser;
 public class SManager {
 	
 	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
-	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "USE_COMMENT", "WRAP_NAME", "DEBUG", "ALIAS"};
+	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "WRAP_NAME", "DEBUG", "ALIAS", "ALLOW_VAR_IN_ID"};
 	public Object label;
 	public GlobalData SystemVar;
 	private boolean open = false;
-	protected HashMap<String, SCommand> cmd = null;
-	protected char comment = '#';
-	protected boolean doBasicSyn = true;
-	protected Vector<String> vec = new Vector<String>();
-	protected boolean isInit = true;
-	protected boolean ignoreCase = false;
-	protected boolean doLog = false;
-	protected IOCenter iostream;
 	protected ArrayList<String> listObject;
+	protected Vector<String> vec = new Vector<String>();
+	protected HashMap<String, SCommand> cmd = null;
 	protected HashMap<String, Object> envVar;
 	protected HashMap<String, String> desc;
 	protected HashMap<String, String> versionMap;
-	protected SParser sparser;
-	protected FileOutputStream logf;
+	protected char varChar = '@';
+	protected boolean doBasicSyn = true;
+	protected boolean isInit = true;
+	protected boolean ignoreCase = false;
 	protected boolean belog = false;
+	protected SParser sparser;
+	protected IOCenter iostream;
+	protected FileOutputStream logf;
 	protected String logPath = "";
 	
 	//
@@ -80,6 +81,11 @@ public class SManager {
 		arr.add(buffer);
 		return arr.toArray(new String[index + 1]);
 	}
+	private String findv(String k) throws SprexorException{
+		if(ExistsVariable(k)) return envVar.get(k).toString();
+		logger("< CRITICAL > variable not found  : " + k);
+		throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
+	}
 	
 	public void logger(String str) {
 		if(belog)
@@ -98,6 +104,7 @@ public class SManager {
 		 SystemVar = new GlobalData();
 		 SystemVar.putData("CURRENT_DIRECTORY", "");
 		 SystemVar.putData("ALIAS", "");
+		 iostream = new IOCenter();
 	}
 	
 	public SManager(String logPath) {
@@ -108,6 +115,7 @@ public class SManager {
 		 SystemVar = new GlobalData();
 		 SystemVar.putData("CURRENT_DIRECTORY", "");
 		 SystemVar.putData("ALIAS", "");
+		 iostream = new IOCenter();
 		 try {
 			logf = new FileOutputStream(new File(logPath + ((logPath.endsWith(File.separator))? "" : File.separator).concat("sprexor.log")));
 			belog = true;
@@ -119,12 +127,12 @@ public class SManager {
 		 
 	}
 	
-	public void setOut(SprexorOstream spo) {
+	public void setOut(PrintStream spo) {
 		if(open) return;
 		iostream.out = spo;
 	}
 	
-	public void setIn(SprexorIstream spi) {
+	public void setIn(Scanner spi) {
 		if(open) return;
 		iostream.in = spi;
 	}
@@ -133,46 +141,49 @@ public class SManager {
 		if(open) return;
 		sparser = sp;
 	}
+	
+	public void setVariablePrefix(char prefix) {
+		varChar = prefix;
+	}
 	/**
 	 * importSprex is get command context(s) that created with class in this sprexor.
 	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
 	 * @param cmp : Other class that implemented with CommandProvider
 	 * @since 0.2.3
 	 */
-	public void use(Class<? extends SFrame> sf) {
+	public void use(Class<? extends Importable> imp) {
 		if(open)return;
 		
-		SCommand[] sc;
-		SFrame sframe;
-		try {
-			sframe = (sf.getDeclaredConstructor().newInstance());
-			sc = sframe.references();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		String n;
-		version v;
-		target t;
-		Class<? extends SCommand> cl;
-		for(SCommand s : sc) {
-			cl = s.getClass();
-			n = s.getClass().getAnnotation(name.class).value();
-			if(cmd.containsKey(n)) {
-				logger(String.format("%s conflicted '%s'", "< ERROR >", n));
+		Spackage sp = imp.getAnnotation(Spackage.class);
+		
+		String packname = sp.packageName();
+		String t, name;
+		Class<? extends SCommand>[] sc = sp.ref();
+		CommandInfo ci;
+		
+		for(Class<? extends SCommand> s : sc) {
+			ci = s.getDeclaredAnnotation(CommandInfo.class);
+			name = ci.name();
+			if(cmd.containsKey(name)) {
+				logger(String.format("%s conflicted '%s'", "< ERROR >", name));
 				continue;
-			}else if((t = cl.getAnnotation(target.class)) != null) {
-				int i = Space.Version.compareTo/*<*/(t.value());
+			}else if((t = ci.targetVersion()) != null) {
+				int i = Space.Version.compareTo/*<*/(t);
 				if(i < 0) {
-					logger(String.format(" %s  not supported '%s' (current version : %s, require version : %s)", "< ERROR >", n, Space.Version, t.value()));
+					logger(String.format(" %s  not supported '%s' (current version : %s, require version : %s)", "< ERROR >", name, Space.Version, t));
 					continue;
 				}
 			}
-			cmd.put(n, s);
-			logger("< INFO > Command imported : ".concat(sframe.PackageName()).concat("::").concat(n));
-			versionMap.put(n, (v = cl.getAnnotation(version.class)) != null? v.value() : "0.0.1");
+			try {
+				cmd.put(name, s.getConstructor().newInstance());
+			} catch (Exception e) {
+				logger("< ERROR > cannot access command : ".concat(packname.concat(name)));
+				continue;
+			}
+			logger("< INFO > Command imported : ".concat(packname).concat("::").concat(name));
+			versionMap.put(name, ci.version());
 		}
-		desc.put(sframe.PackageName(), sframe.getDescription());
+		desc.put(packname, sp.description());
 	}
 	/**
 	 * check whether name is exist.
@@ -206,7 +217,15 @@ public class SManager {
 			logger("< INFO > parser was not selected. switching to default parser...");
 			sparser = new DefaultParser();
 		}
-		if(!open)open = !open;
+		if(iostream.out == null) {
+			logger("< INFO > outputstream was not selected. switching to system.out...");
+			iostream.out = System.out;
+		}
+		if(iostream.in == null) {
+			logger("< INFO > inputstream was not selected. switching to system.in...");
+			iostream.in = new Scanner(System.in);
+		}
+		open = !open;
 		logger("< INFO > Sprexor setup successful");
 	}
 	/**
@@ -233,26 +252,16 @@ public class SManager {
 		listObject.add(str);
 		cmd.put(str, cp);
 	}
-	/**
-	 * 
-	 * @param c : define annotate identifier character.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
-	 * @since 0.1.5
-	 */
-	public void setComment(char c) {
-		if(open) return;
-		if(c != '\0') comment = c;
-	}
 	
 	public SManager copySprexor() {
 		SManager newInstance = new SManager();
 		newInstance.cmd = cmd;
-		newInstance.comment = comment;
 		newInstance.desc = desc;
 		newInstance.doBasicSyn = doBasicSyn;
 		newInstance.envVar = envVar;
 		newInstance.iostream = iostream;
 		newInstance.label = label;
+		newInstance.iostream = iostream;
 		return newInstance;
 	}
 	
@@ -298,6 +307,10 @@ public class SManager {
 				f.createNewFile();
 			} catch (IOException e) { }
 		}
+	}
+	
+	public int exec(SCommand com, String[] args) {
+		return com.main(iostream, new SParameter(args), this);
 	}
 	/**
 	 * execute command line lightly.
@@ -353,10 +366,10 @@ public class SManager {
 		String[] lists = split(options, ';');
 		if(lists.length > 1 && indexOf("BASIC", lists)) throw new SprexorException(SprexorException.INTERNAL_ERROR, SOutputs.bsp);
 		boolean vari = indexOf("USE_VARIABLE", lists);
-		boolean com = indexOf("USE_COMMENT", lists);
 		boolean wrap = indexOf("WRAP_NAME", lists);
 		boolean debug = indexOf("DEBUG",lists);
 		boolean alias = indexOf("ALIAS", lists);
+		boolean varid = indexOf("ALLOW_VAR_IN_ID", lists);
 		
 		int nn = 0;
 		String id = "";
@@ -394,7 +407,7 @@ public class SManager {
 			nn = ii;
 			id = sb.toString();
 		}else {
-			id = input.split(" ")[0];
+			id = varid && vari && input.startsWith("@")? envVar.get(input.split(" ")[0]).toString() : input.split(" ")[0];
 			nn = id.length();
 		}
 		
@@ -413,29 +426,33 @@ public class SManager {
 						continue;
 					}else if(c == '"'){
 						byte bl = 1;
-						while(++ allCount < comar.length) {
-							c = comar[allCount];
-							if(c == '\\') {
-								try {
-								char nextChar = comar[++ allCount];
-								cache.append(switch (nextChar) {
-								case 't' -> '\t';
-								case 'n' -> '\n';
-								case '"' -> '"';
-								case '\\' -> '\\';
-								default -> nextChar;
-								});
-								continue;
-								}catch(Exception e) {
-									logger("< CRITICAL > invalid expression  : " + cache.toString());
-									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										SOutputs.syn);
-								}
-							}else if(c == '"'){
-								bl = 0;
-								break;
-							}else cache.append(c);
-						}
+						try {
+							while(++ allCount < comar.length) {
+								c = comar[allCount];
+								if(c == '\\') {
+									char nextChar = comar[++ allCount];
+									cache.append(switch (nextChar) {
+									case 't' -> '\t';
+									case 'n' -> '\n';
+									case '"' -> '"';
+									case '\\' -> '\\';
+									default -> nextChar;
+									});
+									continue;
+								
+								}else if(c == '"'){
+									bl = 0;
+									break;
+								}else if(c == varChar) {
+									
+								} else cache.append(c);
+							}
+							
+						}catch(Exception e) {
+							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							throw new SprexorException(SprexorException.EXPRSS_ERR, 
+								SOutputs.syn);
+							}
 						if(bl == 1) {
 							logger("< CRITICAL > invalid expression  : " + cache.toString());
 							throw new SprexorException(SprexorException.EXPRSS_ERR, 
@@ -444,28 +461,41 @@ public class SManager {
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
-						while(++ allCount < comar.length) {
-							c = comar[allCount];
-							if(c == '\\') {
-								try {
-								char nextChar = comar[++ allCount];
-								cache.append(switch (nextChar) {
-								case 't' -> '\t';
-								case 'n' -> '\n';
-								case '"' -> '"';
-								case '\\' -> '\\';
-								default -> nextChar;
-								});
-								continue;
-								}catch(Exception e) {
-									logger("< CRITICAL > invalid expression  : " + cache.toString());
-									throw new SprexorException(SprexorException.EXPRSS_ERR, 
-										SOutputs.syn);
-								}
-							}else if(c == '\''){
-								bl = 0;
-								break;
-							}else cache.append(c);
+						try {
+							boolean varm = false;
+							StringBuilder vn = new StringBuilder();
+							while(++ allCount < comar.length) {
+								c = comar[allCount];
+								if(c == '\\') {
+									if(varm) {
+										varm = false;
+										
+										//
+										//next start
+										//
+										
+										cache.append(findv(vn.toString()));
+									}
+									char nextChar = comar[++ allCount];
+									cache.append(switch (nextChar) {
+									case 't' -> '\t';
+									case 'n' -> '\n';
+									case '"' -> '"';
+									case '\\' -> '\\';
+									default -> nextChar;
+									});
+									
+								}else if(c == '\''){
+									bl = 0;
+									break;
+								}else if(c == varChar) {
+									varm = true;
+							} else cache.append(c);
+						}
+						}catch(Exception e) {
+							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							throw new SprexorException(SprexorException.EXPRSS_ERR, 
+								SOutputs.syn);
 						}
 						if(bl == 1) {
 							logger("< CRITICAL > invalid expression  : " + cache.toString());
@@ -473,12 +503,12 @@ public class SManager {
 								SOutputs.syn);
 						};
 						continue; 
-					} else if(c == '@') {
+					} else if(c == varChar) {
 						if(vari) {
 							StringBuffer sb = new StringBuffer();
 							while(++ allCount < comar.length) {
 								c = comar[allCount];
-								if(c !=  ' ' && c != '@') {
+								if(c !=  ' ' && c != varChar) {
 									sb.append(c);
 								}else if(c == '@'){
 									if(args[count] == null) args[count] = "";
@@ -504,17 +534,6 @@ public class SManager {
 								throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
 							}
 							continue;
-						}
-					}else if(c == comment) { // comment (note)
-						if(com) {
-							while(++ allCount < comar.length) {
-								c = comar[allCount];
-								if(c == ';' || c == '\n') {
-									args = trimArr(args);
-									SParameter component = new SParameter(args);
-									if(cmd.containsKey(id)) return cmd.get(id).main(iostream, component, this);
-								}
-							}
 						}
 					}
 				cache.append(c);
@@ -555,87 +574,6 @@ public class SManager {
 		}
 		logger(String.format("< INFO > Program '%s' exit code : %d", id, exitCode));
 		return exitCode;
-	}
-	
-	{
-		iostream = new IOCenter();
-		this.iostream.out = new SprexorOstream((buf) -> {for(String s : buf)System.out.print(s);}) {
-
-			@Override
-			public void print(String msg) {
-				System.out.print(msg);
-			}
-			@Override
-			public void print(String msg, int Color) {
-				print(msg);
-			}
-			@Override
-			public void clear() {
-				
-			}
-			@Override
-			public void println(String msg) {
-				System.out.println(msg);
-			}
-			@Override
-			public void println(String msg, int Color) {
-				println(msg);
-			}
-			@Override
-			public void printf(String msg, Object... obj) {
-				System.out.print(String.format(msg, obj));
-			}
-		};
-		
-		this.iostream.in = new SprexorIstream() {
-
-			@Override
-			public void prompt() {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			@Override
-			public void prompt(String msg) {
-				char ch;
-				try {
-					System.out.println(msg);
-					while((ch = (char) System.in.read()) != delimiter) {
-						buffering(ch);
-					}
-				} catch (IOException e) {
-					
-				}
-			}
-			@Override
-			public void prompt(String msg, int Color) {
-				prompt(msg);
-			}
-			@Override
-			public String getln() {
-				char ch;
-				StringBuffer sb = new StringBuffer();
-				try {
-					while((ch = (char) System.in.read()) != '\n') {
-						sb.append(ch);
-					}
-				} catch (IOException e) {
-					return "";
-				}
-				return sb.toString();
-			}
-			@Override
-			public String getln(String msg) {
-				System.out.println(msg);
-				return getln();
-			}
-			@Override
-			public String getln(String msg, int Color) {
-				return getln(msg);
-			}
-		};
 	}
 	
 }

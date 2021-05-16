@@ -4,9 +4,9 @@ import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
-import sprexor.v2.components.annotations.name;
+import sprexor.v2.components.annotations.CommandInfo;
 
-@name("curl")
+@CommandInfo(name = "curl")
 public class UtlCurl implements SCommand {
 	@Override
 	public int main(IOCenter io, SParameter args, SManager Environment) {

@@ -4,9 +4,9 @@ import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
-import sprexor.v2.components.annotations.name;
+import sprexor.v2.components.annotations.CommandInfo;
 
-@name("javabridge")
+@CommandInfo(name = "javabridge")
 public class UtlJavaBridge implements SCommand {
 	
 	@Override

@@ -122,15 +122,6 @@ public class Nere {
 		 
 	}
 	
-	public void importNere(sprexor.v0.loadNere.BasicPackages.ImportTemplate t) {
-		if(configType != 0)return;
-		
-		cmd.putAll(t.cmds);
-		envVar.putAll(t.variables);
-		helpDB.putAll(t.help);
-		list += t.cmdLists;
-	}
-	
 	public void initScope() {
 		if(configType != 0)return;
 		if(gd != null)return;

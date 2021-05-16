@@ -10,7 +10,7 @@ public class Sprexorv2Test {
     @Test
     public void shouldAnswerWithTrue() {
         Scanner s = new Scanner(System.in);
-		SManager n = new SManager("C:\\Dev\\");
+		SManager n = new SManager("C:\\Dev");
 		n.use(BasicPackages.class);
 		n.setup();
 		try {

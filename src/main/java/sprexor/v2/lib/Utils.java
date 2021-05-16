@@ -7,31 +7,6 @@ import sprexor.SOutputs;
 import sprexor.v2.components.SCommand;
 
 public class Utils {
-	/**<pre>
-	 * quick array creator
-	 * <strong>issue : Type safety: Potential heap pollution 
-	 * 			via varargs parameter sc </strong></pre>
-	 * @param p 
-	 * @return Objects
-	 */
-	public static <T> T[] a(T...p) {
-		return p;
-	}
-	/**<pre>
-	 * quick array creator for SCommand
-	 * <strong>issue : Type safety: Potential heap pollution 
-	 * 			via varargs parameter sc </strong></pre>
-	 * @param p 
-	 * @return Objects
-	 */
-	public static SCommand[] a(Class<? extends SCommand>...sc) {
-		SCommand[] arr = new SCommand[sc.length];
-		int i = 0;
-		for(Class<? extends SCommand> cl : sc) {
-			arr[i ++ ] = g(cl);
-		}
-		return arr;
-	}
 	/**
 	 * get an instance for SCommand
 	 * @param sc

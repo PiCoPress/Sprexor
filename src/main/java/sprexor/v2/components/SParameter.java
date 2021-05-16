@@ -11,6 +11,7 @@ import java.util.Vector;
  */
 public class SParameter implements Iterable<String> {
 	private String[] v;
+	private String[] origin;
 	private Object[] reserved;
 	public String raw = "";
 	
@@ -51,6 +52,7 @@ public class SParameter implements Iterable<String> {
 	}
 	public SParameter(String[] v) {
 		this.v = v;
+		this.origin = v;
 		reserved = new Object[1024];
 	}
 	
@@ -67,8 +69,23 @@ public class SParameter implements Iterable<String> {
 	 * @param value - param values
 	 */
 	public void add(String value) {
+		if(value == null) return;
 		v = Arrays.copyOf(v, v.length + 1);
 		v[v.length - 1] = value;
+	}
+	
+	public void remove(int index) {
+		v[index] = null;
+		String[] tmp = new String[v.length - 1];
+		int i = 0;
+		for(String s : tmp) {
+			if(s != null) tmp[i ++] = s; 
+		}
+		v = tmp;
+	}
+	
+	public void recover() {
+		v = origin;
 	}
 	/**
 	 *Return all of arguments to string array. 
@@ -118,9 +135,7 @@ public class SParameter implements Iterable<String> {
 	public String[] getAllOption() {
 		ArrayList<String> arr = new ArrayList<String>();
 		for(String s : v) {
-			if(s.startsWith("-") && arr.contains(s)) {
-				arr.add(s.substring(s.startsWith("--") ? 2 : 1));
-			}
+			if(s.startsWith("-")) arr.add(s);
 		}
 		return arr.toArray(new String[arr.size()]);
 	}
@@ -132,13 +147,31 @@ public class SParameter implements Iterable<String> {
 	 */
 	public String[] getAllOption(String prefix) {
 		ArrayList<String> arr = new ArrayList<String>();
-		int size = prefix.length();
 		for(String s : v) {
-				arr.add(s.substring(size));
+				if(s.startsWith(prefix)) arr.add(s);
 			}
 		return arr.toArray(new String[arr.size()]);
 	}
 	
+	public boolean findOption(String[] names, int optIndex) {
+		String[] arr = getAllOption();
+		for(String u : arr) {
+			for(String n : names) {
+				if(u.contentEquals(n)) return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean findOption(String[] names, int optIndex, String prefix) {
+		String[] arr = getAllOption(prefix);
+		for(String u : arr) {
+			for(String n : names) {
+				if(u.contentEquals(n)) return true;
+			}
+		}
+		return false;
+	}
 	/**
 	 * the lagacy parser.
 	 * @param str string line

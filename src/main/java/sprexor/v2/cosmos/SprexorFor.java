@@ -5,11 +5,11 @@ import sprexor.v2.SManager;
 import sprexor.v2.SprexorException;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
-import sprexor.v2.components.annotations.name;
+import sprexor.v2.components.annotations.CommandInfo;
 import sprexor.v2.lib.Smt;
 import sprexor.v2.lib.Utils;
 
-@name("for")
+@CommandInfo(name = "for")
 public class SprexorFor implements SCommand {
 	private String help() {
 		return "USAGE : for [OPTION] [NUM] ARGS...[nnt]" +

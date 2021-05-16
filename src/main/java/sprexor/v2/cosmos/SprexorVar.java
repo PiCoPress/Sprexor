@@ -2,14 +2,13 @@ package sprexor.v2.cosmos;
 
 import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
-import sprexor.v2.IOCenter.TYPE;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
-import sprexor.v2.components.annotations.name;
+import sprexor.v2.components.annotations.CommandInfo;
 import sprexor.v2.lib.Smt;
 import sprexor.v2.lib.Utils;
 
-@name("var")
+@CommandInfo(name = "var")
 public class SprexorVar implements SCommand {
 	private static final String HELP = Smt.SMT_FORM("(!) : no action[n]"
 			+ "usage : var [ACTION] ...[nnt]"
@@ -20,7 +19,7 @@ public class SprexorVar implements SCommand {
 	@Override
 	public int main(IOCenter io, SParameter args, SManager Environment) {
 		if(!Environment.useVariableExpression()) { 
-		io.out.setType(TYPE.ERR);
+		System.err.println("ddd");
 		io.out.println("can nont use Variable : disabled");
 		return 1;
 	}
@@ -45,7 +44,6 @@ public class SprexorVar implements SCommand {
 			else Environment.putVariable(kk[0], kk[1]);
 		}
 		}catch(Exception e) {
-			io.out.setType(TYPE.ERR);
 			io.out.println("invalid declaring format");
 		}
 		break;

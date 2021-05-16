@@ -14,4 +14,17 @@ public interface SCommand {
 	 * @return int exit code
 	 */
 	public abstract int main(IOCenter io, SParameter args, SManager Environment);
+	
+	public default String[] strarray(String...a) {
+		return a;
+	}
+	
+	public default int indexOf(String[] arr, String e) {
+		int i = 0;
+		for(String s : arr) {
+			if(s.contentEquals(e)) return i;
+			i ++;
+		}
+		return -1;
+	}
 }

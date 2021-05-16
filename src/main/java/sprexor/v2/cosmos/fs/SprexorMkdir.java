@@ -5,14 +5,14 @@ import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
-import sprexor.v2.components.annotations.name;
+import sprexor.v2.components.annotations.CommandInfo;
 
-@name("mkdir")
+@CommandInfo(name = "mkdir")
 public class SprexorMkdir implements SCommand {
 	
 	@Override
 	public int main(IOCenter io, SParameter args, SManager Environment) {
-		String ks = Environment.SystemVar.getData("CURRENT_DIRECTORY").toString();
+		String ks = FS.currentDirectory(Environment);
 		File f;
 		for(String s : args) {
 			f = new File(s.toCharArray()[1] == ':' || s.startsWith("/")? s : ks.concat(File.separator).concat(s));

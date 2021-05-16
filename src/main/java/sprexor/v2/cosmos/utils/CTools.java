@@ -1,19 +1,9 @@
 package sprexor.v2.cosmos.utils;
 
-import sprexor.v2.components.SCommand;
-import sprexor.v2.components.SFrame;
-import sprexor.v2.lib.Utils;
+import sprexor.v2.components.Importable;
+import sprexor.v2.components.annotations.Spackage;
 
-public class CTools implements SFrame {
-
-	@Override
-	public String PackageName() {
-		return "tools";
-	}
-
-	@Override
-	public SCommand[] references() {
-		return Utils.<SCommand>a(new UtlJavaBridge(), new UtlCurl());
-	}
-
+@Spackage(packageName = "tools", ref = {UtlJavaBridge.class, JavaAdaptor.class, UtlCurl.class, UtlSprexor.class})
+public class CTools implements Importable {
+	
 }

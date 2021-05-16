@@ -1,19 +1,13 @@
 package sprexor.v2.cosmos.fs;
 
-import sprexor.v2.components.SCommand;
-import sprexor.v2.components.SFrame;
-import sprexor.v2.lib.Utils;
+import sprexor.v2.SManager;
+import sprexor.v2.components.Importable;
+import sprexor.v2.components.annotations.Spackage;
 
-public class FS implements SFrame {
-
-	@Override
-	public String PackageName() {
-		return "fs";
+@Spackage(packageName = "fs", ref = {SprexorChangeD.class, SprexorMkdir.class, SprexorRm.class, SprexorLs.class})
+public class FS implements Importable {
+	
+	public static String currentDirectory(SManager s) {
+		return s.SystemVar.getData("CURRENT_DIRECTORY").toString();
 	}
-
-	@Override
-	public SCommand[] references() {
-		return Utils.<SCommand>a(new SprexorChangeD(), new SprexorMkdir(), new SprexorRm());
-	}
-
 }
