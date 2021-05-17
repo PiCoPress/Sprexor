@@ -34,8 +34,7 @@ It has a lot of libraries, functions, and customizing tools to use in many of pu
 
 ## How to use 
 `Requirement : JDK-14.0.2`
-
-[Download JDK14](https://www.oracle.com/kr/java/technologies/javase/jdk14-archive-downloads.html)
+<a href="https://www.oracle.com/kr/java/technologies/javase/jdk14-archive-downloads.html" target="_blank">Download JDK14</a>
 
 There are two ways how to use Sprexor.
 
