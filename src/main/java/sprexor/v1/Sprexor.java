@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+
+import sprexor.SprexorException;
 import sprexor.v1.IOCenter.TYPE;
 import sprexor.v1.lib.Smt;
 import sprexor.v1.lib.Utils;

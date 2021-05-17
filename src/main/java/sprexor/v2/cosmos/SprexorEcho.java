@@ -13,7 +13,7 @@ public class SprexorEcho implements SCommand {
 	public int main(IOCenter io, SParameter args, SManager Environment) {
 		StringBuilder sb = new StringBuilder();
 		for(String str : args) {
-			sb.append(str);
+			sb.append(str).append(' ');
 		}
 		io.out.println(sb.toString());
 		return 0;

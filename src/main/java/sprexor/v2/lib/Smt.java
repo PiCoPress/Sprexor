@@ -12,8 +12,8 @@ public class Smt {
 				count = 0,
 				leng = v.length();
 		char ch;
-		String buffer = "",
-				result = "";
+		StringBuilder buffer = new StringBuilder(),
+				result = new StringBuilder();
 		boolean toFront = false,
 				open = false;;
 		while(v.length() > cursorIndex) {
@@ -24,14 +24,14 @@ public class Smt {
 			}
 			if(toFront) {
 				if(ch != '[') {
-					buffer = st.peek().toString() + buffer;
+					buffer.insert(0, st.peek().toString());
 					st.pop();
 					cursorIndex --;
 					continue;
 				}else {
-					if(buffer.matches("^[^nt]+[^nt]*$")) {
-						result += "[" + buffer + "]";
-						buffer = "";
+					if(iont(buffer.toString())) {
+						result.append("[" + buffer + "]");
+						buffer.setLength(0);
 						toFront = false;
 						cursorIndex = toIndex;
 						cursorIndex ++;
@@ -39,8 +39,8 @@ public class Smt {
 					}
 					toFront = false;
 					cursorIndex = toIndex;
-					result += buffer.replaceAll("n", "\n").replaceAll("t", "\t");
-					buffer = "";
+					result.append(buffer.toString().replaceAll("n", "\n").replaceAll("t", "\t"));
+					buffer.setLength(0);
 					cursorIndex ++;
 					continue;
 				}
@@ -55,8 +55,15 @@ public class Smt {
 			st.push(ch);
 			if(ch == '[') open = true;
 			cursorIndex ++;
-			if(!open) result += ch;
+			if(!open) result.append(ch);
 		}
-		return result;
+		return result.toString();
+	}
+	private static boolean iont(String s) {
+		char[] caa = s.toCharArray();
+		for(char c : caa) {
+			if(c != 't' && c != 'n') return true;
+		}
+		return false;
 	}
 }

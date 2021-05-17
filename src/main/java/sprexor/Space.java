@@ -4,9 +4,7 @@ import sprexor.v1.CommandFactory;
 import sprexor.v1.CommandProvider;
 import sprexor.v1.Sprexor;
 import sprexor.v2.SManager;
-import sprexor.v2.SprexorException;
-import sprexor.v2.components.SCommand;
-import sprexor.v2.components.SFrame;
+import sprexor.v2.components.Importable;
 
 public class Space {
 	static public String Version = "1.0.0";
@@ -20,7 +18,7 @@ public class Space {
 		try {
 			sp.activate();
 			return sp.exec(s);
-		} catch (sprexor.v1.SprexorException e) {
+		} catch (SprexorException e) {
 			e.printStackTrace();
 			return 1;
 		}
@@ -36,42 +34,17 @@ public class Space {
 		try {
 			sp.activate();
 			return sp.exec(s);
-		} catch (sprexor.v1.SprexorException e) {
-			e.printStackTrace();
-			return 1;
-		}
-	}
-	
-	static public int instantRun(SFrame[] sf, String s) {
-		SManager ins = new SManager();
-		for(SFrame k : sf) {
-			ins.use(k.getClass());
-		}
-		ins.setup();
-		try {
-			return ins.exec(s);
 		} catch (SprexorException e) {
 			e.printStackTrace();
 			return 1;
 		}
 	}
 	
-	static public int instantRun(SCommand[] sf, String s) {
+	static public int instantRun(String s, Class<? extends Importable>...sf) {
 		SManager ins = new SManager();
-		SFrame k = new SFrame() {
-			
-			@Override
-			public String PackageName() {
-				return "instant-package";
-			}
-
-			@Override
-			public SCommand[] references() {
-				return sf;
-			}
-			
-		};
-		ins.use(k.getClass());
+		for(Class<? extends Importable> k : sf) {
+			ins.use(k);
+		}
 		ins.setup();
 		try {
 			return ins.exec(s);

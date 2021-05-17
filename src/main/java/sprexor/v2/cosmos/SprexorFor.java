@@ -2,7 +2,7 @@ package sprexor.v2.cosmos;
 
 import sprexor.v2.IOCenter;
 import sprexor.v2.SManager;
-import sprexor.v2.SprexorException;
+import sprexor.SprexorException;
 import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
 import sprexor.v2.components.annotations.CommandInfo;

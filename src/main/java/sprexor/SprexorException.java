@@ -1,6 +1,4 @@
-package sprexor.v2;
-
-import sprexor.SOutputs;
+package sprexor;
 
 public class SprexorException extends Exception {
 	

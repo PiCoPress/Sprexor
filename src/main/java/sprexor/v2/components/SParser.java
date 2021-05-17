@@ -1,6 +1,6 @@
 package sprexor.v2.components;
 
-import sprexor.v2.SprexorException;
+import sprexor.SprexorException;
 
 public interface SParser {
 	public String id(String str);

@@ -22,10 +22,6 @@ public class BasicPackages implements CommandFactory{
 				"2. repeat : Repeat the text.";
 	}
 	@Override
-	public CommandFactory[] referenceClass() {
-		return Utils.toCFClass(this, new For()); //Tools.toCFClasses();
-	}
-	@Override
 	public int code(IOCenter io, Sprexor SprexorInstance) {
 		Component args = io.getComponent();
 		String tmp = Utils.arg2String(Utils.excludeArr(args.get(), 0));

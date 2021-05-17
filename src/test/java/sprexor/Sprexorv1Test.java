@@ -3,7 +3,6 @@ package sprexor;
 import java.util.Scanner;
 import org.junit.Test;
 import sprexor.v1.Sprexor;
-import sprexor.v1.SprexorException;
 
 public class Sprexorv1Test {
 	@Test

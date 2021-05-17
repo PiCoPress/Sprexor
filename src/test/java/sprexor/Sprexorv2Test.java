@@ -2,8 +2,8 @@ package sprexor;
 
 import java.util.Scanner;
 import org.junit.Test;
-
-import sprexor.v2.cosmos.BasicPackages;
+import sprexor.v2.cosmos.Std;
+import sprexor.v2.cosmos.utils.CTools;
 import sprexor.v2.SManager;
 
 public class Sprexorv2Test {
@@ -11,7 +11,7 @@ public class Sprexorv2Test {
     public void shouldAnswerWithTrue() {
         Scanner s = new Scanner(System.in);
 		SManager n = new SManager("C:\\Dev");
-		n.use(BasicPackages.class);
+		n.use(Std.class, CTools.class);
 		n.setup();
 		try {
 			while(true) {

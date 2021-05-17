@@ -13,6 +13,7 @@ import java.util.Vector;
 
 import sprexor.SOutputs;
 import sprexor.Space;
+import sprexor.SprexorException;
 import sprexor.v0.GlobalData;
 import sprexor.v2.components.Importable;
 import sprexor.v2.components.SCommand;
@@ -27,7 +28,7 @@ import sprexor.v2.standard.DefaultParser;
 public class SManager {
 	
 	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
-	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "WRAP_NAME", "DEBUG", "ALIAS", "ALLOW_VAR_IN_ID"};
+	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "WRAP_NAME", "DEBUG", "ALIAS"};
 	public Object label;
 	public GlobalData SystemVar;
 	private boolean open = false;
@@ -146,10 +147,7 @@ public class SManager {
 		varChar = prefix;
 	}
 	/**
-	 * importSprex is get command context(s) that created with class in this sprexor.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
-	 * @param cmp : Other class that implemented with CommandProvider
-	 * @since 0.2.3
+	 * 
 	 */
 	public void use(Class<? extends Importable> imp) {
 		if(open)return;
@@ -185,12 +183,78 @@ public class SManager {
 		}
 		desc.put(packname, sp.description());
 	}
+	
 	/**
-	 * check whether name is exist.
-	 * <br><b><span style="color:ff00ff">SIGN : It can be used after activate.</span></b>
-	 * @param s - command name.
-	 * @return return true if command name(s) is exist, other case false.
-	 * @since 0.2.0
+	 * 
+	 */
+	public void use(Class<? extends Importable>...impa) {
+		if(open)return;
+		
+		for(Class<? extends Importable>  cc : impa) {
+			Spackage sp = cc.getAnnotation(Spackage.class);
+			
+			String packname = sp.packageName();
+			String t, name;
+			Class<? extends SCommand>[] sc = sp.ref();
+			CommandInfo ci;
+			
+			for(Class<? extends SCommand> s : sc) {
+				ci = s.getDeclaredAnnotation(CommandInfo.class);
+				name = ci.name();
+				if(cmd.containsKey(name)) {
+					logger(String.format("%s conflicted '%s'", "< ERROR >", name));
+					continue;
+				}else if((t = ci.targetVersion()) != null) {
+					int i = Space.Version.compareTo/*<*/(t);
+					if(i < 0) {
+						logger(String.format(" %s  not supported '%s' (current version : %s, require version : %s)", "< ERROR >", name, Space.Version, t));
+						continue;
+					}
+				}
+				try {
+					cmd.put(name, s.getConstructor().newInstance());
+				} catch (Exception e) {
+					logger("< ERROR > cannot access command : ".concat(packname.concat(name)));
+					continue;
+				}
+				logger("< INFO > Command imported : ".concat(packname).concat("::").concat(name));
+				versionMap.put(name, ci.version());
+			}
+			desc.put(packname, sp.description());
+		}
+	}
+	/**
+	 * 
+	 */
+	public void useR(Class<? extends Importable> imp) {
+		if(!open) return;
+		Spackage sp = imp.getAnnotation(Spackage.class);
+		String packname = sp.packageName();
+		String t, name;
+		Class<? extends SCommand>[] sc = sp.ref();
+		CommandInfo ci;
+		for(Class<? extends SCommand> s : sc) {
+			ci = s.getDeclaredAnnotation(CommandInfo.class);
+			name = ci.name();
+			if(cmd.containsKey(name)) {
+				continue;
+			}else if((t = ci.targetVersion()) != null) {
+				int i = Space.Version.compareTo(t);
+				if(i < 0) {
+					continue;
+				}
+			}
+			try {
+				cmd.put(name, s.getConstructor().newInstance());
+			} catch (Exception e) {
+				continue;
+			}
+			versionMap.put(name, ci.version());
+		}
+		desc.put(packname, sp.description());
+	}
+	/**
+	 * 
 	 */
 	public boolean isExist(String s) {
 		if(!open)return false;
@@ -224,6 +288,9 @@ public class SManager {
 		if(iostream.in == null) {
 			logger("< INFO > inputstream was not selected. switching to system.in...");
 			iostream.in = new Scanner(System.in);
+		}
+		if(iostream.err == null) {
+			iostream.err = System.err;
 		}
 		open = !open;
 		logger("< INFO > Sprexor setup successful");
@@ -363,13 +430,13 @@ public class SManager {
 		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		if(options.contentEquals("BASIC")) return exec(input);
 		input = input.trim();
+		options = options.toUpperCase();
 		String[] lists = split(options, ';');
 		if(lists.length > 1 && indexOf("BASIC", lists)) throw new SprexorException(SprexorException.INTERNAL_ERROR, SOutputs.bsp);
 		boolean vari = indexOf("USE_VARIABLE", lists);
 		boolean wrap = indexOf("WRAP_NAME", lists);
 		boolean debug = indexOf("DEBUG",lists);
 		boolean alias = indexOf("ALIAS", lists);
-		boolean varid = indexOf("ALLOW_VAR_IN_ID", lists);
 		
 		int nn = 0;
 		String id = "";
@@ -407,7 +474,6 @@ public class SManager {
 			nn = ii;
 			id = sb.toString();
 		}else {
-			id = varid && vari && input.startsWith("@")? envVar.get(input.split(" ")[0]).toString() : input.split(" ")[0];
 			nn = id.length();
 		}
 		
@@ -420,16 +486,23 @@ public class SManager {
 			for(;allCount < comar.length; allCount ++) {
 				c = comar[allCount];
 				if(c == ' ') {
-						if(cache.length() == 0)continue;
+						if(cache.length() == 0) continue;
 						args[count ++] = cache.toString();
 						cache.setLength(0);
 						continue;
 					}else if(c == '"'){
 						byte bl = 1;
+						boolean varm = false;
+						StringBuilder sb = new StringBuilder();
 						try {
 							while(++ allCount < comar.length) {
 								c = comar[allCount];
 								if(c == '\\') {
+									if(varm) {
+										varm = false;
+										cache.append(findv(sb.toString()));
+										sb.setLength(0);
+									}
 									char nextChar = comar[++ allCount];
 									cache.append(switch (nextChar) {
 									case 't' -> '\t';
@@ -442,39 +515,49 @@ public class SManager {
 								
 								}else if(c == '"'){
 									bl = 0;
+									if(varm) cache.append(findv(sb.toString()));
+									varm = false;
 									break;
 								}else if(c == varChar) {
-									
-								} else cache.append(c);
+									if(!varm) {
+										varm = true;
+									} else {
+										cache.append(findv(sb.toString()));
+										sb.setLength(0);
+									}
+								}else if(((c + "").matches("\\W")) && varm) {
+									cache.append(findv(sb.toString())).append(c);
+									sb.setLength(0);
+									varm = false;
+								}else {
+									if(varm) sb.append(c); else cache.append(c);
+								}
 							}
 							
 						}catch(Exception e) {
-							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							e.printStackTrace();
+							logger("< CRITICAL > invalid expression  : " + cache.toString().concat(" # " + allCount));
 							throw new SprexorException(SprexorException.EXPRSS_ERR, 
 								SOutputs.syn);
 							}
 						if(bl == 1) {
-							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							logger("< CRITICAL > invalid expression  : " + cache.toString().concat("# " + allCount));
 							throw new SprexorException(SprexorException.EXPRSS_ERR, 
 								SOutputs.syn);
 						}
 						continue;
 					}else if(c == '\'') {
 						byte bl = 1;
+						boolean varm = false;
+						StringBuilder sb = new StringBuilder();
 						try {
-							boolean varm = false;
-							StringBuilder vn = new StringBuilder();
 							while(++ allCount < comar.length) {
 								c = comar[allCount];
 								if(c == '\\') {
 									if(varm) {
 										varm = false;
-										
-										//
-										//next start
-										//
-										
-										cache.append(findv(vn.toString()));
+										cache.append(findv(sb.toString()));
+										sb.setLength(0);
 									}
 									char nextChar = comar[++ allCount];
 									cache.append(switch (nextChar) {
@@ -484,21 +567,34 @@ public class SManager {
 									case '\\' -> '\\';
 									default -> nextChar;
 									});
-									
+									continue;
+								
 								}else if(c == '\''){
 									bl = 0;
+									if(varm) cache.append(findv(sb.toString()));
+									varm = false;
 									break;
 								}else if(c == varChar) {
-									varm = true;
-							} else cache.append(c);
-						}
+									if(!varm) {
+										varm = true;
+									} else {
+										cache.append(findv(sb.toString()));
+										sb.setLength(0);
+									}
+								}else if(((c + "").matches("\\W")) && varm) {
+										cache.append(findv(sb.toString())).append(c);
+										sb.setLength(0);
+								} else {
+									if(varm) sb.append(c); else cache.append(c);
+								}
+							}
 						}catch(Exception e) {
-							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							logger("< CRITICAL > invalid expression  : " + cache.toString().concat(" # " + allCount));
 							throw new SprexorException(SprexorException.EXPRSS_ERR, 
 								SOutputs.syn);
 						}
 						if(bl == 1) {
-							logger("< CRITICAL > invalid expression  : " + cache.toString());
+							logger("< CRITICAL > invalid expression  : " + cache.toString().concat(" # " + allCount));
 							throw new SprexorException(SprexorException.EXPRSS_ERR, 
 								SOutputs.syn);
 						};
@@ -510,7 +606,7 @@ public class SManager {
 								c = comar[allCount];
 								if(c !=  ' ' && c != varChar) {
 									sb.append(c);
-								}else if(c == '@'){
+								}else if(c == varChar){
 									if(args[count] == null) args[count] = "";
 									String tmp = sb.toString();
 									if(envVar.containsKey(tmp)) args[count] += envVar.get(tmp).toString();

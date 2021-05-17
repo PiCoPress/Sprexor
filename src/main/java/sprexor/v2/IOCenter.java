@@ -12,6 +12,7 @@ public class IOCenter {
 	public Object label;
 	//
 	public PrintStream out;
+	public PrintStream err;
 	public Scanner in;
 	//
 	public Utils utils;

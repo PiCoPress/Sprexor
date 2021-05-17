@@ -133,10 +133,12 @@ public class SParameter implements Iterable<String> {
 	 * @return String[]
 	 */
 	public String[] getAllOption() {
+		
 		ArrayList<String> arr = new ArrayList<String>();
 		for(String s : v) {
 			if(s.startsWith("-")) arr.add(s);
 		}
+		if(arr.size() < 1) return strarray("");
 		return arr.toArray(new String[arr.size()]);
 	}
 	
@@ -358,5 +360,9 @@ public class SParameter implements Iterable<String> {
 				return v[ cursor ++ ];
 			}
 		};
+	}
+	
+	private String[] strarray(String...s) {
+		return s;
 	}
 }
