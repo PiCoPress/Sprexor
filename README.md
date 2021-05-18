@@ -1,7 +1,7 @@
 <!--Stable mark : <b><span style="color:78a094">Stable</span></b>-->
 <!--Latest mark : <b><span style="color:f478cd">Latest</span></b>-->
 
-<img src='./docs/img/Sprexor_mono.png' width='400'>
+<img src='https://raw.githubusercontent.com/PiCoPress/Sprexor/master/docs/img/Sprexor_mono.png' width='400'>
 
 # Sprexor Application Framework
 Sprexor is Framework that manages and runs command line in Java.
