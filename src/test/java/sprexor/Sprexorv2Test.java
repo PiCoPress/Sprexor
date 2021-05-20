@@ -8,7 +8,7 @@ import sprexor.v2.SManager;
 
 public class Sprexorv2Test {
     @Test
-    public void shouldAnswerWithTrue() {
+    public void t() {
         Scanner s = new Scanner(System.in);
 		SManager n = new SManager("C:\\Dev");
 		n.use(Std.class, CTools.class);

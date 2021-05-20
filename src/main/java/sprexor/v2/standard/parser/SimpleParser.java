@@ -1,4 +1,4 @@
-package sprexor.v2.standard;
+package sprexor.v2.standard.parser;
 
 import sprexor.SprexorException;
 import sprexor.v2.components.SParser;

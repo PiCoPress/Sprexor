@@ -20,7 +20,7 @@ import sprexor.v2.components.SCommand;
 import sprexor.v2.components.SParameter;
 import sprexor.v2.components.SParser;
 import sprexor.v2.components.annotations.*;
-import sprexor.v2.standard.DefaultParser;
+import sprexor.v2.standard.parser.DefaultParser;
 
 /*
  * Sprexor : Command Executor 1.0.0
@@ -304,11 +304,7 @@ public class SManager {
 	}
 	/**
 	 * @deprecated
-	 * This method Register a command. Registring command name shouldn't be included special character like *, ^ etc...
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
-	 * @param str : command name that should not be contained special characters. 
-	 * @param cp : CommandProvider
-	 * @param hd : helping message is used in basic command - help.
+	 * replaced by {@link SManager#use(Class)} 
 	 * @since 0.1
 	 */
 	@Deprecated
@@ -316,7 +312,6 @@ public class SManager {
 		if(open) return;
 		else if(isExist(str) || str.isEmpty()) return;
 		else if(ignoreCase) str.toLowerCase();
-		listObject.add(str);
 		cmd.put(str, cp);
 	}
 	

@@ -9,8 +9,8 @@ import java.util.Vector;
 
 import sprexor.SprexorException;
 import sprexor.v1.IOCenter.TYPE;
-import sprexor.v1.lib.Smt;
 import sprexor.v1.lib.Utils;
+import sprexor.v2.lib.Smt;
 
 /*
  * Sprexor : Command Executor 1.0.0

@@ -1,4 +1,4 @@
-package sprexor.v2.standard;
+package sprexor.v2.standard.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
