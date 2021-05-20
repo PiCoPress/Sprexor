@@ -14,8 +14,6 @@ public class DefaultParser implements SParser {
 	public String[] processing(String com) throws SprexorException {
 		if(com.isBlank()) return null;
 		com = com.trim();
-		
-		com = com.substring(split(com, ' ')[0].length());
 		final char[] comar = com.toCharArray();
 		String[] args = new String[comar.length];
 		byte count = 0;
@@ -80,7 +78,7 @@ public class DefaultParser implements SParser {
 		
 		if(cache.length() != 0) args[count] = cache.toString();
 		args = trimArr(args);
-		return null;
+		return args;
 	}
 	
 	@Override

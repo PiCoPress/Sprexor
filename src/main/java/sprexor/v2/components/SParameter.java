@@ -51,6 +51,10 @@ public class SParameter implements Iterable<String> {
 		}
 	}
 	public SParameter(String[] v) {
+		if(v == null) {
+			String[] s = {""};
+			v = s;
+		}
 		this.v = v;
 		this.origin = v;
 		reserved = new Object[1024];

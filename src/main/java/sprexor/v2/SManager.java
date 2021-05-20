@@ -384,7 +384,7 @@ public class SManager {
 	public int exec(String id, String[] args) throws SprexorException {
 		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
 		
-		if(!isExist(id)) {
+		if(isExist(id) == false) {
 			logger("< CRITICAL > Command not found : " + id);
 			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
 		}
@@ -403,11 +403,11 @@ public class SManager {
 		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
 		
 		String id = sparser.id(com);
-		if(isExist(id)) {
+		if(!isExist(id)) {
 			logger("< CRITICAL > Command not found : " + id);
 			throw new SprexorException(SprexorException.CMD_NOT_FOUND, id);
 		}
-		com = com.substring(id.length() + 1);
+		com = com.substring(id.length()).trim();
 		SParameter component = new SParameter(sparser.processing(com));
 		return cmd.get(id).main(iostream, component, this);
 	}
@@ -469,6 +469,7 @@ public class SManager {
 			nn = ii;
 			id = sb.toString();
 		}else {
+			id = split(input, ' ')[0];
 			nn = id.length();
 		}
 		

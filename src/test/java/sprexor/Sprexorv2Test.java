@@ -17,7 +17,7 @@ public class Sprexorv2Test {
 			while(true) {
 				String ss = s.nextLine();
 				if(ss.trim().contentEquals("exit"))break;
-				n.run(ss, "USE_VARIABLE;USE_COMMENT;WRAP_NAME;DEBUG");
+				n.run(ss, "USE_VARIABLE;WRAP_NAME;DEBUG");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
