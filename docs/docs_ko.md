@@ -1,6 +1,6 @@
 # 스프렉서 (Sprexor) - 0.2.19
 
-[0.2.19 수정사항](./changeLog/0.2.19.md)
+<!==[1.0.0 수정사항](./changeLog/1.0.0.md)-->
 
 **목차**
 1. [Sprexor](#sprexor)
@@ -13,7 +13,6 @@
 10. [SprexorOstream](#sprexorostream)
 11. [SprexorIstream](#sprexoristream)
 12. [Standard Commands](#standard-commands)
-13. [예시코드보기](../test.java)
 
 
 #### Sprexor

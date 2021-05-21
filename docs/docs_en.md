@@ -1,6 +1,6 @@
-Sprexor - 0.2.19
+Sprexor - 1.0.0
 =================
-[Updated Things](./changeLog/0.2.19.md)
+<!--[Updated Things](./changeLog/0.2.19.md)-->
 
 
 **index**
@@ -14,7 +14,6 @@ Sprexor - 0.2.19
 10. [SprexorOstream](#sprexorostream)
 11. [SprexorIstream](#sprexoristream)
 12. [Standard Commands](#standard-commands)
-13. [See example code](../test.java)
 
 
 #### Sprexor

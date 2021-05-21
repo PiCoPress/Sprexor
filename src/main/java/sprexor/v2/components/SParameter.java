@@ -6,21 +6,29 @@ import java.util.Iterator;
 import java.util.Vector;
 
 /**
- * SParameter is useful argument managing tool for Sprexor.
- * @since 0.2.18
+ * Iterable class for manage parameters of command.
+ * <p>
+ * There is many methods about command option moreover, 
+ * can setting each parameter via {@link sprexor.v2.components.SParameter.Unit Unit} class. 
+ * 
+ * @since 0.2
  */
-public class SParameter implements Iterable<String> {
+public final class SParameter implements Iterable<String> {
 	private String[] v;
 	private String[] origin;
 	private Object[] reserved;
+	
+	/**
+	 * original string before parsing.
+	 * <p>
+	 * It might not be pure value, so use {@link #toString()} method.
+	 */
 	public String raw = "";
 	
 	/**
-	 * This Unit Class provide methods for a unit of Arguments.
-	 * @since 0.2.18
-	 * @version 1.0
+	 * Unit class has a parameter information.
 	 */
-	public class Unit{
+	public final class Unit{
 		String k = "";
 		int index;
 		public Object label;
@@ -35,7 +43,12 @@ public class SParameter implements Iterable<String> {
 		}
 		/**
 		 * get a element of previous index
-		 * @return Unit
+		 * <p>
+		 * If array is {"a", "b", "c"} and pointing index is 1 : "b",
+		 * <br>
+		 * prev() pointing 0 : "a"
+		 * 
+		 * @return Unit If present index is valid, else null (index = 0)
 		 */
 		public Unit prev() {
 			if(index <= 0) return null;
@@ -43,6 +56,12 @@ public class SParameter implements Iterable<String> {
 		}
 		/**
 		 * get a element of next index
+		 * <p>
+		 * If array is {"a", "b", "c"} and pointing index is 1 : "b",
+		 * <br>
+		 * next() pointing 2 : "c"
+		 * 
+		 * @return Unit If present index is valid, else null (index = last index)
 		 * @return Unit
 		*/
 		public Unit next() {
@@ -50,6 +69,7 @@ public class SParameter implements Iterable<String> {
 			return new Unit(v[index + 1], index + 1);
 		}
 	}
+	
 	public SParameter(String[] v) {
 		if(v == null) {
 			String[] s = {""};
@@ -68,9 +88,11 @@ public class SParameter implements Iterable<String> {
 		}
 		return sb.toString();
 	}
+	
 	/**
-	 * Add new argument at last index.
-	 * @param value - param values
+	 * Add new element at last index.
+	 * 
+	 * @param value parameter value
 	 */
 	public void add(String value) {
 		if(value == null) return;
@@ -78,6 +100,11 @@ public class SParameter implements Iterable<String> {
 		v[v.length - 1] = value;
 	}
 	
+	/**
+	 * remove a element in all parameters
+	 * 
+	 * @param index to remove
+	 */
 	public void remove(int index) {
 		v[index] = null;
 		String[] tmp = new String[v.length - 1];
@@ -88,18 +115,26 @@ public class SParameter implements Iterable<String> {
 		v = tmp;
 	}
 	
+	/**
+	 * When arguments need to recover because of methods 'add' and 'remove', it is helpful.
+	 * 
+	 */
 	public void recover() {
 		v = origin;
 	}
+	
 	/**
-	 *Return all of arguments to string array. 
-	 * @return
+	 *get all arguments including options. 
+	 *
+	 * @return string array
 	 */
 	public String[] getArrays() {
 		return v;
 	}
+	
 	/**
-	 * It returns the class Unit that manage each of elements.
+	 * get a unit selected index
+	 * 
 	 * @param i - index to get unit of arguments.
 	 * @return Unit Class
 	 */
@@ -108,19 +143,23 @@ public class SParameter implements Iterable<String> {
 		u.label = reserved[i];
 		return u;
 	}
+	
 	/**
+	 * get a element selected index
 	 * 
-	 * @param i - The index to get a element of arguments.
+	 * @param i
 	 * @return String
 	 */
 	public String getElement(int i) {
 		if(i < v.length) return v[i];
 		else return "";
 	}
+	
 	/**
-	 * It gets String by Ignoring option.
-	 * @param i
-	 * @return String
+	 * get a element selected index excluding options
+	 *
+	 * @param i index
+	 * @return , if param 'i' is out of boundary, returns last element
 	 */
 	public String getValidElement(int i) {
 		int c = 0;
@@ -130,11 +169,31 @@ public class SParameter implements Iterable<String> {
 				c ++;
 			}
 		}
-		return "";
+		return v[v.length - 1];
 	}
+	
 	/**
-	 * Return Options to Array in order.
-	 * @return String[]
+	 * get a element selected index excluding options
+	 *
+	 * @param i index
+	 * @param prefix
+	 * @return String, if param 'i' is out of boundary, returns last element
+	 */
+	public String getValidElement(int i, String prefix) {
+		int c = 0;
+		for(String s : v) {
+			if(!s.startsWith(prefix)) {
+				if(c == i) return s;
+				c ++;
+			}
+		}
+		return v[v.length - 1];
+	}
+	
+	/**
+	 * get all options
+	 * 
+	 * @return String array
 	 */
 	public String[] getAllOption() {
 		
@@ -147,7 +206,8 @@ public class SParameter implements Iterable<String> {
 	}
 	
 	/**
-	 * get all options specific prefix
+	 * get all options with specific prefix
+	 * 
 	 * @param prefix
 	 * @return string array
 	 */
@@ -159,6 +219,13 @@ public class SParameter implements Iterable<String> {
 		return arr.toArray(new String[arr.size()]);
 	}
 	
+	/**
+	 * check option is exist at selected optIndex
+	 * 
+	 * @param names String Array to apply
+	 * @param optIndex option index
+	 * @return boolean true if exist, else false
+	 */
 	public boolean findOption(String[] names, int optIndex) {
 		String[] arr = getAllOption();
 		for(String u : arr) {
@@ -169,6 +236,13 @@ public class SParameter implements Iterable<String> {
 		return false;
 	}
 	
+	/**
+	 * check option is exist at selected optIndex
+	 * 
+	 * @param names String Array to apply
+	 * @param optIndex option index
+	 * @return booelan boolean true if exist, else false
+	 */
 	public boolean findOption(String[] names, int optIndex, String prefix) {
 		String[] arr = getAllOption(prefix);
 		for(String u : arr) {
@@ -178,8 +252,10 @@ public class SParameter implements Iterable<String> {
 		}
 		return false;
 	}
+	
 	/**
 	 * the lagacy parser.
+	 * 
 	 * @param str string line
 	 * @return string array
 	 */
@@ -285,22 +361,26 @@ public class SParameter implements Iterable<String> {
 		}
 		return vec.toArray(new String[vec.size()]);
 	}
+	
 	/**
-	 * Return the size of arguments.
-	 * @return size
+	 * get size
+	 * 
+	 * @return int size
 	 */
 	public int length() {
 		return v.length;
 	}
 	
 	/**
-	 * @return boolean true if argument is empy, otherwise false.
+	 * @return boolean true if argument is empty, otherwise false.
 	 */
 	public boolean isEmpty() {
 		return v.length == 0;
 	}
+	
 	/**
-	 * get parameters without option starting
+	 * get parameters without option
+	 * 
 	 * @return string array
 	 */
 	public String[] getValidParameters() {
@@ -312,8 +392,10 @@ public class SParameter implements Iterable<String> {
 		}
 		return v_.toArray(new String[v_.size()]);
 	}
+	
 	/**
-	 * get parameters without option starting
+	 * get parameters selected start index
+	 * 
 	 * @param startAt 
 	 * @return string array
 	 */
@@ -328,7 +410,8 @@ public class SParameter implements Iterable<String> {
 	}
 	
 	/**
-	 * get parameters without option starting
+	 * get parameters selected start index with prefix
+	 * 
 	 * @param startAt 
 	 * @param prefix option delimiter
 	 * @return string array
@@ -343,6 +426,28 @@ public class SParameter implements Iterable<String> {
 		return v_.toArray(new String[v_.size()]);
 	}
 	
+	/**
+	 * get parameters with prefix
+	 * 
+	 * @param startAt 
+	 * @param prefix option delimiter
+	 * @return string array
+	 */
+	public String[] getValidParameters(String prefix) {
+		Vector<String> v_ = new Vector<String>();
+		String tmp;
+		for(int i = 0; i < v.length; i ++) {
+			tmp = v[i];
+			if(tmp.startsWith(prefix)) v_.add(tmp);
+		}
+		return v_.toArray(new String[v_.size()]);
+	}
+	
+	/**
+	 * get unparsed string {@link #raw}
+	 * 
+	 * @return string raw
+	 */
 	public String getRaw() {
 		return raw;
 	}

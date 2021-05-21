@@ -18,11 +18,6 @@ public class SprexorVar implements SCommand {
 
 	@Override
 	public int main(IOCenter io, SParameter args, SManager Environment) {
-		if(!Environment.useVariableExpression()) { 
-		System.err.println("ddd");
-		io.out.println("can nont use Variable : disabled");
-		return 1;
-	}
 	int leng_arg = args.length();
 	if(leng_arg >= 1) switch(args.getElement(0)) {
 	case "delete" :

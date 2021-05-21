@@ -27,9 +27,28 @@ import sprexor.v2.standard.parser.DefaultParser;
  */
 public class SManager {
 	
+	/**
+	 * directory that sprexor is started
+	 */
 	static String resourcePath = ClassLoader.getSystemClassLoader().getResource(".").getPath();
+	
+	/**
+	 * parse options using in {@link #run(String, String) run(String command, String options)}
+	 * <pre>
+	 * list : BASIC : call {@link #exec(String)} method, and it must independent.
+	 * <br> USE_VARIABLE : enable to use variable expression
+	 * <br> WRAP_NAME : command ID will support string wrap expression.
+	 * <br> DEBUG : error in command will not be catch.
+	 * <br> ALIAS : use alias
+	 * </pre>
+	 */
 	public static final String[] PARSE_OPTION = {"BASIC", "USE_VARIABLE", "WRAP_NAME", "DEBUG", "ALIAS"};
 	public Object label;
+	
+	/**
+	 * public registry
+	 * @see sprexor.v0.GlobalData
+	 */
 	public GlobalData SystemVar;
 	private boolean open = false;
 	protected ArrayList<String> listObject;
@@ -39,7 +58,6 @@ public class SManager {
 	protected HashMap<String, String> desc;
 	protected HashMap<String, String> versionMap;
 	protected char varChar = '@';
-	protected boolean doBasicSyn = true;
 	protected boolean isInit = true;
 	protected boolean ignoreCase = false;
 	protected boolean belog = false;
@@ -88,15 +106,20 @@ public class SManager {
 		throw new SprexorException(SprexorException.VARIABLE_ERR, SOutputs.nv);
 	}
 	
+	/**
+	 * logging method
+	 * <p>
+	 * NOTE : It is available only that sprexor instance is created by {@link #SManager(String)} constructor.
+	 * 
+	 * @param str
+	 */
 	public void logger(String str) {
 		if(belog)
 			try {
 				logf.write((new Date().toString().concat(" ] ") + str + "\n").getBytes());
 			} catch (IOException e) { }
 	}
-	//
-	//public methods.
-	//
+	
 	public SManager() {
 		 cmd = new HashMap<String, SCommand>();
 		 envVar = new HashMap<String, Object>();
@@ -108,6 +131,11 @@ public class SManager {
 		 iostream = new IOCenter();
 	}
 	
+	/**
+	 * this constructor is used for logging 
+	 * 
+	 * @param logPath directory to logging
+	 */
 	public SManager(String logPath) {
 		 cmd = new HashMap<String, SCommand>();
 		 envVar = new HashMap<String, Object>();
@@ -128,29 +156,69 @@ public class SManager {
 		 
 	}
 	
+	/**
+	 * set Output (PrintStream)
+	 * <p>
+	 * default : {@link System#out}
+	 * 
+	 * @param spo
+	 */
 	public void setOut(PrintStream spo) {
 		if(open) return;
 		iostream.out = spo;
 	}
 	
+	/**
+	 * set Input (Scanner)
+	 * <p>
+	 * default :  {@linkplain Scanner Scanner(System.in)}
+	 * 
+	 * @param spi
+	 */
 	public void setIn(Scanner spi) {
 		if(open) return;
 		iostream.in = spi;
 	}
 	
+	/**
+	 * set parser
+	 * <p>
+	 * default : {@linkplain sprexor.v2.standard.parser.DefaultParser DefaultParser}
+	 * 
+	 * @param sp
+	 */
 	public void setParser(SParser sp) {
 		if(open) return;
 		sparser = sp;
 	}
 	
+	/**
+	 * set variable prefix
+	 * <p>
+	 * default : '@'
+	 * 
+	 * @param prefix
+	 */
 	public void setVariablePrefix(char prefix) {
 		varChar = prefix;
 	}
+	
 	/**
+	 * import classes that implemented 
+	 * {@linkplain sprexor.v2.components.Importable Importable} interface.
+	 * <p>
+	 * If {@linkplain #setup()} was not invoked, refuse to import.
+	 * <p>
+	 * If command is overlapped, that command is not import again.
+	 * <p>
+	 * If required version of command is higher than this Sprexor version, that command is not import.
+	 * <p>
+	 * If can't access to command, that command is not import.
 	 * 
+	 * @param imp Imporable.class
 	 */
 	public void use(Class<? extends Importable> imp) {
-		if(open)return;
+		if(open) return;
 		
 		Spackage sp = imp.getAnnotation(Spackage.class);
 		
@@ -185,7 +253,20 @@ public class SManager {
 	}
 	
 	/**
+	 * import classes that implemented 
+	 * {@linkplain sprexor.v2.components.Importable Importable} interface.
+	 * <p>
+	 * If {@linkplain #setup()} was not invoked, refuse to import.
+	 * <p>
+	 * If command is overlapped, that command is not import again.
+	 * <p>
+	 * If required version of command is higher than this Sprexor version, that command is not import.
+	 * <p>
+	 * If can't access to command, that command is not import.
+	 * <p>
+	 * <b>problem : Type safety: Potential heap pollution via varargs parameter impa</b>
 	 * 
+	 * @param imp Imporable.class array
 	 */
 	public void use(Class<? extends Importable>...impa) {
 		if(open)return;
@@ -223,8 +304,20 @@ public class SManager {
 			desc.put(packname, sp.description());
 		}
 	}
+	
 	/**
+	 * import classes that implemented 
+	 * {@linkplain sprexor.v2.components.Importable Importable} interface dynamically.
+	 * <p>
+	 * If {@linkplain #setup()} was not invoked, refuse to import.
+	 * <p>
+	 * If command is overlapped, that command is not import again.
+	 * <p>
+	 * If required version of command is higher than this Sprexor version, that command is not import.
+	 * <p>
+	 * If can't access to command, that command is not import.
 	 * 
+	 * @param imp Imporable.class
 	 */
 	public void useR(Class<? extends Importable> imp) {
 		if(!open) return;
@@ -253,15 +346,22 @@ public class SManager {
 		}
 		desc.put(packname, sp.description());
 	}
+	
 	/**
+	 * If {@linkplain #setup()} was not invoked, refuse to check.
 	 * 
+	 * @return boolean true if command is exist, else false.
 	 */
 	public boolean isExist(String s) {
 		if(!open)return false;
 		return cmd.containsKey(s);
 	}
+	
 	/**
-	 * get a description
+	 * get a command description, if description not defined, default value is blank.
+	 * <p>
+	 * see {@linkplain sprexor.v2.components.annotations.CommandInfo CommandInfo}
+	 * 
 	 * @param cmdName
 	 * @return string
 	 */
@@ -269,9 +369,12 @@ public class SManager {
 		if(desc.containsKey(cmdName) && open) return desc.get(cmdName);
 		return "";
 	}
+	
 	/**
 	 * If all configure finished, then be able to run command line. This means settings of sprexor prevent to modify secretly.
-	 * <br><b><span style="color:ff00ff">SIGN : It cannot be used after activate.</span></b>
+	 * <p>
+	 * If {@linkplain #setup()} was invoked, refuse to setup.
+	 * 
 	 * @throws SprexorException 
 	 * @since 0.2.3
 	 */
@@ -295,16 +398,24 @@ public class SManager {
 		open = !open;
 		logger("< INFO > Sprexor setup successful");
 	}
+	
 	/**
 	 * get list of usable commands
+	 * 
 	 * @return string array
 	 */
 	public String[] getList() {
 		return cmd.keySet().toArray(new String[cmd.size()]);
 	}
+	
 	/**
 	 * @deprecated
 	 * replaced by {@link SManager#use(Class)} 
+	 * <p>
+	 * register a command quickly.
+	 * <p>
+	 * If {@linkplain #setup()} was invoked, refuse to register.
+	 * 
 	 * @since 0.1
 	 */
 	@Deprecated
@@ -315,11 +426,15 @@ public class SManager {
 		cmd.put(str, cp);
 	}
 	
+	/**
+	 * copy sprexor with deep copy.
+	 * 
+	 * @return new SManager instance
+	 */
 	public SManager copySprexor() {
 		SManager newInstance = new SManager();
 		newInstance.cmd = cmd;
 		newInstance.desc = desc;
-		newInstance.doBasicSyn = doBasicSyn;
 		newInstance.envVar = envVar;
 		newInstance.iostream = iostream;
 		newInstance.label = label;
@@ -327,32 +442,68 @@ public class SManager {
 		return newInstance;
 	}
 	
+	/**
+	 * put a variable
+	 * <p>
+	 * If already exists, not put a variable.
+	 * 
+	 * @param key
+	 * @param value
+	 */
 	public void putVariable(String key, String value) {
 		if(envVar.containsKey(key)) return;
 		envVar.put(key, value);
 	}
 	
+	/**
+	 * set a value of variable
+	 * <p>
+	 * If variable is not exist, put a variable instead.
+	 * 
+	 * @param key
+	 * @param newValue
+	 */
 	public void setVariable(String key, String newValue) {
 		if(envVar.containsKey(key)) envVar.replace(key, newValue);
 		else envVar.put(key, newValue);
 	}
 	
+	/**
+	 * delete a variable
+	 * 
+	 * @param key key name
+	 * @return boolean true if variable was deleted, else false.
+	 */
 	public boolean deleteVariable(String key) {
 		return null != envVar.remove(key);
 	}
 	
+	/**
+	 * check existence of variable
+	 * 
+	 * @param key key name
+	 * @return true if variable is exist, else false.
+	 */
 	public boolean ExistsVariable(String key) {
 		return envVar.containsKey(key);
 	}
 	
-	public boolean useVariableExpression() {
-		return doBasicSyn;
-	}
-	
+	/**
+	 * get command version
+	 * 
+	 * @param cmdName command name
+	 * @return String version
+	 */
 	public String getVersion(String cmdName) {
 		return versionMap.get(cmdName);
 	}
 	
+	/**
+	 * merge with other sprexor
+	 * 
+	 * @param sm
+	 * @return true if merged successful, else false.
+	 */
 	public boolean merge(SManager sm) {
 		if(!open) return false;
 		if(this.hashCode() == sm.hashCode()) return false;
@@ -361,6 +512,11 @@ public class SManager {
 		return true;
 	}
 	
+	/**
+	 * clear log file
+	 * <p>
+	 * NOTE : It is available only that sprexor instance is created by {@link #SManager(String)} constructor.
+	 */
 	public void clearLog() {
 		File f = new File(logPath);
 		if(belog) {
@@ -371,15 +527,29 @@ public class SManager {
 		}
 	}
 	
+	/**
+	 * execute a command line lightly.
+	 * 
+	 * @param com SCommand 
+	 * @param args string arguments
+	 * @return exit code
+	 * @since 1.0
+	 */
 	public int exec(SCommand com, String[] args) {
 		return com.main(iostream, new SParameter(args), this);
 	}
+	
 	/**
-	 * execute command line lightly.
-	 * @param id : command name
-	 * @param args : arguments
-	 * @throws SprexorException 
-	 * @since 0.2.3
+	 * execute a command line lightly.
+	 * <p>
+	 * If {@linkplain #setup()} was not invoked, refuse to execute.
+	 * 
+	 * @param id command name
+	 * @param args string arguments
+	 * @throws SprexorException activation_failed : setup was not invoked.
+	 * <br> cmd_not_found : command is not found.
+	 * 
+	 * @since 0.2
 	 */
 	public int exec(String id, String[] args) throws SprexorException {
 		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, "");
@@ -392,11 +562,16 @@ public class SManager {
 		int i = obj.main(iostream, new SParameter(args), this);
 		return i;
 	}
+	
 	/**
-	 * run a command line lightly.
-	 * <br> and it will be run that you configured.
+	 * execute a command line lightly.
+	 * <p>
+	 * If {@linkplain #setup()} was not invoked, refuse to execute.
+	 * 
 	 * @param com : command string to execute
-	 * @throws SprexorException 
+	 * @throws SprexorException activation_failed : setup was not invoked.
+	 * <br> cmd_not_found : command is not found.
+	 * 
 	 * @since 0.1
 	 */
 	public int exec(String com) throws SprexorException {
@@ -411,15 +586,23 @@ public class SManager {
 		SParameter component = new SParameter(sparser.processing(com));
 		return cmd.get(id).main(iostream, component, this);
 	}
+	
 	/**
-	 * It run a line with powerful string parser but, unstable.
-	 * <br> And it will be run that configured. 
+	 * run a command line with powerful string parser and many features.
+	 * <p>
+	 * <p>
+	 * If {@linkplain #setup()} was not invoked, refuse to run.
+	 * 
 	 * @param input
-	 * @param options string split by semicolon (;)
-	 * BASIC : use basic way, and this option shouldn't along with other options.
+	 * @param options string split by semicolon (;), see {@linkplain #PARSE_OPTION}
 	 * @return int : exit code
-	 * @since 0.2.18
-	 * @throws SprexorException
+	 * @throws SprexorException activation_failed : setup was not invoked.
+	 * <br> cmd_not_found : command is not found.
+	 * <br> internal_error
+	 * <br> express_error : if syntax is wrong, this message will be showed.
+	 * <br> variable_error : no variable
+	 * 
+	 * @since 0.2
 	 */
 	synchronized public int run(String input, String options) throws SprexorException {
 		if(!open) throw new SprexorException(SprexorException.ACTIVATION_FAILED, SOutputs.act);
