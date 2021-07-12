@@ -8,7 +8,7 @@
 >30% 완료됨.
 >V1 은 1세대 Sprexor 소프트웨어입니다.
 
->- [Nere](./V1/Core.md)
+>- [Core](./V1/Core.md)
 >- [IOCenter](./V1/NIOCenter.md)
 >- [GlobalData](./V1/GlobalData.md)
 >- [Lib](./V1/Lib.md)
