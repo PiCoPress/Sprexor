@@ -8,32 +8,29 @@ Sprexor is a Library that creates commands and runs a command line in Java.
 It has a lot of libraries, functions, and customizing tools to use in many of purpose easily.
 
 
-# Downloads
-1.0.0 developing...
-- no release
-
-
 # See Documentation
-documenting...
-- [English](./docs/lang-en/README.md)
-- [Korean](./docs/lang-kr/README.md)
+- [English](./docs/lang-en/README.md) - 0% completed
+- [Korean](./docs/lang-kr/README.md) - 5% completed
 
 
 ## How to use 
-`Requirement : JDK-14.0.2`
+`Requirement : JDK-14.0.2 or later`
 <a href="https://www.oracle.com/kr/java/technologies/javase/jdk14-archive-downloads.html" target="_blank">Download JDK14</a>
 
-There are three ways to make and run command with Sprexor.
+*V1*
 
-**V0**
+>[example code - English](./docs/lang-en/V1/ex.md)
 
-```java
+>[example code - Korean](./docs/lang-kr/V1/ex.md)
 
-```
-**V1**
+*V2*
 
-```java
+>[example code - English](./docs/lang-en/V2/ex.md)
 
-```
-**V2**
+>[example code - Korean](./docs/lang-kr/V2/ex.md)
 
+*V3*
+
+>[example code - English](./docs/lang-en/V3/ex.md)
+
+>[example code - Korean](./docs/lang-kr/V3/ex.md)
