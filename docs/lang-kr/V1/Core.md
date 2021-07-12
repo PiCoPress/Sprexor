@@ -7,13 +7,21 @@ public final class Core
 - 상수 *codename*
 
 1.[initScope](#public-initscope)
+
 2.[isExist](#public-isexist)
+
 3.[send](#public-send)
+
 4.[activate](#public-activate)
+
 5.[getList](#public-getlist)
+
 6.[register](#public-register)
+
 7.[setComment](#public-setcomment)
+
 8.[useSyntax](#public-usesyntax)
+
 9.[exec](#public-exec)
 
 ## `public initScope`
