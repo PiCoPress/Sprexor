@@ -3,7 +3,7 @@ package sprexor.v3;
 import java.util.HashMap;
 
 /*
- * if last char of keyName is '_', read-only data that cannot modify or remove.
+ * It is a value that cannot modify or remove if last char is '_'.
  * 
  */
 

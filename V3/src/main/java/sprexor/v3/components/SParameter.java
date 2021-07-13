@@ -84,7 +84,8 @@ public final class SParameter implements Iterable<String> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for(String str : v) {
-			sb.append(str).append(" ");
+			if(str.contains(" "))sb.append("\"").append(str).append("\" ");
+			else sb.append(str).append(" ");
 		}
 		return sb.toString();
 	}

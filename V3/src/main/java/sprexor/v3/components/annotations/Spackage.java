@@ -10,6 +10,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+
+/**
+ * description()
+ * packageName()
+ * ref()
+ */
 public @interface Spackage {
 	public String description() default "no description";
 	public String packageName();

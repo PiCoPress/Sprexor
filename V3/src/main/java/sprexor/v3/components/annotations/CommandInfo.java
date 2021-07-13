@@ -9,8 +9,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+/**
+ * name()
+ * version()
+ * targetVersion()
+ */
 public @interface CommandInfo {
 	public String name();
 	public String version() default "0.0.1";
-	public String targetVersion() default "1.0.0";
+	public String targetVersion() default "3.0.0";
 }

@@ -34,7 +34,7 @@ public final class Core
 ## `public isExist`
 > *str*이라는 이름을 가진 명령어가 있는지 확인합니다.
 > 
->*반환* : boolean
+>*반환* : boolean / 
 >존재하면 *true*, 그렇지 않으면 *false*
 >
 >|Arguments|Type|Detail|
@@ -75,7 +75,7 @@ public final class Core
 >*@Deprecated*
 >등록된 명령어 목록을 출력합니다.
 >
->*반환* : String
+>*반환* : String / 
 >빈 문자열을 출력함.
 
 ---
@@ -145,3 +145,6 @@ public final class Core
 >|--|--|--|
 >|in|boolean Array| .|
 >|num|int|새 배열의 크기|
+
+---
+
