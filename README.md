@@ -4,7 +4,7 @@
 <img src='https://raw.githubusercontent.com/PiCoPress/Sprexor/master/docs/img/Sprexor_mono.png' width='400'>
 
 # Sprexor CommandLine Library
-Sprexor is a Library that creates commands and runs a command line in Java.
+Sprexor is a Library what creates commands and runs a command line in Java.
 It has a lot of libraries, functions, and customizing tools to use in many of purpose easily.
 
 
